@@ -1,0 +1,140 @@
+package Engine;
+
+import java.io.File;
+import java.io.IOException;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.BooleanControl;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.FloatControl;
+import javax.sound.sampled.UnsupportedAudioFileException;
+
+
+/**
+ * This class is used to create sound object throughout the simulation. Each sound object takes an audio file
+ * and has several methods to manipulate this file. It contains a loop, play, stop, change song, mute, unmute, 
+ * low medium and high volume method. The class implements the Serializable interface.
+ * @author Team Barracuda
+ *
+ */
+public class Sound implements  java.io.Serializable {
+	/**
+	 *  This variable contains the path for the sound file used.
+	 */
+	private String SongPath; 
+	/**
+	 * Clip that is used as a sound player which loads audio data prior before playback.
+	 */
+	private Clip clip;		
+	/**
+	 * audioIn turns an audio file into a suitable data type for the program to read.
+	 */
+	private AudioInputStream audioIn;
+	/**
+	 * Field to control the volume of the sound. FloatControl uses the clip class to 
+	 * manipulate the sound to be able to adjust volume.
+	 */
+	private FloatControl VolumeControl; 
+	/**
+	 * Field to control whether the volume mutes or not . BooleanControl takes an object of
+	 * Clip and can manipulate the sound to produce several methods regarding mute.
+	 * 
+	 */
+	private BooleanControl MuteControl;
+	
+	
+	/**
+	 * This constructor acquire the audio file specified in the parameters via the file path and turns it into an audio stream.
+	 * The audio stream is then used in the clip instance which in turn is used by the float control class.
+	 * @param SongPath This parameter holds a string which is the audio file path used for sound
+	 */
+	public Sound(String SongPath) {
+		this.SongPath = SongPath;
+		initialiseAudioIn();
+	}
+	
+	/**
+	 * The method reloading the sound
+	 * 		solution to the near-handing-in problem of sound not playing if play() is invoked a second time
+	 */
+	public void initialiseAudioIn(){
+		try {
+			//File soundFile = new File(GameEngine.class.getResource(SongPath));
+			audioIn = AudioSystem.getAudioInputStream(GameEngine.class.getResource(SongPath));
+		} catch (UnsupportedAudioFileException | IOException e) {
+			System.err.println(e.getMessage());
+			e.printStackTrace();
+		}
+		try{
+			clip = AudioSystem.getClip();
+			clip.open(audioIn);
+			VolumeControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+			MuteControl = (BooleanControl) clip.getControl(BooleanControl.Type.MUTE);
+		} catch(Exception e) {System.err.println(e.getMessage());}
+	}
+	
+	/**
+	 * Method to that continually plays the audio.
+	 */
+	public void loopMusic() {	
+			initialiseAudioIn();
+			clip.stop();
+			clip.loop(Clip.LOOP_CONTINUOUSLY);
+	}
+	
+	/**
+	 * Method that plays the audio once.
+	 */
+	public void play() {
+			initialiseAudioIn();
+			clip.stop();
+			clip.start();
+	}
+	
+	/**
+	 * Method that stops playing the audio.
+	 */
+	public void stop()   {
+			initialiseAudioIn();
+			clip.stop();
+	}
+	
+	/**
+	 * Method that changes the song to be played.
+	 * @param SongPath this string contains the path of the new audio file to be played
+	 */
+	
+	public void changeSong(String SongPath) {
+		clip.stop();
+		this.SongPath = SongPath;
+	}
+	
+	/**
+	 * Method to set the volume to low level.
+	 */
+	public void lowVolume() {VolumeControl.setValue(-16.0f);} 
+	
+	/**
+	 * Method to set the volume to medium level.
+	 */
+	public void medVolume() {VolumeControl.setValue(-8.0f);} 
+	
+	/**
+	 * Method to set the volume to high level.
+	 */
+	public void highVolume() {VolumeControl.setValue(0.0f);} 
+	
+	/**
+	 * Method to mute the sound.
+	 */
+	public void muteVolume() {MuteControl.setValue(true);} 
+	
+	/**
+	 * Method to unmute the sound.
+	 */
+	public void unmuteVolume() {MuteControl.setValue(false);}
+	
+	
+}	
+
+	

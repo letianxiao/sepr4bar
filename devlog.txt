@@ -1,0 +1,10 @@
+Devlog for dab's final stage in SEPR
+
+Done:
+got acquainted with Maven
+
+Current goals:
+import existing project into new Maven + Netbeans environment
+DONE - problem: use maven way of accessing resources
+
+setup git repo after
