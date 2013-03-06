@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  *
  * @author james
  */
-public class Valve {
+public abstract class Valve {
 
     @JsonProperty
     private boolean open = true;

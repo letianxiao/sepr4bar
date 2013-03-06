@@ -26,12 +26,14 @@ public class Reactor extends FailableComponent {
     private Temperature temperature;
     @JsonProperty
     private Pressure pressure;
+    // TODO: used locally in step(), do not remove this todo until told author of his stupidity
     @JsonProperty
     private Density steamDensity;
     @JsonProperty
     private Port outputPort = new Port();
     @JsonProperty
     private Port inputPort = new Port();
+    // TODO: used locally in step(); see above
     @JsonProperty
     private double boilingPtAtPressure;
     @JsonProperty
@@ -40,7 +42,7 @@ public class Reactor extends FailableComponent {
     /**
      *
      */
-    public Reactor() {
+    public Reactor() { // TODO: call full constructor with default values from this one
         super();
         fuelPile.moveControlRods(new Percentage(0));
         waterMass = maximumWaterMass;
@@ -264,6 +266,7 @@ public class Reactor extends FailableComponent {
     /**
      *
      * Avoid issues with floating-point error
+     * TODO: investigate this hackery
      */
     private void correctWaterMass() {
         if (waterMass.inKilograms() > maximumWaterMass.inKilograms()) {

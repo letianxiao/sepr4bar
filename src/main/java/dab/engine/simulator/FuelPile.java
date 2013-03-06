@@ -15,6 +15,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "@class")
 public class FuelPile {
 
+    // TODO: should this be a JsonProperty also or...?
     private final int maximumOutput = 20000000;
     @JsonProperty
     private Percentage controlRodPosition = new Percentage(0);
