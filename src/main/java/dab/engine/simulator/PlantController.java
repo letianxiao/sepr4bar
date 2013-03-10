@@ -2,7 +2,7 @@ package dab.engine.simulator;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import dab.engine.utilities.Percentage;
-import icarus.seprphase2.GameOverException;
+import dab.engine.seprphase2.GameOverException;
 
 import java.io.IOException;
 

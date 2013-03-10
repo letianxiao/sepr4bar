@@ -113,9 +113,10 @@ class CvStory extends Canvas
 
     CvStory () throws IOException
     {
-        //File f2 = new File("resources/WelcomeStory.txt");
-        //System.out.println(f2.getAbsolutePath());
+        File f2 = new File("resources/WelcomeStory.txt");
+        System.out.println(f2.getAbsolutePath());
         ReadFile f = new ReadFile ("resources/WelcomeStory.txt");
+      
 
         storyTxt = f.getStory ();
         storySize = f.getSize ();

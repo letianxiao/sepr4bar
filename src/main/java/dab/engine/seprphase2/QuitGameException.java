@@ -1,4 +1,4 @@
-package icarus.seprphase2;
+package dab.engine.seprphase2;
 
 /**
  * Exception thrown to quit the current game and return to the top-level menu
