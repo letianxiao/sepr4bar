@@ -27,6 +27,10 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
  *	Water and steam is transferred between the Reactor, Turbine and Condenser through Pumps
  *	and Connections.
  *
+ * TODO:  refactor turbine to reactor, heatsink to blabla code
+ * TODO2: bitch to David about using json and failing massively.
+ * TODO3: it's still buggy, find what that is all about...
+ * 
  * @author Marius
  */
 @JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
@@ -41,15 +45,7 @@ public class PhysicalModel implements PlantController, PlantStatus {
     @JsonProperty
     private Condenser condenser = new Condenser();
     @JsonProperty
-    private Energy energyGenerated = joules(0);
-    @JsonProperty
-    private Connection reactorToTurbine;
-    @JsonProperty
-    private Connection turbineToCondenser;
-    @JsonProperty
-    private Pump condenserToReactor;
-    @JsonProperty
-    private Pump heatsinkToCondenser;
+    private Energy energyGenerated = joules(0); 
     @JsonProperty
     private String username;
     @JsonProperty
@@ -67,6 +63,11 @@ public class PhysicalModel implements PlantController, PlantStatus {
      */
     public PhysicalModel() {
 
+            Connection reactorToTurbine;
+            Connection turbineToCondenser;
+            Pump condenserToReactor;
+            Pump heatsinkToCondenser;
+        
         heatSink = new HeatSink();
 
         allPumps = new HashMap<Integer, Pump>();
@@ -155,13 +156,22 @@ public class PhysicalModel implements PlantController, PlantStatus {
             turbine.step();
             condenser.step();
             energyGenerated = joules(energyGenerated.inJoules() + turbine.outputPower());
-            reactorToTurbine.step();
-            turbineToCondenser.step();
-            condenserToReactor.step();
-            heatsinkToCondenser.step();
+            
+            getReactorToTurbineConnection().step();
+            getTurbineToCondenser().step();
+            getCondenserToReactor().step();
+            getHeatsinkToCondenser().step();
         }
     }
-
+    
+    protected Connection getReactorToTurbineConnection() {
+        return allConnections.get(1);
+    }
+    
+    protected Connection getTurbineToCondenser() {
+        return allConnections.get(2);
+    }
+    
     /**
      *
      * @param percent % to move control rods
@@ -279,7 +289,7 @@ public class PhysicalModel implements PlantController, PlantStatus {
      */
     @Override
     public void setReactorToTurbine(boolean open) {
-        reactorToTurbine.setOpen(open);
+        allConnections.get(1).setOpen(open);
     }
 
     /**
@@ -288,7 +298,7 @@ public class PhysicalModel implements PlantController, PlantStatus {
      */
     @Override
     public boolean getReactorToTurbine() {
-        return reactorToTurbine.getOpen();
+        return allConnections.get(1).getOpen();
     }
     /**
      *
@@ -300,9 +310,17 @@ public class PhysicalModel implements PlantController, PlantStatus {
         c.add(0, turbine);
         c.add(1, reactor);
         c.add(2, condenser);
-        c.add(3, condenserToReactor);
-        c.add(4, heatsinkToCondenser);
+        c.add(3, getCondenserToReactor());
+        c.add(4, getHeatsinkToCondenser());
         return c;
+    }
+    
+    protected Pump getCondenserToReactor() {
+        return allPumps.get(1);
+    }
+    
+    protected Pump getHeatsinkToCondenser() {
+        return allPumps.get(2);
     }
 
     /**

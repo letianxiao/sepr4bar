@@ -18,14 +18,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
  */
 public class SaveGame {
 
-    @JsonProperty
-    private PhysicalModel physicalModel;
-    @JsonProperty
-    private String userName;
-
-    private SaveGame() {
-    }
-
     /**
      * Load a specified saved game
      *  @param String
@@ -34,6 +26,14 @@ public class SaveGame {
     public static SaveGame load(String filename) throws JsonParseException, IOException {
         Persistence p = new Persistence();
         return p.deserializeSaveGame(FileSystem.readString(filename));
+    }
+
+    @JsonProperty
+    private PhysicalModel physicalModel;
+    @JsonProperty
+    private String userName;
+
+    private SaveGame() {
     }
 
     /**
@@ -46,6 +46,7 @@ public class SaveGame {
         this.physicalModel = physicalModel;
         this.userName = userName;
     }
+
     /**
      * Serialize the saved game
      * @throws JsonProcessingException, FileNotFoundException, IOException
@@ -56,7 +57,6 @@ public class SaveGame {
         FileSystem.createSavePath();
         FileSystem.writeString(fileName(), data);
     }
-
     /**
      * Get the name of the user
      *  @return String
