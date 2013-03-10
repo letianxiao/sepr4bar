@@ -5,7 +5,7 @@ import dab.engine.utilities.Energy;
 import dab.engine.utilities.Percentage;
 import dab.engine.utilities.Pressure;
 import dab.engine.utilities.Temperature;
-import icarus.seprphase2.GameOverException;
+import dab.engine.seprphase2.GameOverException;
 
 import java.util.ArrayList;
 import java.util.Random;

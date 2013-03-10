@@ -3,7 +3,7 @@ package dab.engine.simulator;
 import static dab.engine.simulator.PhysicalConstants.*;
 import static dab.engine.utilities.Units.*;
 import dab.engine.utilities.*;
-import icarus.seprphase2.GameOverException;
+import dab.engine.seprphase2.GameOverException;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

@@ -13,7 +13,7 @@ import dab.gui.sound.Sounds;
 import dab.engine.utilities.Percentage;
 import dab.engine.utilities.Pressure;
 
-import icarus.seprphase2.GameOverException;
+import dab.engine.seprphase2.GameOverException;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
