@@ -1,5 +1,0 @@
-Component		Pump1		Pump2		Reactor		Turbine		Condenser
-Top Left		345, 475	660, 520	020, 188	438, 025	461,285
-Bottom Right	418, 548	733, 592	260, 508	527, 194	654,603
-Size Vals		73
-Image size: 960x635
