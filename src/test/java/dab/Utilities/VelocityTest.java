@@ -2,14 +2,10 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package icarus.Utilities;
+package dab.Utilities;
 
-import icarus.Utilities.Velocity;
+import dab.engine.utilities.Velocity;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.junit.Assert.*;

@@ -2,11 +2,10 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package icarus.Utilities;
+package dab.Utilities;
 
+import dab.engine.utilities.Format;
 import static org.junit.Assert.*;
-import icarus.Utilities.Format;
-
 import org.junit.Test;
 
 
