@@ -2,17 +2,11 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package icarus.Utilities;
+package dab.Utilities;
 
-import icarus.Utilities.Density;
-
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
+import dab.engine.utilities.Density;
 import static org.junit.Assert.*;
+import org.junit.Test;
 
 /**
  *

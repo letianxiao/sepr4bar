@@ -1,10 +1,9 @@
-package icarus.Utilities;
+package dab.Utilities;
 
+import dab.engine.utilities.Percentage;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-
-import org.junit.Ignore;
 import org.junit.Test;
 
 

@@ -2,16 +2,14 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package icarus.Simulator;
+package dab.Simulator;
 
-import icarus.Simulator.FuelPile;
-import icarus.Utilities.Percentage;
+import dab.engine.simulator.FuelPile;
+import dab.engine.utilities.Percentage;
 import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
 import static org.junit.Assert.*;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  *

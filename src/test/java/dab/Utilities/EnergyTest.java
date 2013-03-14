@@ -2,13 +2,11 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package icarus.Utilities;
+package dab.Utilities;
 
-import icarus.Utilities.Energy;
-
-import org.junit.Test;
-
+import dab.engine.utilities.Energy;
 import static org.junit.Assert.*;
+import org.junit.Test;
 
 /**
  *
