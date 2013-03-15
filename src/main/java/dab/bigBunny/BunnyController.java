@@ -1,5 +1,7 @@
 package dab.bigBunny;
 
+import java.awt.Point;
+
 public class BunnyController {
 
     int rotation;
@@ -9,8 +11,10 @@ public class BunnyController {
     final double defAcceleration = 0.4;
     final double breakingAcceleration = -1;
     final double noramlStopping = -0.5;
+    Environment environment;
+    int radius;
 
-    BunnyController() {
+    BunnyController(Environment environment, int radius) {
         x = 100;
         y = 100;
         rotation = 0;
@@ -19,7 +23,8 @@ public class BunnyController {
         rotateRight = false;
         speed = 1;
         braking = false;
-
+        this.environment = environment;
+        this.radius = radius;
     }
 
     public void step() {
@@ -68,7 +73,7 @@ public class BunnyController {
 
     //Do not Go outside the game!!
     public void moveForward(boolean forw) {
-        double acceleration = 0;
+        double acceleration;
         if (forward && !braking) {
             acceleration = defAcceleration;
         } else if (braking) {
@@ -76,12 +81,28 @@ public class BunnyController {
         } else {
             acceleration = noramlStopping;
         }
-        speed = speed + acceleration;
+        
+        Slime intersected = environment.intersectWithSlime(new Point(getX(), getY()), radius);
+        if (intersected != null) {
+            System.out.println("Intersected with " + intersected.toString());
+            // BAD CODE!!!
+            if (speed > 2) {
+                acceleration = -1 * (intersected.getFreshness() + 0.5);
+            } else {
+                acceleration /= 2;
+            }
+        }
+        
+        System.out.println(String.format("speed: %f, acc: %f", speed, acceleration));
+        
+        speed += acceleration;
         if (speed < 0) {
             speed = 0;
         }
-        x = x + speed * Math.cos(Math.toRadians(rotation));
-        y = y + speed * Math.sin(Math.toRadians(rotation));
+        x += speed * Math.cos(Math.toRadians(rotation));
+        y += speed * Math.sin(Math.toRadians(rotation));
+        
+       
     }
 
     public void startBrake() {
