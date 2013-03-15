@@ -51,7 +51,7 @@ public class Temperature {
 
     @Override
     public String toString() {
-        return Format.toTwoDecimalPlaces(inCelsius()) + degreeSign + "C";
+        return Format.toTwoDecimalPlaces(inKelvin()) + degreeSign + "K";
     }
 
     @Override

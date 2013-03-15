@@ -33,6 +33,7 @@ public class Reactor extends FailableComponent {
     private Port outputPort = new Port();
     @JsonProperty
     private Port inputPort = new Port();
+    
     // TODO: used locally in step(); see above
     @JsonProperty
     private double boilingPtAtPressure;
@@ -115,6 +116,7 @@ public class Reactor extends FailableComponent {
      */
     public void step() throws GameOverException {
 
+        System.out.println(inputPort.mass.inKilograms());
         if (steamMass.inKilograms() > inputPort.mass.inKilograms()) {
             steamMass = steamMass.minus(inputPort.mass);
             waterMass = waterMass.plus(inputPort.mass);
@@ -136,8 +138,15 @@ public class Reactor extends FailableComponent {
          * then it calculates the needed enegry to reach that boiling point
          */
 
+        double old = boilingPtAtPressure;
+        // FIXME: when bug occurs boilingPtAtPressure always > temperature
+        // therefore it thinks that the water is not boiling and therefore not converting
+        // it into steam. Because it doesn't convert it into steam,
+        // the pressure accumulates
         boilingPtAtPressure = boilingPointOfWater + 10 * Math.log(pressure.inPascals() / atmosphericPressure);
-
+        if (boilingPtAtPressure - old < 0.3)
+            System.out.println("BROKE");
+        
         neededEnergy = (boilingPtAtPressure - temperature.inKelvin()) * waterMass.inKilograms() * specificHeatOfWater;
 
 
@@ -195,8 +204,9 @@ public class Reactor extends FailableComponent {
         /*
          * Calculates component wear after a time step
          */
-
         stepWear();
+        
+        //System.out.println(temperature.toString());
     }
 
     /**

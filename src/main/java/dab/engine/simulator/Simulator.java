@@ -122,6 +122,7 @@ public class Simulator implements PlantController, PlantStatus, GameManager {
         try {
             failureModel.step();
         } catch (GameOverException e) {
+            // FIXME: shouldn't it be sufficient to just throw the gameover exception
             throw new GameOverException("Dear " + userName + ",\n\n" +
                     "YOU HAVE FAILED\n\n" +
                     "The reactor vessel has failed catastrophically,\n"+

@@ -38,7 +38,7 @@ public class FailureModel implements PlantController, PlantStatus {
     private Random failChance = new Random();
     @JsonProperty
     private int numberOfTimesWaterLevelIsTooLow;
-    private final int reactorOverheatThreshold = 8;
+    private static int reactorOverheatThreshold = 8;
     private final Pressure condenserMaxPressure = new Pressure(30662500);
     private SoftFailReport lastFailReport = new SoftFailReport();
     private ArrayList<FailableComponent> repairList = new ArrayList<FailableComponent>();
@@ -65,6 +65,13 @@ public class FailureModel implements PlantController, PlantStatus {
         checkCondenserPressure();
         checkTurbineFailure();
     }
+    
+    
+    @Override
+    public void step(int i) throws GameOverException {
+        throw new RuntimeException("Oups... shouldn't call this one!");
+        //controller.step(i);
+    }
 
     /**
      * Method to determine failures
@@ -78,6 +85,7 @@ public class FailureModel implements PlantController, PlantStatus {
             componentsFailChance += components.get(i).wear().points() / components.size();
             if (componentsFailChance > failValue) {
                 components.get(i).fail();
+                
                 break; //We only want to induce one hardware failure! Break here.
             }
 
@@ -209,10 +217,6 @@ public class FailureModel implements PlantController, PlantStatus {
         controller.failReactor();
     }
 
-    @Override
-    public void step(int i) throws GameOverException {
-        controller.step(i);
-    }
 
     @Override
     public boolean turbineHasFailed() {
@@ -229,6 +233,7 @@ public class FailureModel implements PlantController, PlantStatus {
      */
     private void checkReactorWaterLevel() {
         if (status.reactorWaterLevel().points() < status.reactorMinimumWaterLevel().points()) {
+            System.out.println(numberOfTimesWaterLevelIsTooLow);
             numberOfTimesWaterLevelIsTooLow += 1;
             if (numberOfTimesWaterLevelIsTooLow > reactorOverheatThreshold) {
                 controller.failReactor();

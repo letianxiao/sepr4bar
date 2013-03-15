@@ -1,10 +1,8 @@
 package dab.engine.simulator;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import dab.engine.utilities.Percentage;
 import dab.engine.seprphase2.GameOverException;
 
-import java.io.IOException;
 
 /**
  *

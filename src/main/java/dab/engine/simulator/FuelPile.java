@@ -39,6 +39,11 @@ public class FuelPile {
         return (int)(maximumOutput * controlRodPosition.ratio() * seconds + 3000000);
     }
 
+    @Override
+    public String toString() {
+        return String.valueOf(output(1));
+    }
+    
     /**
      *
      * @return Returns the control rod height position

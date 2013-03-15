@@ -83,6 +83,17 @@ public class InterfaceController extends JPanel implements Observer, FixObserver
             public void actionPerformed(ActionEvent evt){
                 try {
                     simulator.step();
+                    
+                    // FIXME: insta repair
+                    try {
+                    simulator.repairCondenser();
+                    simulator.repairPump(1);
+                    simulator.repairPump(2);
+                    simulator.repairTurbine();
+                    } catch (CannotRepairException e) {}
+                    catch (KeyNotFoundException e) {}
+                    
+                     
                     infoPanel.setText("<html>Control Rod Position "+ (Integer.parseInt((simulator.controlRodPosition().toString()))*2)+"<br>"+  //this lines throws a NullPointerException at the moment
                             "<br>"+   "Reactor Water Level "+ simulator.reactorWaterLevel()+"<br>"+"Reactor Temperature "+ simulator.reactorTemperature()+
                             "<br>"+"Reactor Pressure "+ simulator.reactorPressure()+"<br>"+ "<br>"+"Condenser Water Level "+ simulator.condenserWaterLevel()+
@@ -323,6 +334,7 @@ public class InterfaceController extends JPanel implements Observer, FixObserver
             e.printStackTrace();
         } catch (CannotControlException e) {
         }
+        
         screenUpdate();
     }
     class EscapeListener implements ActionListener {
