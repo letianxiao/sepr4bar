@@ -43,5 +43,12 @@
       <version>1.3</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit-dep</artifactId>
+      <version>4.4</version>
+      <scope>test</scope>
+      <type>jar</type>
+    </dependency>
   </dependencies>
 </project>
