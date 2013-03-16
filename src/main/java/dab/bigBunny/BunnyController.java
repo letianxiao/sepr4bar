@@ -4,15 +4,16 @@ import java.awt.Point;
 
 public class BunnyController {
 
-    int rotation;
-    double x, y, speed;
-    boolean forward, rotateLeft, rotateRight, braking;
-    final int rotationAmount = 5;
-    final double defAcceleration = 0.4;
-    final double breakingAcceleration = -1;
-    final double noramlStopping = -0.5;
-    Environment environment;
-    int radius;
+    private int rotation;
+    private double x, y, speed;
+    private boolean forward, rotateLeft, rotateRight, braking;
+    private final int rotationAmount = 5;
+    private final double defAcceleration = 0.4;
+    private final double breakingAcceleration = -1;
+    private final double noramlStopping = -0.5;
+    private Environment environment;
+    private int radius;
+    private int health;
 
     BunnyController(Environment environment, int radius) {
         x = 100;
@@ -25,6 +26,7 @@ public class BunnyController {
         braking = false;
         this.environment = environment;
         this.radius = radius;
+        health = 100;
     }
 
     public void step() {
@@ -84,7 +86,7 @@ public class BunnyController {
         
         Slime intersected = environment.intersectWithSlime(new Point(getX(), getY()), radius);
         if (intersected != null) {
-            System.out.println("Intersected with " + intersected.toString());
+           // System.out.println("Intersected with " + intersected.toString());
             // BAD CODE!!!
             if (speed > 2) {
                 acceleration = -1 * (intersected.getFreshness() + 0.5);
@@ -93,7 +95,7 @@ public class BunnyController {
             }
         }
         
-        System.out.println(String.format("speed: %f, acc: %f", speed, acceleration));
+       // System.out.println(String.format("speed: %f, acc: %f", speed, acceleration));
         
         speed += acceleration;
         if (speed < 0) {
@@ -113,6 +115,16 @@ public class BunnyController {
         braking = false;
     }
 
+    public void hasBeenShot(){
+        health --;
+        System.out.println(health);
+        if(health <= 0){
+            
+           //Nice animation of dying bunny, and gameover
+       
+        }
+    }
+    
     public int getX() {
         return (int) x;
     }
@@ -120,8 +132,20 @@ public class BunnyController {
     public int getY() {
         return (int) y;
     }
+    
+    public Point getCoordinates(){
+        return (new Point(getX(),getY()));
+    }
 
     public int getRotation() {
         return rotation;
+    }
+    
+    public int getHealth(){
+        return health;
+    }
+    
+    public int getRadius(){
+        return radius;
     }
 }

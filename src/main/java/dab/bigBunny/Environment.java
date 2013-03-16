@@ -17,12 +17,13 @@ public class Environment {
     private LinkedList<Slime> slimes;
     private int width;
     private int height;
-    
+    private LinkedList<Bullets> bullets;
     
     public Environment(int width, int height) {
         slimes = new LinkedList<Slime>();
+        bullets = new LinkedList<Bullets>();
         this.width = width;
-        this.height = height;
+        this.height = height;        
     }
     
     // idea: keep them sorted them by freshness
@@ -44,6 +45,9 @@ public class Environment {
         for (Slime s : slimes) {
             s.step();
         }
+        
+        
+        
         
     }
     
