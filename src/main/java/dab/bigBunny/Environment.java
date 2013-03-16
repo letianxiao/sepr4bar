@@ -46,8 +46,12 @@ public class Environment {
             s.step();
         }
         
+        //CopyPasting from Slime. Bad. Sorry. 
+        while(!bullets.isEmpty() && !bullets.getFirst().getIsVisible()){
+            bullets.removeFirst();
+        }
         
-        
+        for (Bullets b : bullets) { b.step(); }
         
     }
     
@@ -66,4 +70,14 @@ public class Environment {
     public LinkedList<Slime> getSlimes() {
         return slimes;
     }
+    
+    public void addBullet(Point location){
+        bullets.add(new Bullets(location));
+    }
+    
+    //CopyPasting from Slime. Bad. Sorry. 
+    public LinkedList<Bullets> getBullets(){
+        return bullets;
+    }
+    
 }

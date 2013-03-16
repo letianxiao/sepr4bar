@@ -35,41 +35,27 @@ public class BunnyController {
         doRotateLeft(rotateLeft);
     }
 
-    public void startForward() {
-        forward = true;
-    }
+    public void startForward() { forward = true; }
 
-    public void stopForward() {
-        forward = false;
-    }
+    public void stopForward() { forward = false; }
 
-    public void startRotateLeft() {
-        rotateLeft = true;
-    }
+    public void startRotateLeft() { rotateLeft = true; }
 
-    public void stopRotateLeft() {
-        rotateLeft = false;
-    }
+    public void stopRotateLeft() { rotateLeft = false; }
 
-    public void startRotateRight() {
-        rotateRight = true;
-    }
+    public void startRotateRight() { rotateRight = true; }
 
-    public void stopRotateRight() {
-        rotateRight = false;
-    }
+    public void stopRotateRight() { rotateRight = false; }
 
     public void doRotateLeft(boolean left) {
-        if (left) {
+        if (left) { 
             rotation = (rotation - rotationAmount) % 360;
-
         }
     }
 
     public void doRotateRight(boolean right) {
         if (right) {
             rotation = (rotation + rotationAmount) % 360;
-
         }
     }
 
@@ -93,27 +79,19 @@ public class BunnyController {
             } else {
                 acceleration /= 2;
             }
-        }
-        
-       // System.out.println(String.format("speed: %f, acc: %f", speed, acceleration));
-        
+        }        
+       // System.out.println(String.format("speed: %f, acc: %f", speed, acceleration));     
         speed += acceleration;
         if (speed < 0) {
             speed = 0;
         }
         x += speed * Math.cos(Math.toRadians(rotation));
-        y += speed * Math.sin(Math.toRadians(rotation));
-        
-       
+        y += speed * Math.sin(Math.toRadians(rotation));     
     }
 
-    public void startBrake() {
-        braking = true;
-    }
+    public void startBrake() { braking = true; }
 
-    public void stopBrake() {
-        braking = false;
-    }
+    public void stopBrake() { braking = false; }
 
     public void hasBeenShot(){
         health --;
@@ -125,27 +103,15 @@ public class BunnyController {
         }
     }
     
-    public int getX() {
-        return (int) x;
-    }
+    public int getX() { return (int) x; }
 
-    public int getY() {
-        return (int) y;
-    }
+    public int getY() { return (int) y; }
     
-    public Point getCoordinates(){
-        return (new Point(getX(),getY()));
-    }
+    public Point getCoordinates(){ return (new Point(getX(),getY())); }
 
-    public int getRotation() {
-        return rotation;
-    }
+    public int getRotation() { return rotation; }
     
-    public int getHealth(){
-        return health;
-    }
+    public int getHealth(){ return health; }
     
-    public int getRadius(){
-        return radius;
-    }
+    public int getRadius(){ return radius; }
 }

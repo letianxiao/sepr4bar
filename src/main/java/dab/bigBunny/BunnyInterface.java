@@ -84,10 +84,8 @@ public class BunnyInterface extends JFrame implements KeyListener {
         }
     }
 
-    @Override
-    public void keyTyped(KeyEvent e) {
-        // TODO Auto-generated method stub
-    }
+    @Override  
+    public void keyTyped(KeyEvent e) { } //Do nothing
 }
 
 class ShowCanvas extends JPanel implements MouseListener {
@@ -116,7 +114,7 @@ class ShowCanvas extends JPanel implements MouseListener {
             System.err.println("Image not found");
         }
 
-        centeredCoordinates(image);
+        
     }
 
     public void paintComponent(Graphics g) {
@@ -139,6 +137,13 @@ class ShowCanvas extends JPanel implements MouseListener {
             g2D.fill(circle);
 
         }
+        
+        for (Bullets b : environment.getBullets()) {
+            Ellipse2D.Double circle = new Ellipse2D.Double(b.getLocation().getX(),b.getLocation().getY(),4.0,4.0);
+            g2D.setColor(Color.BLACK);
+            g2D.fill(circle);
+        }
+        
         Ellipse2D.Double circle = new Ellipse2D.Double((double) controller.getX() - 10, (double) controller.getY() - 10, 20.0, 20.0);
         g2D.drawImage(image, af, this);
         g2D.setColor(Color.black);
@@ -147,42 +152,28 @@ class ShowCanvas extends JPanel implements MouseListener {
         bar.setValue(controller.getHealth());
     }
 
-    public Point centeredCoordinates(BufferedImage theImage) {
-        double adjustedX, adjustedY;
-        adjustedX = controller.getX() - (theImage.getHeight() / 2);
-        adjustedY = controller.getY() - (theImage.getWidth() / 2);
-        // System.out.println("Width" + theImage.getWidth() + "x: " + controller.getX() + "centered " + adjustedX);
-        // System.out.println("height" + theImage.getHeight() + "y " + controller.getY()+ "centered " + adjustedY);
-        Point point = new Point(0, 0);
-        point.setLocation(adjustedX, adjustedY);
-        return point;
-    }
-
     public void mousePressed(MouseEvent e) {
         Point clicked = new Point(e.getX(), e.getY());
-        //Implement Bullets class that's responsible for making bullet holes in the GUI
+        
+        
         //Also get the power generated, check if it is > then some amount,
         //if it is - subtrackt that amount and call this:
         double distance = clicked.distance(controller.getCoordinates());
         if (distance <= controller.getRadius()) {
             System.out.println("Bunny has been shot");
             controller.hasBeenShot();
+            //Animation of shot bunny 
+        }
+        else {
+            environment.addBullet(clicked); //bullet hole if missed
         }
     }
 
-      public void mouseClicked(MouseEvent e) {
-        //Do nothing
-    }
+    public void mouseClicked(MouseEvent e) { } //Do nothing
     
-    public void mouseReleased(MouseEvent e) {
-        //Do nothing
-    }
+    public void mouseReleased(MouseEvent e) { } //Do nothing
 
-    public void mouseEntered(MouseEvent e) {
-        //Do nothing
-    }
+    public void mouseEntered(MouseEvent e) { } //Do nothing
 
-    public void mouseExited(MouseEvent e) {
-        //Do nothing
-    }
+    public void mouseExited(MouseEvent e) { } //Do nothing
 }
