@@ -1,11 +1,13 @@
 package dab.bigBunny;
 
 import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.geom.Point2D;
 
 public class BunnyController {
 
     private int rotation;
-    private double x, y, speed;
+    private double x, y, speed, boundX, boundY;
     private boolean forward, rotateLeft, rotateRight, braking;
     private final int rotationAmount = 5;
     private final double defAcceleration = 0.4;
@@ -14,6 +16,7 @@ public class BunnyController {
     private Environment environment;
     private int radius;
     private int health;
+    private Rectangle bounds;
 
     BunnyController(Environment environment, int radius) {
         x = 100;
@@ -87,6 +90,11 @@ public class BunnyController {
         }
         x += speed * Math.cos(Math.toRadians(rotation));
         y += speed * Math.sin(Math.toRadians(rotation));     
+        
+        //to check if intersectig with something - be that bounds or components
+        checkInBounds(new Point2D.Double(x,y) ); 
+        
+        
     }
 
     public void startBrake() { braking = true; }
@@ -103,6 +111,37 @@ public class BunnyController {
         }
     }
     
+    private void checkInBounds(Point2D.Double point){
+        double a,b;
+        a= point.getX();
+        b= point.getY();
+        
+        
+        
+        
+        
+        if(!bounds.contains(a,b)){
+           //set speed. maybe bounce
+            
+            
+            if(bounds.getMinX() > a){
+                x = bounds.getMinX();
+            }
+            else if (bounds.getMaxX() < a){
+                x = bounds.getMaxX();
+            }
+            
+            if(bounds.getMinY() > b){
+                y = bounds.getMinY();
+            }
+            else if (bounds.getMaxY() < b){
+                y = bounds.getMaxY();
+            }
+        }
+        
+        
+    }
+    
     public int getX() { return (int) x; }
 
     public int getY() { return (int) y; }
@@ -114,4 +153,14 @@ public class BunnyController {
     public int getHealth(){ return health; }
     
     public int getRadius(){ return radius; }
+    
+    public void setBounds(Rectangle rectangle) {
+        bounds = rectangle;
+        System.out.println("x of bounds " + bounds.getX());
+        System.out.println("x2 of bounds " + (bounds.getX()+bounds.getWidth()));
+        System.out.println("is the same? " + bounds.getMaxX());
+    }
+    
+    
+    
 }

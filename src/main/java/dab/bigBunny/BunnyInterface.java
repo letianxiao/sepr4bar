@@ -16,6 +16,7 @@ public class BunnyInterface extends JFrame implements KeyListener {
     private ShowCanvas canvas;
     private BunnyController controller;
     private Environment environment;
+    private Rectangle bounds;
 
     public BunnyInterface() {
 
@@ -23,13 +24,20 @@ public class BunnyInterface extends JFrame implements KeyListener {
         //Change radius according to image
         controller = new BunnyController(environment, 10);
         Container container = getContentPane();
-        canvas = new ShowCanvas(controller, environment);
+        //setSize(100, 100);
+        canvas = new ShowCanvas(controller, environment, 800, 600);
         container.add(canvas);
-        setSize(800, 600);
+        
+        this.setMinimumSize(new Dimension(800,600));
         container.setFocusable(true);
         setVisible(true);
         container.addKeyListener(this);
         this.setDefaultCloseOperation(this.EXIT_ON_CLOSE);
+        
+        
+        //to call this on the reactorPannel, not on this thing
+        bounds = this.getBounds();
+        controller.setBounds(bounds);
 
         int delay = 1000 / 30; // milliseconds
         ActionListener taskPerformer = new ActionListener() {
@@ -94,16 +102,18 @@ class ShowCanvas extends JPanel implements MouseListener {
     BunnyController controller;
     Environment environment;
     JProgressBar bar;
+   // private Rectangle bounds;
 
-    ShowCanvas(BunnyController controller, Environment environment) {
+    ShowCanvas(BunnyController controller, Environment environment, int dimX, int dimY) {
         this.controller = controller;
         this.environment = environment;
-        setBackground(Color.white);
-        setSize(450, 400);
+        this.setSize(dimY, dimY);
+        setBackground(Color.WHITE);
         bar = new JProgressBar(0, controller.getHealth());
         this.add(bar);
         bar.setVisible(true);
         bar.setStringPainted(true);
+        
 
         //This needs to be added to the ReactorPannel, so that only on reactor pannel we could shoot
         addMouseListener(this);
