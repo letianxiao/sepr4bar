@@ -9,35 +9,33 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import javax.swing.border.TitledBorder;
 
 public class BunnyInterface extends JFrame implements KeyListener {
 
     private ShowCanvas canvas;
     private BunnyController controller;
     private Environment environment;
-    private Rectangle bounds;
+    private Dimension resolution;
+    private JFrame frame;
 
     public BunnyInterface() {
-
-        environment = new Environment(800, 600);
+        frame = new JFrame("MockGui");
+        //for now temproray resolution. The one in haddocks game needs fixing as well
+        resolution = new Dimension (800, 600);
+        environment = new Environment(resolution.width, resolution.height);
         //Change radius according to image
         controller = new BunnyController(environment, 10);
-        Container container = getContentPane();
-        //setSize(100, 100);
-        canvas = new ShowCanvas(controller, environment, 800, 600);
-        container.add(canvas);
-        
-        this.setMinimumSize(new Dimension(800,600));
+        Container container = frame.getContentPane();       
+        canvas = new ShowCanvas(controller, environment, resolution.width, resolution.height);
+        container.add(canvas);      
+        container.setMinimumSize(resolution);
+        container.setPreferredSize(resolution);
+        container.setMaximumSize(resolution);       
         container.setFocusable(true);
-        setVisible(true);
+        frame.setVisible(true);
         container.addKeyListener(this);
-        this.setDefaultCloseOperation(this.EXIT_ON_CLOSE);
-        
-        
-        //to call this on the reactorPannel, not on this thing
-        bounds = this.getBounds();
-        controller.setBounds(bounds);
+        frame.setDefaultCloseOperation(this.EXIT_ON_CLOSE);    
+        frame.pack();
 
         int delay = 1000 / 30; // milliseconds
         ActionListener taskPerformer = new ActionListener() {
@@ -102,18 +100,21 @@ class ShowCanvas extends JPanel implements MouseListener {
     BunnyController controller;
     Environment environment;
     JProgressBar bar;
-   // private Rectangle bounds;
+    private Rectangle bounds;
 
     ShowCanvas(BunnyController controller, Environment environment, int dimX, int dimY) {
         this.controller = controller;
         this.environment = environment;
-        this.setSize(dimY, dimY);
+        this.setSize(dimX, dimY);
         setBackground(Color.WHITE);
         bar = new JProgressBar(0, controller.getHealth());
         this.add(bar);
         bar.setVisible(true);
         bar.setStringPainted(true);
         
+         //to call this on the reactorPannel, not on this thing
+        bounds = this.getBounds();
+        controller.setBounds(bounds);        
 
         //This needs to be added to the ReactorPannel, so that only on reactor pannel we could shoot
         addMouseListener(this);
