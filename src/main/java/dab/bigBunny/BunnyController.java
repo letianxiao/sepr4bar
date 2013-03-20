@@ -16,7 +16,7 @@ public class BunnyController {
     private Environment environment;
     private int radius;
     private int health;
-    private Rectangle bounds;
+    private Rectangle bounds, hitBounds;
 
     BunnyController(Environment environment, int radius) {
         x = 100;
@@ -93,6 +93,7 @@ public class BunnyController {
         
         //to check if intersectig with something - be that bounds or components
         checkInBounds(new Point2D.Double(x,y) ); 
+        chekIntersects(new Point2D.Double(x,y));
              
     }
 
@@ -132,6 +133,30 @@ public class BunnyController {
                 y = bounds.getMaxY();
             }
         }     
+    }
+    
+    public void chekIntersects(Point2D.Double point){
+        double x1, y1, x2, y2;
+        x1= point.getX();
+        y1= point.getY();
+        
+        y2 = hitBounds.getCenterY();
+        
+        // ToDo Write a check for X and a check if doesn't jump through
+        if((y1 - radius < y2 + (hitBounds.height/2)) && (y1 + radius > y2 - (hitBounds.height/2))){
+            System.out.println("Hit wyyy");
+            if(y1<y2){
+                y = y2- (hitBounds.height/2);
+            }
+        }
+        
+      
+    }
+    
+    
+     public void setHitBounds(Rectangle rectangle) {
+        hitBounds = rectangle;
+        System.out.println("centerX" +hitBounds.getCenterX());
     }
     
     public int getX() { return (int) x; }

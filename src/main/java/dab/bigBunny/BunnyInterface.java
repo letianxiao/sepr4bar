@@ -1,5 +1,8 @@
 package dab.bigBunny;
 
+import dab.gui.ComponentController;
+import dab.gui.DynamicImage;
+import dab.gui.DynamicImageFactory;
 import java.awt.*;
 
 import javax.imageio.ImageIO;
@@ -8,6 +11,7 @@ import java.awt.event.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
+import java.awt.image.ImageProducer;
 import java.io.File;
 
 public class BunnyInterface extends JFrame implements KeyListener {
@@ -27,6 +31,7 @@ public class BunnyInterface extends JFrame implements KeyListener {
         controller = new BunnyController(environment, 10);
         Container container = frame.getContentPane();       
         canvas = new ShowCanvas(controller, environment, resolution.width, resolution.height);
+        container.setLayout(null);
         container.add(canvas);      
         container.setMinimumSize(resolution);
         container.setPreferredSize(resolution);
@@ -96,22 +101,37 @@ public class BunnyInterface extends JFrame implements KeyListener {
 
 class ShowCanvas extends JPanel implements MouseListener {
 
-    BufferedImage image;
+    BufferedImage bunny;
     BunnyController controller;
     Environment environment;
     JProgressBar bar;
     private Rectangle bounds;
+    private JLabel box;
+    private ImageIcon boxToHit;
+    private ComponentController pump1;
 
     ShowCanvas(BunnyController controller, Environment environment, int dimX, int dimY) {
         this.controller = controller;
         this.environment = environment;
         this.setSize(dimX, dimY);
+        this.setLayout(null);
         setBackground(Color.WHITE);
         bar = new JProgressBar(0, controller.getHealth());
         this.add(bar);
+        //bar.setLocation(0, 100);
+        bar.setBounds(10, 10, 100, 20);
         bar.setVisible(true);
         bar.setStringPainted(true);
         
+        box = new JLabel("Box");
+        boxToHit = new ImageIcon("resources/HitableBox.png");
+        box.setIcon(boxToHit);
+        box.setBounds(500, 500, 30, 30);
+        this.add(box);       
+        box.setVisible(true);
+        controller.setHitBounds(box.getBounds());
+  
+         
          //to call this on the reactorPannel, not on this thing
         bounds = this.getBounds();
         controller.setBounds(bounds);        
@@ -120,7 +140,7 @@ class ShowCanvas extends JPanel implements MouseListener {
         addMouseListener(this);
 
         try {
-            image = ImageIO.read(new File("resources/bunny.jpg"));
+            bunny = ImageIO.read(new File("resources/bunny.jpg"));
         } catch (Exception e) {
             System.err.println("Image not found");
         }
@@ -135,7 +155,7 @@ class ShowCanvas extends JPanel implements MouseListener {
 
         af.translate(controller.getX(), controller.getY());
         af.rotate((90 + controller.getRotation()) * Math.PI / 180);
-        af.translate(-image.getWidth() / 2, -image.getHeight() / 2);
+        af.translate(-bunny.getWidth() / 2, -bunny.getHeight() / 2);
 
         for (Slime s : environment.getSlimes()) {
             Ellipse2D.Double circle = new Ellipse2D.Double(
@@ -156,7 +176,7 @@ class ShowCanvas extends JPanel implements MouseListener {
         }
         
         Ellipse2D.Double circle = new Ellipse2D.Double((double) controller.getX() - 10, (double) controller.getY() - 10, 20.0, 20.0);
-        g2D.drawImage(image, af, this);
+        g2D.drawImage(bunny, af, this);
         g2D.setColor(Color.black);
         g2D.draw(circle);
         
