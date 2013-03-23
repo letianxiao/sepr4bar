@@ -157,6 +157,8 @@ public class BunnyController {
         if(hit(y2, x2, halfHeight, halfWidth)){ 
             //Break the component
             //do stuff with speed
+            //Maybe bounce??
+            speed = defAcceleration; 
             //give headake
             
             if (rotation == 0) {
@@ -183,33 +185,22 @@ public class BunnyController {
                 handleBottomLeft(x0,x2,y0,y2,halfHeight,halfWidth);
             }
         }
-        
-        
-        
-        
-        
-     
-
-      
+         
     }
     
     private void handleHitFromAbove(double y2, double halfHeight){
-        System.out.println("above");
         y = y2 - halfHeight - radius;
     }
     
     private void handleHitFromLeft(double x2, double halfWidth){
-        System.out.println("left");
         x= x2 - halfWidth - radius;
     }
     
     private void handleHitFromRight(double x2, double halfWidth){
-        System.out.println("right");
         x = x2 + halfWidth + radius;
     }
     
     private void handleHitFromBelow(double y2, double halfHeight){
-        System.out.println("below");
         y = y2 + halfHeight + radius;
     }
     
@@ -218,37 +209,47 @@ public class BunnyController {
         //hits from above
         if(hitFromAbove(x0, x2, y0, y2, halfHeight, halfWidth)){
             y = y2 - halfHeight - radius;
-            x = x0 + ((y-y0)*(Math.tan(Math.toRadians(90-rotation))));
-            System.out.println("top left. x0 " + x0 +" y0 " + y0 + "rotation" + rotation + " new coord" + x + " " + y);
+            x = x0 + ((y-y0)*tangent(90-rotation));       
         }
         else{
             //hits from left
             x = x2 - halfWidth - radius;
-            y = y0 + ((x-x0)* Math.tan(Math.toRadians(rotation)));
-            System.out.println("right top. x0 " + x0 +" y0 " + y0 + "rotation" + rotation + " new coord" + x + " " + y);
+            y = y0 + ((x-x0)* tangent(rotation));           
         }
     }
     
-    private void handleTopRight(double x0, double x2, double y0, double y2, double halfHeight, double halfWidth){
-        System.out.println("top right");
+    private void handleTopRight(double x0, double x2, double y0, double y2, double halfHeight, double halfWidth){        
         if(hitFromAbove(x0, x2, y0, y2, halfHeight, halfWidth)){
             y = y2 - halfHeight - radius;
-            x = x0 - ((y-y0)*(Math.tan(Math.toRadians(rotation-90))));
+            x = x0 - ((y-y0)*tangent(rotation-90));
         }
         else{
             x = x2 + halfWidth + radius;
-            y = y0 + ((x0-x)*Math.tan(Math.toRadians(180-rotation)));  // jei minusinis rotation, tai ta pati funkcija tik su -
+            y = y0 + ((x0-x)*tangent(180-rotation));  // jei minusinis rotation, tai ta pati funkcija tik su -
         }    
     }
     
     private void handleBottomLeft(double x0, double x2, double y0, double y2, double halfHeight, double halfWidth){
-        System.out.println("bottom left");
-        //if()
+        if(hitFromBelow(x0, x2, y0, y2, halfHeight, halfWidth)){
+           y = y2 + halfHeight + radius;
+           x = x0 + (y0-y)*tangent(rotation-90);
+        }
+        else{
+           x = x2 - halfWidth - radius;
+           y = y0 - (x-x0)*tangent(360 - rotation);
+        }
         
     }
     
     private void handleBottomRight(double x0, double x2, double y0, double y2, double halfHeight, double halfWidth){
-        System.out.println("bottom right");
+        if(hitFromBelow(x0, x2, y0, y2, halfHeight, halfWidth)){
+            y = y2 + radius + halfHeight;
+            x = x0 - (y0-y)*tangent(270 - rotation);
+        }
+        else{           
+            x = x2 + radius + halfWidth;
+            y = y0 - (x0-x)*tangent(rotation-180);
+        }
     }
     
     private boolean hit(double y2, double x2, double halfHeight, double halfWidth){
@@ -269,13 +270,11 @@ public class BunnyController {
         newX = x0 + (deltaY * tangent(90-rotation));
         return (hitOnWidth(newX, x2, halfWidth));
     }
-    
- 
-    
+   
     private boolean hitFromBelow(double x0, double x2,double y0, double y2, double halfHeight, double halfWidth){
        double deltaY = y0 - (y2 + halfHeight + radius);
        double newX;
-       newX = x0 + (deltaY * tangent(90-rotation));        
+       newX = x0 + (deltaY * tangent(rotation-90));        
        return (hitOnWidth(newX, x2, halfWidth));
     }
     
