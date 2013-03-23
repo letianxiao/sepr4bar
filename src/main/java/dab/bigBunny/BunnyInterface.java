@@ -119,14 +119,14 @@ class ShowCanvas extends JPanel implements MouseListener {
         bar = new JProgressBar(0, controller.getHealth());
         this.add(bar);
         //bar.setLocation(0, 100);
-        bar.setBounds(10, 10, 100, 20);
+        bar.setBounds(10, 10, 100, 30);
         bar.setVisible(true);
         bar.setStringPainted(true);
         
         box = new JLabel("Box");
         boxToHit = new ImageIcon("resources/HitableBox.png");
         box.setIcon(boxToHit);
-        box.setBounds(500, 500, 30, 30);
+        box.setBounds(500, 500, 40, 40);
         this.add(box);       
         box.setVisible(true);
         controller.setHitBounds(box.getBounds());

@@ -52,7 +52,10 @@ public class BunnyController {
 
     public void doRotateLeft(boolean left) {
         if (left) { 
-            rotation = (rotation - rotationAmount) % 360;
+            rotation = (rotation - rotationAmount)% 360;
+            if (rotation < 0) {
+                rotation += 360;
+            }
         }
     }
 
@@ -64,7 +67,7 @@ public class BunnyController {
 
     //Do not Go outside the game!!
     public void moveForward(boolean forw) {
-        double acceleration;
+        double acceleration, x0, y0;
         if (forward && !braking) {
             acceleration = defAcceleration;
         } else if (braking) {
@@ -88,12 +91,15 @@ public class BunnyController {
         if (speed < 0) {
             speed = 0;
         }
+        x0 = x;
+        y0 = y;
+        
         x += speed * Math.cos(Math.toRadians(rotation));
         y += speed * Math.sin(Math.toRadians(rotation));     
         
         //to check if intersectig with something - be that bounds or components
         checkInBounds(new Point2D.Double(x,y) ); 
-        chekIntersects(new Point2D.Double(x,y));
+        chekIntersects(x0, y0);
              
     }
 
@@ -135,24 +141,145 @@ public class BunnyController {
         }     
     }
     
-    public void chekIntersects(Point2D.Double point){
-        double x1, y1, x2, y2;
-        x1= point.getX();
-        y1= point.getY();
-        
+    public void chekIntersects(double a, double b){
+        double x0, y0, x1, y1, x2, y2, halfHeight, halfWidth;
+        x0 = a;
+        y0 = b;
+        //do I need to feed x and y to this method, or is it OK to just use them?
+        //latter make these for multiple thingies
+        x2 = hitBounds.getCenterX();                    
         y2 = hitBounds.getCenterY();
+        halfHeight = hitBounds.getHeight() / 2;
+        halfWidth = hitBounds.getWidth() / 2;
         
-        // ToDo Write a check for X and a check if doesn't jump through
-        if((y1 - radius < y2 + (hitBounds.height/2)) && (y1 + radius > y2 - (hitBounds.height/2))){
-            System.out.println("Hit wyyy");
-            if(y1<y2){
-                y = y2- (hitBounds.height/2);
+           
+        
+        if(hit(y2, x2, halfHeight, halfWidth)){ 
+            //Break the component
+            //do stuff with speed
+            //give headake
+            
+            if (rotation == 0) {
+                 handleHitFromLeft(x2, halfWidth);}
+            else if(rotation == 90){
+                handleHitFromAbove(y2, halfHeight);
+            }
+            else if (rotation == 180){
+                handleHitFromRight(x2, halfWidth);
+            }
+            else if (rotation == 270){
+                handleHitFromBelow(y2, halfHeight);
+            }          
+            else if(rotation<90) {                    
+                handleTopLeft(x0,x2,y0,y2,halfHeight,halfWidth);                                        
+            }
+            else if(rotation < 180){
+                handleTopRight(x0,x2,y0,y2,halfHeight,halfWidth);
+            }
+            else if(rotation < 270){
+                handleBottomRight(x0,x2,y0,y2,halfHeight,halfWidth);
+            }
+            else {
+                handleBottomLeft(x0,x2,y0,y2,halfHeight,halfWidth);
             }
         }
         
+        
+        
+        
+        
+     
+
       
     }
     
+    private void handleHitFromAbove(double y2, double halfHeight){
+        System.out.println("above");
+        y = y2 - halfHeight - radius;
+    }
+    
+    private void handleHitFromLeft(double x2, double halfWidth){
+        System.out.println("left");
+        x= x2 - halfWidth - radius;
+    }
+    
+    private void handleHitFromRight(double x2, double halfWidth){
+        System.out.println("right");
+        x = x2 + halfWidth + radius;
+    }
+    
+    private void handleHitFromBelow(double y2, double halfHeight){
+        System.out.println("below");
+        y = y2 + halfHeight + radius;
+    }
+    
+    private void handleTopLeft(double x0, double x2, double y0, double y2, double halfHeight, double halfWidth){
+        
+        //hits from above
+        if(hitFromAbove(x0, x2, y0, y2, halfHeight, halfWidth)){
+            y = y2 - halfHeight - radius;
+            x = x0 + ((y-y0)*(Math.tan(Math.toRadians(90-rotation))));
+            System.out.println("top left. x0 " + x0 +" y0 " + y0 + "rotation" + rotation + " new coord" + x + " " + y);
+        }
+        else{
+            //hits from left
+            x = x2 - halfWidth - radius;
+            y = y0 + ((x-x0)* Math.tan(Math.toRadians(rotation)));
+            System.out.println("right top. x0 " + x0 +" y0 " + y0 + "rotation" + rotation + " new coord" + x + " " + y);
+        }
+    }
+    
+    private void handleTopRight(double x0, double x2, double y0, double y2, double halfHeight, double halfWidth){
+        System.out.println("top right");
+        if(hitFromAbove(x0, x2, y0, y2, halfHeight, halfWidth)){
+            y = y2 - halfHeight - radius;
+            x = x0 - ((y-y0)*(Math.tan(Math.toRadians(rotation-90))));
+        }
+        else{
+            x = x2 + halfWidth + radius;
+            y = y0 + ((x0-x)*Math.tan(Math.toRadians(180-rotation)));  // jei minusinis rotation, tai ta pati funkcija tik su -
+        }    
+    }
+    
+    private void handleBottomLeft(double x0, double x2, double y0, double y2, double halfHeight, double halfWidth){
+        System.out.println("bottom left");
+        //if()
+        
+    }
+    
+    private void handleBottomRight(double x0, double x2, double y0, double y2, double halfHeight, double halfWidth){
+        System.out.println("bottom right");
+    }
+    
+    private boolean hit(double y2, double x2, double halfHeight, double halfWidth){
+        return((hitOnHeight(y, y2,halfHeight))&&hitOnWidth(x, x2, halfWidth));
+    }
+    
+    private boolean hitOnHeight(double theY, double y2, double halfHeight){
+        return((theY > y2 - halfHeight - radius)&&(theY < y2 + halfHeight + radius));
+    }
+    
+    private boolean hitOnWidth(double theX,double x2, double halfWidth){
+        return((theX > x2 - halfWidth - radius)&&(theX < x2 + halfWidth + radius));
+    }
+        
+    private boolean hitFromAbove(double x0, double x2,double y0, double y2, double halfHeight, double halfWidth) {
+        double deltaY = (y2 - halfHeight - radius) - y0;
+        double newX;
+        newX = x0 + (deltaY * tangent(90-rotation));
+        return (hitOnWidth(newX, x2, halfWidth));
+    }
+    
+ 
+    
+    private boolean hitFromBelow(double x0, double x2,double y0, double y2, double halfHeight, double halfWidth){
+       double deltaY = y0 - (y2 + halfHeight + radius);
+       double newX;
+       newX = x0 + (deltaY * tangent(90-rotation));        
+       return (hitOnWidth(newX, x2, halfWidth));
+    }
+    
+
     
      public void setHitBounds(Rectangle rectangle) {
         hitBounds = rectangle;
@@ -174,4 +301,9 @@ public class BunnyController {
     public void setBounds(Rectangle rectangle) {
         bounds = rectangle;
     }    
+    
+    private double tangent(int alfa){
+        return Math.tan(Math.toRadians(alfa));
+    }
+    
 }
