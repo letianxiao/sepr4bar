@@ -12,11 +12,12 @@ public class BunnyController {
     private final int rotationAmount = 5;
     private final double defAcceleration = 0.4;
     private final double breakingAcceleration = -1;
-    private final double noramlStopping = -0.5;
+    private final double normalStopping = -0.5;
     private Environment environment;
     private int radius;
     private int health;
     private Rectangle bounds, hitBounds;
+    private final double bounce = -0.5;
 
     BunnyController(Environment environment, int radius) {
         x = 100;
@@ -35,7 +36,7 @@ public class BunnyController {
     public void step() {
         moveForward(forward);
         doRotateRight(rotateRight);
-        doRotateLeft(rotateLeft);
+        doRotateLeft(rotateLeft);        
     }
 
     public void startForward() { forward = true; }
@@ -68,13 +69,15 @@ public class BunnyController {
     //Do not Go outside the game!!
     public void moveForward(boolean forw) {
         double acceleration, x0, y0;
-        if (forward && !braking) {
+        if ((forward && !braking)|| (speed <0)) {
             acceleration = defAcceleration;
-        } else if (braking) {
+        } else if (braking && (speed >0)) {
             acceleration = breakingAcceleration;
-        } else {
-            acceleration = noramlStopping;
-        }
+        } else if(speed >0){
+            acceleration = normalStopping;
+        } else {acceleration = 0;}
+        
+        System.out.println("speed "+ speed);
         
         Slime intersected = environment.intersectWithSlime(new Point(getX(), getY()), radius);
         if (intersected != null) {
@@ -88,9 +91,7 @@ public class BunnyController {
         }        
        // System.out.println(String.format("speed: %f, acc: %f", speed, acceleration));     
         speed += acceleration;
-        if (speed < 0) {
-            speed = 0;
-        }
+        if((speed>-1)&& speed<0){speed =0;}
         x0 = x;
         y0 = y;
         
@@ -123,7 +124,7 @@ public class BunnyController {
         b= point.getY();
   
         if(!bounds.contains(a,b)){
-           speed = defAcceleration;           
+           speed = bounce * speed;           
             
             if(bounds.getMinX() > a){
                 x = bounds.getMinX();
@@ -141,24 +142,22 @@ public class BunnyController {
         }     
     }
     
-    public void chekIntersects(double a, double b){
-        double x0, y0, x1, y1, x2, y2, halfHeight, halfWidth;
-        x0 = a;
-        y0 = b;
-        //do I need to feed x and y to this method, or is it OK to just use them?
+    public void chekIntersects(double x0, double y0){
+        double x2, y2, halfHeight, halfWidth;
+        
+        
         //latter make these for multiple thingies
         x2 = hitBounds.getCenterX();                    
         y2 = hitBounds.getCenterY();
         halfHeight = hitBounds.getHeight() / 2;
         halfWidth = hitBounds.getWidth() / 2;
         
-           
         
         if(hit(y2, x2, halfHeight, halfWidth)){ 
             //Break the component
             //do stuff with speed
             //Maybe bounce??
-            speed = defAcceleration; 
+            speed = bounce * speed; 
             //give headake
             
             if (rotation == 0) {
@@ -184,86 +183,99 @@ public class BunnyController {
             else {
                 handleBottomLeft(x0,x2,y0,y2,halfHeight,halfWidth);
             }
-        }
-         
+        }        
     }
     
+    //set y to be at the upper border of the hittable object
     private void handleHitFromAbove(double y2, double halfHeight){
         y = y2 - halfHeight - radius;
     }
     
+    //set x to be at the left border of the hittable object
     private void handleHitFromLeft(double x2, double halfWidth){
         x= x2 - halfWidth - radius;
     }
     
+    //set x to be at the right border of the hittable object
     private void handleHitFromRight(double x2, double halfWidth){
         x = x2 + halfWidth + radius;
     }
     
+    //set x to be at the bottom border of the hittable object
     private void handleHitFromBelow(double y2, double halfHeight){
         y = y2 + halfHeight + radius;
     }
     
-    private void handleTopLeft(double x0, double x2, double y0, double y2, double halfHeight, double halfWidth){
-        
-        //hits from above
+    private void handleTopLeft(double x0, double x2, double y0, double y2, double halfHeight, double halfWidth){       
+        //check if the object is hit from above or from the side
         if(hitFromAbove(x0, x2, y0, y2, halfHeight, halfWidth)){
-            y = y2 - halfHeight - radius;
-            x = x0 + ((y-y0)*tangent(90-rotation));       
+            handleHitFromAbove(y2, halfHeight);
+            adjustX(x0, y0);      
         }
-        else{
-            //hits from left
-            x = x2 - halfWidth - radius;
-            y = y0 + ((x-x0)* tangent(rotation));           
+        else{           
+            handleHitFromLeft(x2, halfWidth);
+            adjustY(x0, y0, 1);           
         }
     }
     
     private void handleTopRight(double x0, double x2, double y0, double y2, double halfHeight, double halfWidth){        
+        //check if the object is hit from above or from the side
         if(hitFromAbove(x0, x2, y0, y2, halfHeight, halfWidth)){
-            y = y2 - halfHeight - radius;
-            x = x0 - ((y-y0)*tangent(rotation-90));
+            handleHitFromAbove(y2, halfHeight);
+            adjustX(x0, y0);  
         }
         else{
-            x = x2 + halfWidth + radius;
-            y = y0 + ((x0-x)*tangent(180-rotation));  // jei minusinis rotation, tai ta pati funkcija tik su -
+            handleHitFromRight(x2, halfWidth);
+            adjustY(x0, y0, -1);
         }    
     }
     
     private void handleBottomLeft(double x0, double x2, double y0, double y2, double halfHeight, double halfWidth){
+        //check if the object is hit from bellow or from the side
         if(hitFromBelow(x0, x2, y0, y2, halfHeight, halfWidth)){
-           y = y2 + halfHeight + radius;
-           x = x0 + (y0-y)*tangent(rotation-90);
+           handleHitFromBelow(y2, halfHeight);
+           adjustX(x0, y0);  
         }
         else{
-           x = x2 - halfWidth - radius;
-           y = y0 - (x-x0)*tangent(360 - rotation);
+           handleHitFromLeft(x2, halfWidth);
+           adjustY(x0, y0, 1);
         }
         
     }
     
     private void handleBottomRight(double x0, double x2, double y0, double y2, double halfHeight, double halfWidth){
+        //check if the object is hit from bellow or from the side
         if(hitFromBelow(x0, x2, y0, y2, halfHeight, halfWidth)){
-            y = y2 + radius + halfHeight;
-            x = x0 - (y0-y)*tangent(270 - rotation);
+            handleHitFromBelow(y2, halfHeight);
+            adjustX(x0, y0);  
         }
         else{           
-            x = x2 + radius + halfWidth;
-            y = y0 - (x0-x)*tangent(rotation-180);
+            handleHitFromRight(x2, halfWidth);
+            adjustY(x0, y0, -1);
         }
     }
     
+    //a check that the circle(bunny) has hit the the hittable object
     private boolean hit(double y2, double x2, double halfHeight, double halfWidth){
         return((hitOnHeight(y, y2,halfHeight))&&hitOnWidth(x, x2, halfWidth));
     }
     
+    //a check if the circle is between the height coordinates of the hittable object
     private boolean hitOnHeight(double theY, double y2, double halfHeight){
         return((theY > y2 - halfHeight - radius)&&(theY < y2 + halfHeight + radius));
     }
     
+    //a check if the circle is between the width coordinates of the hittable object
     private boolean hitOnWidth(double theX,double x2, double halfWidth){
         return((theX > x2 - halfWidth - radius)&&(theX < x2 + halfWidth + radius));
     }
         
+    /* A check if the bunny hits the object from above. It gets the coordinates of 
+     * y at which the circle would have hit the object. Then it gets the coordinates of x
+     * at that point, those depend on rotation of the bunny and current position. then it checks 
+     * if the x is in the bounds of the width of object. If it is not - the object is still not hit
+     * and would get hit from the side.
+     */
     private boolean hitFromAbove(double x0, double x2,double y0, double y2, double halfHeight, double halfWidth) {
         double deltaY = (y2 - halfHeight - radius) - y0;
         double newX;
@@ -271,6 +283,7 @@ public class BunnyController {
         return (hitOnWidth(newX, x2, halfWidth));
     }
    
+    //same as hitFromAbove, just checks for the thing from above
     private boolean hitFromBelow(double x0, double x2,double y0, double y2, double halfHeight, double halfWidth){
        double deltaY = y0 - (y2 + halfHeight + radius);
        double newX;
@@ -278,11 +291,25 @@ public class BunnyController {
        return (hitOnWidth(newX, x2, halfWidth));
     }
     
-
+    /* when object is hit from above or below, x for the place where it was hit is counted. 
+     * it is counted using dX = dY * tan(alfa), where dX and dY is the difference between bunny starting point 
+     * and hit-point (i.e. the edges of triangle), and alfa is the angle of the corner oposite to x.  
+     */
+    private void adjustX(double x0, double y0){
+        x = x0 + ((y-y0)*tangent(90-rotation));
+    }
+    
+    /* when object is hit from left or right, y for the place where it was hit is counted. 
+     * it is counted using dY = dX * tan(alfa), where dX and dY is the difference between bunny starting point 
+     * and hit-point (i.e. the edges of triangle), and alfa is the angle of the corner oposite to y. i is either 1
+     * or -1 used only for angle direction adjustment. 
+     */
+    private void adjustY(double x0, double y0, int i){
+        y = y0 + ((x-x0)* tangent(rotation*i));    
+    }
     
      public void setHitBounds(Rectangle rectangle) {
-        hitBounds = rectangle;
-        System.out.println("centerX" +hitBounds.getCenterX());
+        hitBounds = rectangle;        
     }
     
     public int getX() { return (int) x; }
@@ -300,7 +327,7 @@ public class BunnyController {
     public void setBounds(Rectangle rectangle) {
         bounds = rectangle;
     }    
-    
+        
     private double tangent(int alfa){
         return Math.tan(Math.toRadians(alfa));
     }
