@@ -152,8 +152,11 @@ public class BunnyController {
         halfHeight = hitBounds.getHeight() / 2;
         halfWidth = hitBounds.getWidth() / 2;
         
-        
-        if(hit(y2, x2, halfHeight, halfWidth)){ 
+        /* first proposition checks if new coordinates of the bunny are inside the hitable object,
+         * second one checks if the bunny jumps over the hitable object, i.e. the line between its
+         * previous coordinates and the new ones intersects the object. 
+         */
+        if((hit(y2, x2, halfHeight, halfWidth))||(hitBounds.intersectsLine(x0, y0, x, y))){ 
             //Break the component
             //do stuff with speed
             //Maybe bounce??
