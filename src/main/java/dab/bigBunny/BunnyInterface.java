@@ -126,7 +126,7 @@ class ShowCanvas extends JPanel implements MouseListener {
         box = new JLabel("Box");
         boxToHit = new ImageIcon("resources/HitableBox.png");
         box.setIcon(boxToHit);
-        box.setBounds(500, 500, 10, 10);
+        box.setBounds(500, 500, 40, 40);
         this.add(box);       
         box.setVisible(true);
         controller.setHitBounds(box.getBounds());
