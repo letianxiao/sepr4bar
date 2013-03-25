@@ -9,11 +9,11 @@ public class BunnyController {
     private int rotation;
     private double x, y, speed;
     private boolean forward, rotateLeft, rotateRight, braking;
-    private boolean softwareFailure, switched;
-    private final int rotationAmount = 5;
-    private final double defAcceleration = 0.4;
-    private final double breakingAcceleration = -1;
-    private final double normalStopping = -0.5;
+    private boolean softwareFailure;
+    private final int ROTATION_AMOUNT = 5;
+    private final double DEF_ACCELERATION = 0.4;
+    private final double BRAKING_ACCELERATION = -1;
+    private final double NORMAL_STOPPING = -0.5;
     private Environment environment;
     private int radius;
     private int health;
@@ -32,7 +32,6 @@ public class BunnyController {
         this.environment = environment;
         this.radius = radius;
         health = 100;
-        switched = false;
     }
 
     public void step() {
@@ -69,25 +68,24 @@ public class BunnyController {
     }
     
     private void rotateRight(){
-        rotation = (rotation + rotationAmount) % 360;
+        rotation = (rotation + ROTATION_AMOUNT) % 360;
     }
     
     private void rotateLeft(){
-        rotation = (rotation - rotationAmount)% 360;
+        rotation = (rotation - ROTATION_AMOUNT)% 360;
                 if (rotation < 0) {
                     rotation += 360;
                 }
     }
 
-    //Do not Go outside the game!!
     public void moveForward() {
         double acceleration, x0, y0;
         if ((forward && !braking)|| (speed <0)) {
-            acceleration = defAcceleration;
+            acceleration = DEF_ACCELERATION;
         } else if (braking && (speed >0)) {
-            acceleration = breakingAcceleration;
+            acceleration = BRAKING_ACCELERATION;
         } else if(speed >0){
-            acceleration = normalStopping;
+            acceleration = NORMAL_STOPPING;
         } else {acceleration = 0;}
         
         System.out.println("speed "+ speed);
@@ -141,15 +139,13 @@ public class BunnyController {
             
             if(bounds.getMinX() > a){
                 x = bounds.getMinX();
-            }
-            else if (bounds.getMaxX() < a){
+            } else if (bounds.getMaxX() < a){
                 x = bounds.getMaxX();
             }
             
             if(bounds.getMinY() > b){
                 y = bounds.getMinY();
-            }
-            else if (bounds.getMaxY() < b){
+            } else if (bounds.getMaxY() < b){
                 y = bounds.getMaxY();
             }
         }     
@@ -165,128 +161,118 @@ public class BunnyController {
         halfHeight = hitBounds.getHeight() / 2;
         halfWidth = hitBounds.getWidth() / 2;
         
-        /* first proposition checks if new coordinates of the bunny are inside the hitable object,
+        /* 
+         * first proposition checks if new coordinates of the bunny are inside the hitable object,
          * second one checks if the bunny jumps over the hitable object, i.e. the line between its
          * previous coordinates and the new ones intersects the object. 
          */
         if((hit(y2, x2, halfHeight, halfWidth))||(hitBounds.intersectsLine(x0, y0, x, y))){ 
             //Break the component
-            //do stuff with speed
-            //Maybe bounce??
+
             speed = bounce * speed; 
             //give headake
             
             if (rotation == 0) {
-                 handleHitFromLeft(x2, halfWidth);}
-            else if(rotation == 90){
+                handleHitFromLeft(x2, halfWidth);
+            } else if(rotation == 90){
                 handleHitFromAbove(y2, halfHeight);
-            }
-            else if (rotation == 180){
+            } else if (rotation == 180){
                 handleHitFromRight(x2, halfWidth);
-            }
-            else if (rotation == 270){
+            } else if (rotation == 270){
                 handleHitFromBelow(y2, halfHeight);
-            }          
-            else if(rotation<90) {                    
+            } else if(rotation<90) {                    
                 handleTopLeft(x0,x2,y0,y2,halfHeight,halfWidth);                                        
-            }
-            else if(rotation < 180){
+            } else if(rotation < 180){
                 handleTopRight(x0,x2,y0,y2,halfHeight,halfWidth);
-            }
-            else if(rotation < 270){
+            } else if(rotation < 270){
                 handleBottomRight(x0,x2,y0,y2,halfHeight,halfWidth);
-            }
-            else {
+            } else {
                 handleBottomLeft(x0,x2,y0,y2,halfHeight,halfWidth);
             }
         }        
     }
     
-    //set y to be at the upper border of the hittable object
+    /*set y to be at the upper border of the hittable object */
     private void handleHitFromAbove(double y2, double halfHeight){
         y = y2 - halfHeight - radius;
     }
     
-    //set x to be at the left border of the hittable object
+    /*set x to be at the left border of the hittable object */
     private void handleHitFromLeft(double x2, double halfWidth){
         x= x2 - halfWidth - radius;
     }
     
-    //set x to be at the right border of the hittable object
+    /*set x to be at the right border of the hittable object */
     private void handleHitFromRight(double x2, double halfWidth){
         x = x2 + halfWidth + radius;
     }
     
-    //set x to be at the bottom border of the hittable object
+    /*set x to be at the bottom border of the hittable object */
     private void handleHitFromBelow(double y2, double halfHeight){
         y = y2 + halfHeight + radius;
     }
     
+    /*check if the object is hit from above or from the side*/
     private void handleTopLeft(double x0, double x2, double y0, double y2, double halfHeight, double halfWidth){       
-        //check if the object is hit from above or from the side
         if(hitFromAbove(x0, x2, y0, y2, halfHeight, halfWidth)){
             handleHitFromAbove(y2, halfHeight);
             adjustX(x0, y0);      
-        }
-        else{           
+        } else{           
             handleHitFromLeft(x2, halfWidth);
             adjustY(x0, y0, 1);           
         }
     }
     
+    /*check if the object is hit from above or from the side */
     private void handleTopRight(double x0, double x2, double y0, double y2, double halfHeight, double halfWidth){        
-        //check if the object is hit from above or from the side
         if(hitFromAbove(x0, x2, y0, y2, halfHeight, halfWidth)){
             handleHitFromAbove(y2, halfHeight);
             adjustX(x0, y0);  
-        }
-        else{
+        } else{
             handleHitFromRight(x2, halfWidth);
             adjustY(x0, y0, -1);
         }    
     }
     
-    private void handleBottomLeft(double x0, double x2, double y0, double y2, double halfHeight, double halfWidth){
-        //check if the object is hit from bellow or from the side
+    /*check if the object is hit from bellow or from the side */
+    private void handleBottomLeft(double x0, double x2, double y0, double y2, double halfHeight, double halfWidth){        
         if(hitFromBelow(x0, x2, y0, y2, halfHeight, halfWidth)){
            handleHitFromBelow(y2, halfHeight);
            adjustX(x0, y0);  
-        }
-        else{
+        } else{
            handleHitFromLeft(x2, halfWidth);
            adjustY(x0, y0, 1);
-        }
-        
+        }     
     }
     
-    private void handleBottomRight(double x0, double x2, double y0, double y2, double halfHeight, double halfWidth){
-        //check if the object is hit from bellow or from the side
+    /*check if the object is hit from bellow or from the side */
+    private void handleBottomRight(double x0, double x2, double y0, double y2, double halfHeight, double halfWidth){  
         if(hitFromBelow(x0, x2, y0, y2, halfHeight, halfWidth)){
             handleHitFromBelow(y2, halfHeight);
             adjustX(x0, y0);  
-        }
-        else{           
+        } else{           
             handleHitFromRight(x2, halfWidth);
             adjustY(x0, y0, -1);
         }
     }
     
-    //a check that the circle(bunny) has hit the the hittable object
+    /*a check that the circle(bunny) has hit the the hittable object */
     private boolean hit(double y2, double x2, double halfHeight, double halfWidth){
         return((hitOnHeight(y, y2,halfHeight))&&hitOnWidth(x, x2, halfWidth));
     }
     
-    //a check if the circle is between the height coordinates of the hittable object
+    /*a check if the circle is between the height coordinates of the hittable object */
     private boolean hitOnHeight(double theY, double y2, double halfHeight){
         return((theY > y2 - halfHeight - radius)&&(theY < y2 + halfHeight + radius));
     }
     
-    //a check if the circle is between the width coordinates of the hittable object
+    /*a check if the circle is between the width coordinates of the hittable object */
     private boolean hitOnWidth(double theX,double x2, double halfWidth){
         return((theX > x2 - halfWidth - radius)&&(theX < x2 + halfWidth + radius));
     }
         
-    /* A check if the bunny hits the object from above. It gets the coordinates of 
+    /* 
+     * A check if the bunny hits the object from above. It gets the coordinates of 
      * y at which the circle would have hit the object. Then it gets the coordinates of x
      * at that point, those depend on rotation of the bunny and current position. then it checks 
      * if the x is in the bounds of the width of object. If it is not - the object is still not hit
@@ -299,7 +285,7 @@ public class BunnyController {
         return (hitOnWidth(newX, x2, halfWidth));
     }
    
-    //same as hitFromAbove, just checks for the thing from above
+    /*same as hitFromAbove, just checks for the thing from above */
     private boolean hitFromBelow(double x0, double x2,double y0, double y2, double halfHeight, double halfWidth){
        double deltaY = y0 - (y2 + halfHeight + radius);
        double newX;
@@ -307,7 +293,8 @@ public class BunnyController {
        return (hitOnWidth(newX, x2, halfWidth));
     }
     
-    /* when object is hit from above or below, x for the place where it was hit is counted. 
+    /* 
+     * when object is hit from above or below, x for the place where it was hit is counted. 
      * it is counted using dX = dY * tan(alfa), where dX and dY is the difference between bunny starting point 
      * and hit-point (i.e. the edges of triangle), and alfa is the angle of the corner oposite to x.  
      */
@@ -315,7 +302,8 @@ public class BunnyController {
         x = x0 + ((y-y0)*tangent(90-rotation));
     }
     
-    /* when object is hit from left or right, y for the place where it was hit is counted. 
+    /* 
+     * when object is hit from left or right, y for the place where it was hit is counted. 
      * it is counted using dY = dX * tan(alfa), where dX and dY is the difference between bunny starting point 
      * and hit-point (i.e. the edges of triangle), and alfa is the angle of the corner oposite to y. i is either 1
      * or -1 used only for angle direction adjustment. 
@@ -339,16 +327,12 @@ public class BunnyController {
     public int getHealth(){ return health; }
     
     public int getRadius(){ return radius; }
-    
-    public boolean getSoftwareFailure() {return softwareFailure;}
-    
+       
     public void setBounds(Rectangle rectangle) {
         bounds = rectangle;
     }    
-        
 
     private double tangent(int alfa){
         return Math.tan(Math.toRadians(alfa));
     }
-    
 }

@@ -18,9 +18,9 @@ public class Environment {
     private int height;
     private LinkedList<Bullets> bullets;
     private boolean softwareFailure;
-    private final int defaultSFtime = 100;
-    private final int defaultSFgap = 300;
-    private int sFTime, sFGap;  
+    private final int DEFAULT_FAILURE_TIME = 100;
+    private final int DEFAULT_CANT_FAIL = 300;
+    private int sfTime, sfCantFailTime;  
     
     public Environment(int width, int height) {
         slimes = new LinkedList<Slime>();
@@ -28,8 +28,8 @@ public class Environment {
         this.width = width;
         this.height = height;
         softwareFailure = false;
-        sFTime = 0;
-        sFGap = 0;
+        sfTime = 0;
+        sfCantFailTime = 0;
     }
     
     // idea: keep them sorted them by freshness
@@ -88,22 +88,22 @@ public class Environment {
     }
     
     public void startSoftwareFailure() {
-        if(sFGap<=0){
+        if(sfCantFailTime<=0){
             softwareFailure = true;
-            sFTime = defaultSFtime;
-            sFGap = defaultSFgap;
+            sfTime = DEFAULT_FAILURE_TIME;
+            sfCantFailTime = DEFAULT_CANT_FAIL;
             //call software failure in the powerplant
         }
     } 
     
     private void stepSoftwareFailure(){       
         if(softwareFailure) {
-            sFTime --;
-            if(sFTime <=0){
+            sfTime --;
+            if(sfTime <=0){
                softwareFailure = false; 
             }
         }
-        if(sFGap>0) {sFGap --;}
+        if(sfCantFailTime>0) {sfCantFailTime --;}
     }
     
     public boolean getSoftwareFailure(){
