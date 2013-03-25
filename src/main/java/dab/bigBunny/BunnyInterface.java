@@ -1,18 +1,14 @@
 package dab.bigBunny;
 
 import dab.gui.ComponentController;
-import dab.gui.DynamicImage;
-import dab.gui.DynamicImageFactory;
 import java.awt.*;
-
-import javax.imageio.ImageIO;
-import javax.swing.*;
 import java.awt.event.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
-import java.awt.image.ImageProducer;
 import java.io.File;
+import javax.imageio.ImageIO;
+import javax.swing.*;
 
 public class BunnyInterface extends JFrame implements KeyListener {
 
@@ -74,6 +70,9 @@ public class BunnyInterface extends JFrame implements KeyListener {
             case KeyEvent.VK_DOWN:
                 controller.startBrake();
                 break;
+            case KeyEvent.VK_SPACE:
+                environment.startSoftwareFailure();
+                break;
         }
     }
 
@@ -91,6 +90,9 @@ public class BunnyInterface extends JFrame implements KeyListener {
                 break;
             case KeyEvent.VK_DOWN:
                 controller.stopBrake();
+                break;
+            case KeyEvent.VK_SPACE:
+                environment.startSoftwareFailure();
                 break;
         }
     }
@@ -148,6 +150,7 @@ class ShowCanvas extends JPanel implements MouseListener {
         
     }
 
+    @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2D = (Graphics2D) g;

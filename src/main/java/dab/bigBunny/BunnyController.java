@@ -7,8 +7,9 @@ import java.awt.geom.Point2D;
 public class BunnyController {
 
     private int rotation;
-    private double x, y, speed, boundX, boundY;
+    private double x, y, speed;
     private boolean forward, rotateLeft, rotateRight, braking;
+    private boolean softwareFailure, switched;
     private final int rotationAmount = 5;
     private final double defAcceleration = 0.4;
     private final double breakingAcceleration = -1;
@@ -27,16 +28,18 @@ public class BunnyController {
         rotateLeft = false;
         rotateRight = false;
         speed = 1;
-        braking = false;
+        braking = false;        
         this.environment = environment;
         this.radius = radius;
         health = 100;
+        switched = false;
     }
 
     public void step() {
-        moveForward(forward);
+        moveForward();
         doRotateRight(rotateRight);
-        doRotateLeft(rotateLeft);        
+        doRotateLeft(rotateLeft);
+        softwareFailure = environment.getSoftwareFailure();
     }
 
     public void startForward() { forward = true; }
@@ -53,21 +56,31 @@ public class BunnyController {
 
     public void doRotateLeft(boolean left) {
         if (left) { 
-            rotation = (rotation - rotationAmount)% 360;
-            if (rotation < 0) {
-                rotation += 360;
-            }
+            if(!softwareFailure){ rotateLeft(); }
+            else { rotateRight(); }
         }
     }
 
     public void doRotateRight(boolean right) {
         if (right) {
-            rotation = (rotation + rotationAmount) % 360;
-        }
+            if(!softwareFailure){ rotateRight(); }
+            else { rotateLeft(); }
+        }       
+    }
+    
+    private void rotateRight(){
+        rotation = (rotation + rotationAmount) % 360;
+    }
+    
+    private void rotateLeft(){
+        rotation = (rotation - rotationAmount)% 360;
+                if (rotation < 0) {
+                    rotation += 360;
+                }
     }
 
     //Do not Go outside the game!!
-    public void moveForward(boolean forw) {
+    public void moveForward() {
         double acceleration, x0, y0;
         if ((forward && !braking)|| (speed <0)) {
             acceleration = defAcceleration;
@@ -314,7 +327,7 @@ public class BunnyController {
      public void setHitBounds(Rectangle rectangle) {
         hitBounds = rectangle;        
     }
-    
+        
     public int getX() { return (int) x; }
 
     public int getY() { return (int) y; }
@@ -327,10 +340,13 @@ public class BunnyController {
     
     public int getRadius(){ return radius; }
     
+    public boolean getSoftwareFailure() {return softwareFailure;}
+    
     public void setBounds(Rectangle rectangle) {
         bounds = rectangle;
     }    
         
+
     private double tangent(int alfa){
         return Math.tan(Math.toRadians(alfa));
     }
