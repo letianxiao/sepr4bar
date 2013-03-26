@@ -1,18 +1,13 @@
 package dab.bigBunny;
 
-import dab.gui.ComponentController;
-import dab.gui.DynamicImage;
-import dab.gui.DynamicImageFactory;
 import java.awt.*;
-
-import javax.imageio.ImageIO;
-import javax.swing.*;
 import java.awt.event.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
-import java.awt.image.ImageProducer;
 import java.io.File;
+import javax.imageio.ImageIO;
+import javax.swing.*;
 
 public class BunnyInterface extends JFrame implements KeyListener {
 
@@ -25,22 +20,22 @@ public class BunnyInterface extends JFrame implements KeyListener {
     public BunnyInterface() {
         frame = new JFrame("MockGui");
         //for now temproray resolution. The one in haddocks game needs fixing as well
-        resolution = new Dimension (800, 600);
+        resolution = new Dimension(800, 600);
         environment = new Environment(resolution.width, resolution.height);
         //Change radius according to image
         controller = new BunnyController(environment, 10);
-        Container container = frame.getContentPane();       
+        Container container = frame.getContentPane();
         canvas = new ShowCanvas(controller, environment, resolution.width, resolution.height);
         container.setLayout(null);
-        container.add(canvas);      
+        container.add(canvas);
         container.setMinimumSize(resolution);
         container.setPreferredSize(resolution);
-        container.setMaximumSize(resolution);       
+        container.setMaximumSize(resolution);
         container.setFocusable(true);
         frame.setResizable(false);
         frame.setVisible(true);
         container.addKeyListener(this);
-        frame.setDefaultCloseOperation(this.EXIT_ON_CLOSE);    
+        frame.setDefaultCloseOperation(this.EXIT_ON_CLOSE);
         frame.pack();
 
         int delay = 1000 / 30; // milliseconds
@@ -75,6 +70,9 @@ public class BunnyInterface extends JFrame implements KeyListener {
             case KeyEvent.VK_DOWN:
                 controller.startBrake();
                 break;
+            case KeyEvent.VK_SPACE:
+                environment.startSoftwareFailure();
+                break;
         }
     }
 
@@ -96,8 +94,9 @@ public class BunnyInterface extends JFrame implements KeyListener {
         }
     }
 
-    @Override  
-    public void keyTyped(KeyEvent e) { } //Do nothing
+    @Override
+    public void keyTyped(KeyEvent e) {
+    } //Do nothing
 }
 
 class ShowCanvas extends JPanel implements MouseListener {
@@ -109,7 +108,6 @@ class ShowCanvas extends JPanel implements MouseListener {
     private Rectangle bounds;
     private JLabel box;
     private ImageIcon boxToHit;
-    private ComponentController pump1;
 
     ShowCanvas(BunnyController controller, Environment environment, int dimX, int dimY) {
         this.controller = controller;
@@ -119,23 +117,21 @@ class ShowCanvas extends JPanel implements MouseListener {
         setBackground(Color.WHITE);
         bar = new JProgressBar(0, controller.getHealth());
         this.add(bar);
-        //bar.setLocation(0, 100);
-        bar.setBounds(10, 10, 100, 20);
+        bar.setBounds(10, 10, 100, 30);
         bar.setVisible(true);
         bar.setStringPainted(true);
-        
+
         box = new JLabel("Box");
         boxToHit = new ImageIcon("resources/HitableBox.png");
         box.setIcon(boxToHit);
-        box.setBounds(500, 500, 30, 30);
-        this.add(box);       
+        box.setBounds(500, 500, 40, 40);
+        this.add(box);
         box.setVisible(true);
         controller.setHitBounds(box.getBounds());
-  
-         
-         //to call this on the reactorPannel, not on this thing
+
+        //to call this on the reactorPannel, not on this thing
         bounds = this.getBounds();
-        controller.setBounds(bounds);        
+        controller.setBounds(bounds);
 
         //This needs to be added to the ReactorPannel, so that only on reactor pannel we could shoot
         addMouseListener(this);
@@ -146,9 +142,10 @@ class ShowCanvas extends JPanel implements MouseListener {
             System.err.println("Image not found");
         }
 
-        
+
     }
 
+    @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2D = (Graphics2D) g;
@@ -169,25 +166,25 @@ class ShowCanvas extends JPanel implements MouseListener {
             g2D.fill(circle);
 
         }
-        
+
         for (Bullets b : environment.getBullets()) {
-            Ellipse2D.Double circle = new Ellipse2D.Double(b.getLocation().getX(),b.getLocation().getY(),4.0,4.0);
+            Ellipse2D.Double circle = new Ellipse2D.Double(b.getLocation().getX(), b.getLocation().getY(), 4.0, 4.0);
             g2D.setColor(Color.BLACK);
             g2D.fill(circle);
         }
-        
+
         Ellipse2D.Double circle = new Ellipse2D.Double((double) controller.getX() - 10, (double) controller.getY() - 10, 20.0, 20.0);
         g2D.drawImage(bunny, af, this);
         g2D.setColor(Color.black);
         g2D.draw(circle);
-        
+
         bar.setValue(controller.getHealth());
     }
 
     public void mousePressed(MouseEvent e) {
         Point clicked = new Point(e.getX(), e.getY());
-        
-        
+
+
         //Also get the power generated, check if it is > then some amount,
         //if it is - subtrackt that amount and call this:
         double distance = clicked.distance(controller.getCoordinates());
@@ -195,17 +192,20 @@ class ShowCanvas extends JPanel implements MouseListener {
             System.out.println("Bunny has been shot");
             controller.hasBeenShot();
             //Animation of shot bunny 
-        }
-        else {
+        } else {
             environment.addBullet(clicked); //bullet hole if missed
         }
     }
 
-    public void mouseClicked(MouseEvent e) { } //Do nothing
-    
-    public void mouseReleased(MouseEvent e) { } //Do nothing
+    public void mouseClicked(MouseEvent e) {
+    } //Do nothing
 
-    public void mouseEntered(MouseEvent e) { } //Do nothing
+    public void mouseReleased(MouseEvent e) {
+    } //Do nothing
 
-    public void mouseExited(MouseEvent e) { } //Do nothing
+    public void mouseEntered(MouseEvent e) {
+    } //Do nothing
+
+    public void mouseExited(MouseEvent e) {
+    } //Do nothing
 }
