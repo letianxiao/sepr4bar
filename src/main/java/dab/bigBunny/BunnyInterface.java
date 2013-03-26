@@ -37,6 +37,7 @@ public class BunnyInterface extends JFrame implements KeyListener {
         container.setPreferredSize(resolution);
         container.setMaximumSize(resolution);       
         container.setFocusable(true);
+        frame.setResizable(false);
         frame.setVisible(true);
         container.addKeyListener(this);
         frame.setDefaultCloseOperation(this.EXIT_ON_CLOSE);    
