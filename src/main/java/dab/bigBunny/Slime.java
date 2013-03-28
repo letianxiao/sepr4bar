@@ -36,9 +36,10 @@ public class Slime {
     public Point getLocation()      { return location; }
     public int   getRadius() { return radius; }
     
-    /*
-     * return 0 if we have faded away
-     *        1 if we have just been created
+    
+    /**
+     * @return a double from 0 (old) to 1 (new) \\
+     *         depending on how old the slime is.
      */
     public double getFreshness() {
         return (double)remainingTimeToLive / (double)initialTimeToLive;

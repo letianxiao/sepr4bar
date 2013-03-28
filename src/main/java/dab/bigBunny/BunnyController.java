@@ -54,10 +54,10 @@ public class BunnyController {
     }
 
     public void step() {
-        //updateMovement();
-        moveForward();
-        doRotateLeft(rotatingLeft);
-        doRotateRight(rotatingRight);
+        updateMovement();
+        //moveForward();
+        //doRotateLeft(rotatingLeft);
+        //doRotateRight(rotatingRight);
         softwareFailure = environment.getSoftwareFailure();
     }
     
@@ -79,11 +79,13 @@ public class BunnyController {
         if (intersected != null) {
            // System.out.println("Intersected with " + intersected.toString());
             // BAD CODE!!!
-            if (speed > 2) {
+            if (speed > 2)
+                speed = speed * (1 - intersected.getFreshness() * 0.2);
+                /*{
                 acceleration = -1 * (intersected.getFreshness() + 0.5);
             } else {
                 acceleration /= 2;
-            }
+            }*/
         }
         
         return acceleration;
@@ -110,8 +112,8 @@ public class BunnyController {
         if (rotatingLeft)
             rotation = (rotation - ROTATION_AMOUNT) % 360;
         if (rotatingRight) 
-            rotation = (rotation + ROTATION_AMOUNT) % 360;
-        
+            rotation = (rotation + ROTATION_AMOUNT) % 360; 
+       
         // calculate new coordonates
         x = newX;
         y = newY;
@@ -197,7 +199,7 @@ public class BunnyController {
         }        
        // System.out.println(String.format("speed: %f, acc: %f", speed, acceleration));     
         speed += acceleration;
-        if((speed>-1)&& speed<0){speed =0;}
+        if((-1<speed)&& speed<0){speed =0;}
         x0 = x;
         y0 = y;
         
