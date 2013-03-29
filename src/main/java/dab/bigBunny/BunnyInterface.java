@@ -45,6 +45,7 @@ public class BunnyInterface extends JFrame implements KeyListener {
                 controller.step();
                 environment.step();
                 canvas.repaint();
+                System.out.println("" + controller.getOrientation());
             }
         };
         new Timer(delay, taskPerformer).start();
@@ -152,7 +153,7 @@ class ShowCanvas extends JPanel implements MouseListener {
         AffineTransform af = new AffineTransform();
 
         af.translate(controller.getX(), controller.getY());
-        af.rotate((90 + controller.getRotation()) * Math.PI / 180);
+        af.rotate((90 + controller.getOrientation()) * Math.PI / 180);
         af.translate(-bunny.getWidth() / 2, -bunny.getHeight() / 2);
 
         for (Slime s : environment.getSlimes()) {
@@ -167,7 +168,7 @@ class ShowCanvas extends JPanel implements MouseListener {
 
         }
 
-        for (Bullets b : environment.getBullets()) {
+        for (BulletHole b : environment.getBullets()) {
             Ellipse2D.Double circle = new Ellipse2D.Double(b.getLocation().getX(), b.getLocation().getY(), 4.0, 4.0);
             g2D.setColor(Color.BLACK);
             g2D.fill(circle);

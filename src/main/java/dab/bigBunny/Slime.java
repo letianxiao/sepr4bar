@@ -11,11 +11,9 @@ import java.awt.geom.Point2D;
  *
  * @author eduard
  */
-public class Slime {
+public class Slime extends TemporaryObject {
     
     private static final int radius = 50;
-    private Point location;
-    private int remainingTimeToLive;
     private int initialTimeToLive;
     
     public Slime(int x, int y, int ttl) {
@@ -23,18 +21,11 @@ public class Slime {
     }
     
     public Slime(Point p, int ttl) {
-        this.location = p;
-        this.remainingTimeToLive = ttl;
-        this.initialTimeToLive = ttl;
+        super(p, ttl);
+        initialTimeToLive = ttl;
     }
     
-    public void step() {
-        if (remainingTimeToLive > 0)
-            remainingTimeToLive--;
-    }
-    
-    public Point getLocation()      { return location; }
-    public int   getRadius() { return radius; }
+    public int   getRadius()   { return radius; }
     
     
     /**

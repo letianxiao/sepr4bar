@@ -13,18 +13,22 @@ import java.util.Random;
  * @author eduard
  */
 public class Environment {
-    private LinkedList<Slime> slimes;
+    //private LinkedList<Slime> slimes;
     private int width;
     private int height;
-    private LinkedList<Bullets> bullets;
+    //private LinkedList<Bullets> bullets;
+    
+    private TemporaryObjectList<Slime> slimes;
+    private TemporaryObjectList<BulletHole> bullets;
+    
     private boolean softwareFailure;
     private final int DEFAULT_FAILURE_TIME = 100;
     private final int DEFAULT_CANT_FAIL = 300;
     private int sfTime, sfCantFailTime;  
     
     public Environment(int width, int height) {
-        slimes = new LinkedList<Slime>();
-        bullets = new LinkedList<Bullets>();
+        slimes = new TemporaryObjectList<Slime>();
+        bullets = new TemporaryObjectList<BulletHole>();
         this.width = width;
         this.height = height;
         softwareFailure = false;
@@ -39,32 +43,17 @@ public class Environment {
         if (rnd.nextDouble() < 0.01 && slimes.size() < 10) { // 1% chance
             int x = rnd.nextInt(width);
             int y = rnd.nextInt(height);
-            slimes.addFirst(new Slime(x, y, 3000));
+            slimes.add(new Slime(x, y, 3000));
             System.out.println("new slime " + x + " " + y);
         }
-            
-        
-        // FIXME: slow as fuck
-        while (!slimes.isEmpty() && slimes.getLast().getFreshness() == 0) {
-            slimes.removeLast();
-        }
-        
-        for (Slime s : slimes) {
-            s.step();
-        }
-        
-        //CopyPasting from Slime. Bad. Sorry. 
-        while(!bullets.isEmpty() && !bullets.getFirst().getIsVisible()){
-            bullets.removeFirst();
-        }
-        
-        for (Bullets b : bullets) { b.step(); }
+        slimes.step();
+        bullets.step();
         
     }
     
     // return the newest one that intersects
     public Slime intersectWithSlime(Point p, int radius) {
-        for (Slime s : slimes) {
+        for (Slime s : slimes.getRawList()) {
             int sqdistance = (int)p.distanceSq(s.getLocation());
             int sqSumRadius = (radius + s.getRadius()) * (radius + s.getRadius());
             if (sqdistance < sqSumRadius) // they intersect
@@ -75,16 +64,16 @@ public class Environment {
     
     // NOTE: return arrayList;
     public LinkedList<Slime> getSlimes() {
-        return slimes;
+        return slimes.getRawList();
     }
     
     public void addBullet(Point location){
-        bullets.add(new Bullets(location));
+        bullets.add(new BulletHole(location));
     }
     
     //CopyPasting from Slime. Bad. Sorry. 
-    public LinkedList<Bullets> getBullets(){
-        return bullets;
+    public LinkedList<BulletHole> getBullets(){
+        return bullets.getRawList();
     }
     
     public void startSoftwareFailure() {

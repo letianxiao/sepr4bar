@@ -1,5 +1,6 @@
 package dab.bigBunny;
 
+import dab.bigBunny.util.Vector;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.geom.Point2D;
@@ -58,61 +59,112 @@ public class BunnyController {
         //moveForward();
         //doRotateLeft(rotatingLeft);
         //doRotateRight(rotatingRight);
+        
+        // NOTE on this one: never asign a variable a value that changes over time
+        // reason is that you need to keep updating the variable, better is to just call the changing method directly
         softwareFailure = environment.getSoftwareFailure();
     }
     
-    /*
+    private boolean isConfused() {
+        return environment.getSoftwareFailure();
+    }
+    
+    /**
      * calculate acceleration depending on the state
      * (running, braking, intersecting slime)
      */
     private double computeAcceleration() {
-        double acceleration;
         if (movingForward && !braking) {
-            acceleration = DEF_ACCELERATION;
+            return DEF_ACCELERATION;
         } else if (braking) {
-            acceleration = BRAKING_ACCELERATION;
+            return BRAKING_ACCELERATION;
         } else {
-            acceleration = NORMAL_STOPPING;
+            return NORMAL_STOPPING;
         }
+    }
+    
+    /**
+     * Calculates the new speed also taking into consideration slimes
+     */
+    private double computeSpeed() {
+        double acceleration = computeAcceleration();
+        double newSpeed = speed;
+        newSpeed += acceleration;
         
+        // apply slime speed modifier       
         Slime intersected = environment.intersectWithSlime(new Point(getX(), getY()), radius);
         if (intersected != null) {
-           // System.out.println("Intersected with " + intersected.toString());
-            // BAD CODE!!!
-            if (speed > 2)
-                speed = speed * (1 - intersected.getFreshness() * 0.2);
-                /*{
-                acceleration = -1 * (intersected.getFreshness() + 0.5);
-            } else {
-                acceleration /= 2;
-            }*/
+            if (newSpeed > 2) {
+                // when slime is new, we slowdown by 80% (1 - 1*0.2 = 0.8)
+                // for old slime, no slowdown: 1 - 0*0.2 = 1
+                newSpeed *= (1 - intersected.getFreshness() * 0.2);
+            }
+        }
+       
+        // no not allow backwards movement
+        if (newSpeed < 0) {
+            newSpeed = 0;
         }
         
-        return acceleration;
+        return newSpeed;
+    }
+    
+    /**
+     * Calculates orientation based only on turning left/right values
+     */
+    private double computeBasicOrientation() {
+        // -sidenote-
+        // for the optimization-freak, we can use 'circuit logic' with 3 inputs:
+        // rotatingLeft (L), rotatingRight(R) and isConfused(C)
+        // and 2 outputs: rotating? (R?) and rotatingLeft? (L?)
+        // thus, R? = rotatingRight ^ rotatingLeft
+        // and L? = (C & !L) || (!C & L)
+        // after that we only need two 'if's
+        // -end-sidenote-
+        
+        double newOrientation = rotation;
+        
+        // FIXME: bad naming...
+        boolean actuallyRotatingLeft, actuallyRotatingRight;
+        // when confused (software failures) swap rotating left right values;
+        if (isConfused()) {
+            actuallyRotatingLeft  = rotatingRight;
+            actuallyRotatingRight = rotatingLeft;
+        } else {
+            actuallyRotatingLeft  = rotatingLeft;
+            actuallyRotatingRight = rotatingRight;
+        }
+            
+            
+        if (actuallyRotatingLeft)
+            newOrientation -= ROTATION_AMOUNT;
+        if (actuallyRotatingRight)
+            newOrientation += ROTATION_AMOUNT;
+        
+        
+        if (newOrientation >= 360)
+            return newOrientation - 360;
+        if (newOrientation < 0)
+            return newOrientation + 360;
+        
+        return newOrientation;
     }
     
     protected void updateMovement() {
-        double acceleration = computeAcceleration();
         double newX, newY;
-        
-        // no not allow backwards movement
-        speed += acceleration;
-        if (speed < 0) {
-            speed = 0;
-        }
 
+        rotation = (int)computeBasicOrientation();
+        speed    = computeSpeed();
+        
+        Vector movementV = new Vector(new Point2D.Double(x, y), Math.toRadians(rotation), speed);
+        
         // calculate predicted coordonates
-        newX = x + speed * Math.cos(Math.toRadians(rotation));
-        newY = y + speed * Math.sin(Math.toRadians(rotation));  
+        newX = movementV.getB().getX();
+        newY = movementV.getB().getY();
         
         // check for solid collisions (including bounding box)
         
-        // update orientation (rotation)
-        // TODO: should we update the rotation first and then the coordonates?
-        if (rotatingLeft)
-            rotation = (rotation - ROTATION_AMOUNT) % 360;
-        if (rotatingRight) 
-            rotation = (rotation + ROTATION_AMOUNT) % 360; 
+
        
         // calculate new coordonates
         x = newX;
