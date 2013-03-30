@@ -9,23 +9,27 @@ public class BunnyController {
     private final int ROTATION_AMOUNT = 5;
     
     // default ammount to accelerate
-    private final double DEF_ACCELERATION = 0.4;;
+    private final double DEF_ACCELERATION = 0.4;
     
     private final double BRAKING_ACCELERATION = -1;
     
     // ammount we slow down when nothing is happenning (it's basically usual drag)
     private final double NORMAL_STOPPING = -0.5;
     
-    //the angle at which the bunny slids, not bounces
-    private final int SLIDE_ANGLE = 35;
+    private final double FRICTION_SLOWDOWN = 0.5;
     
-    //the speed at which the bunny bouces of things
-    private final int BOUNCE_SPEED = 2;
+    //the angle at which the bunny slids, not bounces
+    private final int SLIDE_ANGLE = 40;
+    
+    //the speed from which the bunny bouces of things
+    private final int BOUNCE_SPEED = 6;
+    
+    //the amount of bouncing
+    private final double BOUNCE_AMOUNT = -0.5;
       
-    private int tempOrientation;
-    private int orientation;
+    private int orientation, tempOrientation;
     private String spinDirection;
-    private double x, y, speed;
+    private double x, y, speed,tempSpeed;
     private boolean movingForward, rotatingLeft, rotatingRight, braking;
     private boolean softwareFailure;
 
@@ -33,7 +37,7 @@ public class BunnyController {
     private int radius;
     private int health;
     private Rectangle bounds, hitBounds;
-    private final double bounce = -0.5;
+    
     
 
     /* 
@@ -218,7 +222,7 @@ public class BunnyController {
             acceleration = NORMAL_STOPPING;
         } else {acceleration = 0;}
         
-        System.out.println("speed "+ speed);
+       // System.out.println("speed "+ speed);
         
         Slime intersected = environment.intersectWithSlime(new Point(getX(), getY()), radius);
         if (intersected != null) {
@@ -460,8 +464,7 @@ public class BunnyController {
     }
     
     
-    //<<<This needs shrinking and making nicer. Will try to fix later. For now - ugly but fun
-    // also play a bit more with directions - expand their dependancies to fit real life more>>>>>
+    //<<<This needs shrinking and making nicer. Will try to fix later. For now - ugly but fun>>>>>
     private void adjustOrientation(int direction){
    
         switch(direction){
@@ -471,15 +474,8 @@ public class BunnyController {
                 } else if ((orientation-270<SLIDE_ANGLE)&&(orientation-270>0)){
                     tempOrientation = 270;
                 } else if(speed > BOUNCE_SPEED){
-                    tempOrientation = (360-orientation)%360;
-                    if(orientation>270){                            //expand
-                        spinDirection = "right";
-                    } else {
-                        spinDirection = "left";
-                    }                   
-                    speed = bounce * speed;
+                    startSpin(0);
                 } else {
-                    speed = DEF_ACCELERATION;
                     tempOrientation = orientation;
                 }
                 break;
@@ -489,15 +485,8 @@ public class BunnyController {
                 } else if (orientation > 180-SLIDE_ANGLE){
                     tempOrientation = 180;
                 } else if (speed > BOUNCE_SPEED) {
-                    tempOrientation = 90 + 90 - orientation;
-                    if(orientation>90) {                        //expand
-                        spinDirection = "right";
-                    } else {
-                        spinDirection = "left";
-                    }
-                   speed = bounce * speed;  
+                   startSpin(1);
                 } else {
-                    speed = DEF_ACCELERATION;
                     tempOrientation = orientation;
                 }
                 break;
@@ -507,15 +496,8 @@ public class BunnyController {
                 } else if (orientation < 90 + SLIDE_ANGLE) {
                     tempOrientation = 90;
                 } else if (speed > BOUNCE_SPEED) {
-                    tempOrientation = 180 + 180 - orientation;
-                    if(orientation<180){                                   //expand
-                        spinDirection = "right";
-                    } else {
-                        spinDirection = "left";
-                    }
-                  speed = bounce * speed;  
+                    startSpin(2);
                 } else {
-                    speed = DEF_ACCELERATION;
                     tempOrientation = orientation;              
                 }
                 break;   
@@ -525,31 +507,84 @@ public class BunnyController {
                 } else if(360 - orientation < SLIDE_ANGLE){
                     tempOrientation = 0;
                 } else if (speed > BOUNCE_SPEED) {
-                    tempOrientation = 270 + (270 - orientation);
-                    if(orientation<270){                            //expand
+                   startSpin(3);
+                } else {                   
+                    tempOrientation = orientation;
+                }
+                break;          
+        }
+        
+        if (speed > 0) {
+            speed -= FRICTION_SLOWDOWN ;
+        }
+    }
+ 
+    private void startSpin(int direction){
+        switch(direction) {
+            case 0:
+                tempOrientation = (360-orientation)%360;
+                    if(orientation>270){                           
+                        spinDirection = "right";
+                    } else {
+                        spinDirection = "left";
+                    }  
+            break;
+            case 1:
+                 tempOrientation = 90 + 90 - orientation;
+                    if(orientation<90) {                        
+                        spinDirection = "right";
+                    } else {
+                        spinDirection = "left";
+                    }
+            break;
+            case 2:
+                tempOrientation = 180 + 180 - orientation;
+                    if(orientation<180){                                   
+                        spinDirection = "right";
+                    } else {
+                        spinDirection = "left";
+                    }
+            break;
+            case 3:
+                 tempOrientation = 270 + (270 - orientation);
+                    if(orientation<270){                            
                         spinDirection="right";
                     } else {
                         spinDirection = "left";
                     }
-                    speed = bounce * speed;
-                } else {
-                    speed = DEF_ACCELERATION;
-                    tempOrientation = orientation;
-                }
-                break;
-            
-        }
-    }
+           break;
+        }                 
  
+        tempSpeed =speed;
+        speed = BOUNCE_AMOUNT * speed;
+        
+    }
+    
     //<<<<This is bad and incomlete. To be reajusted and expanded. 
     //Commiting before "breaking" stuff..>>>>>>>
     private void spin(){
-       if(spinDirection.equalsIgnoreCase("left")){
-           orientation -= 10;
+        double spinCoef;
+        int angle;
+        double a,b,c,d;
+        a=0.0001;        
+        b=0.35;
+        c=-0.5;
+        d = -0.5;
+       
+        double speedCoef = b*tempSpeed*tempSpeed +c*tempSpeed + d;
+        
+        
+        if(spinDirection.equalsIgnoreCase("left")){
+            angle = 90- tempOrientation%90;
+            spinCoef = a*angle*angle ;
+            orientation -= speedCoef*spinCoef;
        } else {
-           orientation += 10;
+            angle = tempOrientation%90;
+            spinCoef = a*angle*angle ;
+           orientation += speedCoef*spinCoef;
        }
         
+       System.out.println("angle: " + angle + " spincoef: " + spinCoef + " speed: " + speed); 
     }
     
     public void setHitBounds(Rectangle rectangle) {
