@@ -16,8 +16,15 @@ public class BunnyController {
     // ammount we slow down when nothing is happenning (it's basically usual drag)
     private final double NORMAL_STOPPING = -0.5;
     
+    //the angle at which the bunny slids, not bounces
+    private final int SLIDE_ANGLE = 35;
+    
+    //the speed at which the bunny bouces of things
+    private final int BOUNCE_SPEED = 2;
+      
     private int tempOrientation;
     private int orientation;
+    private String spinDirection;
     private double x, y, speed;
     private boolean movingForward, rotatingLeft, rotatingRight, braking;
     private boolean softwareFailure;
@@ -27,6 +34,7 @@ public class BunnyController {
     private int health;
     private Rectangle bounds, hitBounds;
     private final double bounce = -0.5;
+    
 
     /* 
      * BunnyController: Environment, position, size
@@ -57,15 +65,15 @@ public class BunnyController {
         softwareFailure = environment.getSoftwareFailure();
         //updateMovement();
         moveForward();
-        doRotateLeft(rotatingLeft);
-        doRotateRight(rotatingRight);
-        
-        
+        doRotateLeft();
+        doRotateRight();     
     }
     
     /*
      * calculate acceleration depending on the state
      * (running, braking, intersecting slime)
+     * <<<<<<look at the acceleration computation below. That one is not finished either, but it has more stuff
+     * than this>>>>>
      */
     
     private double computeAcceleration() {
@@ -92,17 +100,20 @@ public class BunnyController {
         return acceleration;
     }
     
+    //<<<<<this is awesome, except for newX, as it would require a lot of refactoring of later things
+    //but if you insist that x can't be readjusted a few times.. Go ahead :P Refactor :P I tried and broke stuff :D >>>>
     protected void updateMovement() {
         double acceleration = computeAcceleration();
         double newX, newY;
         
         // no not allow backwards movement
+        //<<<<<Yes, allow backwards movements for awesome bouncing :P>>>>>>>>>
         speed += acceleration;
         if (speed < 0) {
             speed = 0;
         }
 
-        // calculate predicted coordonates
+        // calculate predicted coordonates        
         newX = x + speed * Math.cos(Math.toRadians(orientation));
         newY = y + speed * Math.sin(Math.toRadians(orientation));  
         
@@ -110,6 +121,11 @@ public class BunnyController {
         
         // update orientation (orientation)
         // TODO: should we update the orientation first and then the coordonates?
+        
+        //<<<<<<<<<<<<<<This is BAD, orientation shouldnt go from -360 to 360. 
+        //Why dont you want to call the methods I wrote, with SF from here? 
+        //They're not pretty, could use improvements, but at least they're not
+        //calculating it wrongly as those are..>>>>>>>>>>>>>>
         if (rotatingLeft)
             orientation = (orientation - ROTATION_AMOUNT) % 360;
         if (rotatingRight) 
@@ -136,8 +152,8 @@ public class BunnyController {
      * see {@link moveForward()} for reasons
      */
     @Deprecated
-    public void doRotateLeft(boolean left) {
-        if (left) { 
+    public void doRotateLeft() {
+        if (rotatingLeft) { 
             if(!softwareFailure){ rotateLeft(); }
             else { rotateRight(); }
         }
@@ -147,8 +163,8 @@ public class BunnyController {
      * see {@link moveForward()} for reasons
      */
     @Deprecated
-    public void doRotateRight(boolean right) {
-        if (right) {
+    public void doRotateRight() {
+        if (rotatingRight) {
             if(!softwareFailure){ rotateRight(); }
             else { rotateLeft(); }
         }       
@@ -183,6 +199,11 @@ public class BunnyController {
      *   it doesn't allow for easy changes in orientation 
      *     (think what happens if we colide with a component at a very small angle)
      * 
+     * <<<<<<<Fixed the sliding, have no idea what the rest of the comment mean :(  
+     * Do what you want, but please at least look at what I did first. Would appreciate if refactoring wouldnt
+     * mean you rewriting stuff from scratch, I can fix my mistakes or you can fix them, but incomplete things
+     * shouldnt be dissmissed only when they're incomplete :PPPPPP >>>>>>>>>>>
+     * 
      * @deprecated use {@link updateMovement()} instead
      */
     //Do not Go outside the game!!
@@ -212,11 +233,17 @@ public class BunnyController {
        // System.out.println(String.format("speed: %f, acc: %f", speed, acceleration));     
         speed += acceleration;
         if((speed>-1)&& speed<0){speed =0;}
+        if(speed>=0) {
+            tempOrientation = orientation;
+        } else {
+            spin();
+        }
+        
         x0 = x;
         y0 = y;
         
-        x += speed * Math.cos(Math.toRadians(orientation));
-        y += speed * Math.sin(Math.toRadians(orientation));     
+        x += speed * Math.cos(Math.toRadians(tempOrientation));
+        y += speed * Math.sin(Math.toRadians(tempOrientation));     
         
         //to check if intersectig with something - be that bounds or components
         checkInBounds(); 
@@ -235,13 +262,10 @@ public class BunnyController {
         }
     }
     
+    //<<<<<geting weird stuff when trying to use strings in cases. Will fix it later, as lazy to google now 8)>>>>>
     private void checkInBounds(){
-      
-  
-        if(!bounds.contains(x,y)){
-           
-           
-            
+
+        if(!bounds.contains(x,y)){    
             if(bounds.getMinX() > x){
                 x = bounds.getMinX();
                 //adjustOrientation("right");
@@ -282,10 +306,7 @@ public class BunnyController {
          * previous coordinates and the new ones intersects the object. 
          */
         if((hit(y2, x2, halfHeight, halfWidth))||(hitBounds.intersectsLine(x0, y0, x, y))){ 
-            //Break the component
-
-            
-            
+            //Break the component         
             //give headake
             
             if (orientation == 0) {
@@ -438,34 +459,78 @@ public class BunnyController {
         y = y0 + ((x-x0)* tangent(orientation*i));    
     }
     
+    
+    //<<<This needs shrinking and making nicer. Will try to fix later. For now - ugly but fun
+    // also play a bit more with directions - expand their dependancies to fit real life more>>>>>
     private void adjustOrientation(int direction){
-        int slideCoef = 40;
-        int bounceSpeed = 2;
-        
+   
         switch(direction){
             case 0:
-                if((90-orientation<slideCoef)&&(90-orientation >0)){
+                if((90-orientation<SLIDE_ANGLE)&&(90-orientation >0)){
                     tempOrientation = 90;
-                } else if ((orientation-270<slideCoef)&&(orientation-270>0)){
+                } else if ((orientation-270<SLIDE_ANGLE)&&(orientation-270>0)){
                     tempOrientation = 270;
-                } else if(speed > bounceSpeed){
-                    //tempOrientation = (360-orientation)%360;
-                    //tempOrientation = orientation-90;
-                    //spin(0);
+                } else if(speed > BOUNCE_SPEED){
+                    tempOrientation = (360-orientation)%360;
+                    if(orientation>270){                            //expand
+                        spinDirection = "right";
+                    } else {
+                        spinDirection = "left";
+                    }                   
                     speed = bounce * speed;
                 } else {
                     speed = DEF_ACCELERATION;
                     tempOrientation = orientation;
                 }
                 break;
-            
-            case 3:
-                if(orientation-180<slideCoef){
+            case 1: 
+                if(orientation<SLIDE_ANGLE){
+                    tempOrientation =0;
+                } else if (orientation > 180-SLIDE_ANGLE){
                     tempOrientation = 180;
-                } else if(360 - orientation < slideCoef){
+                } else if (speed > BOUNCE_SPEED) {
+                    tempOrientation = 90 + 90 - orientation;
+                    if(orientation>90) {                        //expand
+                        spinDirection = "right";
+                    } else {
+                        spinDirection = "left";
+                    }
+                   speed = bounce * speed;  
+                } else {
+                    speed = DEF_ACCELERATION;
+                    tempOrientation = orientation;
+                }
+                break;
+            case 2:
+                if(orientation>270-SLIDE_ANGLE){
+                    tempOrientation = 270;
+                } else if (orientation < 90 + SLIDE_ANGLE) {
+                    tempOrientation = 90;
+                } else if (speed > BOUNCE_SPEED) {
+                    tempOrientation = 180 + 180 - orientation;
+                    if(orientation<180){                                   //expand
+                        spinDirection = "right";
+                    } else {
+                        spinDirection = "left";
+                    }
+                  speed = bounce * speed;  
+                } else {
+                    speed = DEF_ACCELERATION;
+                    tempOrientation = orientation;              
+                }
+                break;   
+            case 3:
+                if(orientation-180<SLIDE_ANGLE){
+                    tempOrientation = 180;
+                } else if(360 - orientation < SLIDE_ANGLE){
                     tempOrientation = 0;
-                } else if (speed > bounceSpeed) {
+                } else if (speed > BOUNCE_SPEED) {
                     tempOrientation = 270 + (270 - orientation);
+                    if(orientation<270){                            //expand
+                        spinDirection="right";
+                    } else {
+                        spinDirection = "left";
+                    }
                     speed = bounce * speed;
                 } else {
                     speed = DEF_ACCELERATION;
@@ -476,10 +541,15 @@ public class BunnyController {
         }
     }
  
-    private void spin(int i){
-        if(speed<0){
-            orientation =orientation + 10;
-        }
+    //<<<<This is bad and incomlete. To be reajusted and expanded. 
+    //Commiting before "breaking" stuff..>>>>>>>
+    private void spin(){
+       if(spinDirection.equalsIgnoreCase("left")){
+           orientation -= 10;
+       } else {
+           orientation += 10;
+       }
+        
     }
     
     public void setHitBounds(Rectangle rectangle) {
