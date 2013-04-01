@@ -2,7 +2,6 @@ package dab.bigBunny;
 
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.geom.Point2D;
 
 public class BunnyController {
     // number of degrees to rotate per step
@@ -16,17 +15,20 @@ public class BunnyController {
     // ammount we slow down when nothing is happenning (it's basically usual drag)
     private final double NORMAL_STOPPING = -0.5;
     
-    private final double FRICTION_SLOWDOWN = 0.5;
+    //if the bunny is sliding off the surface(not next to it, but in the direction of it),
+    //its speed is decreased by this amount
+    private final double FRICTION_SLOWDOWN = 3;
     
     //the angle at which the bunny slids, not bounces
     private final int SLIDE_ANGLE = 30;
     
+    //if the bunny has lower speed then the counce speed, it starts sliding (rotating) by this
     private final int SLIDE_AMOUNT = 2;
     
     //the speed from which the bunny bouces of things
-    private final int BOUNCE_SPEED = 6;
+    private final int BOUNCE_SPEED = 2;
     
-    //the amount of bouncing
+    //the amount of bouncing 
     private final double BOUNCE_AMOUNT = -0.5;
       
     private int orientation, tempOrientation, direction;
@@ -216,12 +218,14 @@ public class BunnyController {
     @Deprecated
     public void moveForward() {
         double acceleration, x0, y0;
-        if ((movingForward && !braking)|| (speed <0)) {
+        if (movingForward && !braking) {
             acceleration = DEF_ACCELERATION;
         } else if (braking && (speed >0)) {
             acceleration = BRAKING_ACCELERATION;
         } else if(speed >0){
             acceleration = NORMAL_STOPPING;
+        } else if (speed < 0){
+            acceleration = -BRAKING_ACCELERATION;
         } else {acceleration = 0;}
         
        // System.out.println("speed "+ speed);
@@ -232,7 +236,9 @@ public class BunnyController {
             // BAD CODE!!!
             if (speed > 2) {
                 acceleration = -1 * (intersected.getFreshness() + 0.5);
-            } else {
+            } else if (speed < -2){
+                acceleration = intersected.getFreshness() + 0.5;
+            } else  {
                 acceleration /= 2;
             }
         }      
@@ -242,36 +248,28 @@ public class BunnyController {
        // System.out.println(String.format("speed: %f, acc: %f", speed, acceleration));     
         speed += acceleration;
         if((speed>-1)&& speed<0){speed =0;}
+        
         if(speed>=0) {
             tempOrientation = orientation;
-             x += speed * Math.cos(Math.toRadians(tempOrientation));
-             y += speed * Math.sin(Math.toRadians(tempOrientation));  
+            updateXY(tempOrientation);   
         } else {
             spin();
-             x += speed * Math.cos(Math.toRadians(direction));
-             y += speed * Math.sin(Math.toRadians(direction));  
+             updateXY(direction); 
         }
-        
-        
-        
-          
-        
+      
         //to check if intersectig with something - be that bounds or components
         checkInBounds(); 
         chekIntersects(x0, y0);
     }
 
-
-
-    public void hasBeenShot(){
-        health --;
-        System.out.println(health);
-        if (health <= 0){
-            
-           //Nice animation of dying bunny, and gameover
-       
-        }
+      private void updateXY(int thisDirection){
+        x += speed * Math.cos(Math.toRadians(thisDirection));
+        y += speed * Math.sin(Math.toRadians(thisDirection));
     }
+    
+    
+    
+  
     
     //<<<<<geting weird stuff when trying to use strings in cases. Will fix it later, as lazy to google now 8)>>>>>
     private void checkInBounds(){
@@ -302,7 +300,7 @@ public class BunnyController {
     
     public void chekIntersects(double x0, double y0){
         double x2, y2, halfHeight, halfWidth;
-        
+        int thisDirection;
         
         //latter make these for multiple thingies
         x2 = hitBounds.getCenterX();                    
@@ -315,25 +313,31 @@ public class BunnyController {
          * second one checks if the bunny jumps over the hitable object, i.e. the line between its
          * previous coordinates and the new ones intersects the object. 
          */
-        if((hit(y2, x2, halfHeight, halfWidth))||(hitBounds.intersectsLine(x0, y0, x, y))){ 
+        if((hit(y2, x2, halfHeight, halfWidth))){
+      
+        //ToDo: use that with actual bounds, not the expanded ones. So that the bunny wouldn't jump over the thing
+        //(hitBounds.intersectsLine(x0, y0, x, y))
+            
+            
             //Break the component         
             //give headake
            
-            
+           thisDirection = adjustThisDirection();
          
-            if (orientation == 0) {
+            
+            if (thisDirection == 0) {
                 handleHitFromLeft(x2, halfWidth);
-            } else if(orientation == 90){
+            } else if(thisDirection == 90){
                 handleHitFromAbove(y2, halfHeight);
-            } else if (orientation == 180){
+            } else if (thisDirection == 180){
                 handleHitFromRight(x2, halfWidth);
-            } else if (orientation == 270){
+            } else if (thisDirection == 270){
                 handleHitFromBelow(y2, halfHeight);
-            } else if(orientation<90) {                    
+            } else if(thisDirection<90) {                    
                 handleTopLeft(x0,x2,y0,y2,halfHeight,halfWidth);                                        
-            } else if(orientation < 180){
+            } else if(thisDirection < 180){
                 handleTopRight(x0,x2,y0,y2,halfHeight,halfWidth);
-            } else if(orientation < 270){
+            } else if(thisDirection < 270){
                 handleBottomRight(x0,x2,y0,y2,halfHeight,halfWidth);
             } else {
                 handleBottomLeft(x0,x2,y0,y2,halfHeight,halfWidth);
@@ -341,31 +345,32 @@ public class BunnyController {
          orientation = tempOrientation;
         }        
     }
+   
     
     /*set y to be at the upper border of the hittable object */
     private void handleHitFromAbove(double y2, double halfHeight){
-        y = y2 - halfHeight - radius;   
+        y = y2 - halfHeight;
         //adjustOrientation("down");
         adjustOrientation(1);
     }
     
     /*set x to be at the left border of the hittable object */
     private void handleHitFromLeft(double x2, double halfWidth){
-        x= x2 - halfWidth - radius;
+        x = x2 - halfWidth;
         //adjustOrientation("left");
         adjustOrientation(0);
     }
     
     /*set x to be at the right border of the hittable object */
     private void handleHitFromRight(double x2, double halfWidth){
-        x = x2 + halfWidth + radius;
+        x = x2 + halfWidth;
         //adjustOrientation("right");
         adjustOrientation(2);
     }
     
     /*set x to be at the bottom border of the hittable object */
     private void handleHitFromBelow(double y2, double halfHeight){
-        y = y2 + halfHeight + radius;
+        y = y2 + halfHeight;
         //adjustOrientation("up");
         adjustOrientation(3);
     }
@@ -421,12 +426,12 @@ public class BunnyController {
     
     /*a check if the circle is between the height coordinates of the hittable object */
     private boolean hitOnHeight(double theY, double y2, double halfHeight){
-        return((theY > y2 - halfHeight - radius)&&(theY < y2 + halfHeight + radius));
+        return ((theY > y2 - halfHeight)&&(theY < y2 + halfHeight));
     }
     
     /*a check if the circle is between the width coordinates of the hittable object */
     private boolean hitOnWidth(double theX,double x2, double halfWidth){
-        return((theX > x2 - halfWidth - radius)&&(theX < x2 + halfWidth + radius));
+        return((theX > x2 - halfWidth)&&(theX < x2 + halfWidth));
     }
         
     /* 
@@ -437,7 +442,7 @@ public class BunnyController {
      * and would get hit from the side.
      */
     private boolean hitFromAbove(double x0, double x2,double y0, double y2, double halfHeight, double halfWidth) {
-        double deltaY = (y2 - halfHeight - radius) - y0;
+        double deltaY = (y2 - halfHeight) - y0;
         double newX;
         newX = x0 + (deltaY * tangent(90-orientation));
         return (hitOnWidth(newX, x2, halfWidth));
@@ -445,7 +450,7 @@ public class BunnyController {
    
     /*same as hitFromAbove, just checks for the thing from above */
     private boolean hitFromBelow(double x0, double x2,double y0, double y2, double halfHeight, double halfWidth){
-       double deltaY = y0 - (y2 + halfHeight + radius);
+       double deltaY = y0 - (y2 + halfHeight);
        double newX;
        newX = x0 + (deltaY * tangent(orientation-90));        
        return (hitOnWidth(newX, x2, halfWidth));
@@ -470,58 +475,61 @@ public class BunnyController {
         y = y0 + ((x-x0)* tangent(orientation*i));    
     }
     
-    
-    //<<<This needs shrinking and making nicer. Will try to fix later. For now - ugly but fun>>>>>
     private void adjustOrientation(int headingFrom){
-   
+        int thisDirection;
+        boolean wouldBounce = (speed > BOUNCE_SPEED || speed< -BOUNCE_SPEED);
+        //System.out.println("speed " + speed + " wouldBounce " + wouldBounce);
+               
+        thisDirection = adjustThisDirection();
+
         switch(headingFrom){
             case 0:
-                if((90-orientation<SLIDE_ANGLE)&&(90-orientation >0)){
+                if((90-thisDirection<SLIDE_ANGLE)&&(90-thisDirection >0)){
                     tempOrientation = 90;
-                } else if ((orientation-270<SLIDE_ANGLE)&&(orientation-270>0)){
+                } else if ((thisDirection-270<SLIDE_ANGLE)&&(thisDirection-270>0)){
                     tempOrientation = 270;
-                } else if(speed > BOUNCE_SPEED){
-                    startSpin(0);
-                } else if(orientation>270){
+                } else if(wouldBounce){
+                    startSpin(0,thisDirection);
+                } else if(thisDirection>270){
                     slide(-1);                 
                 } else {
                     slide(1);
                 }
                 break;
             case 1: 
-                if(orientation<SLIDE_ANGLE){
+                if(thisDirection<SLIDE_ANGLE){
                     tempOrientation =0;
-                } else if (orientation > 180-SLIDE_ANGLE){
+                } else if (thisDirection > 180-SLIDE_ANGLE){
                     tempOrientation = 180;
-                } else if (speed > BOUNCE_SPEED) {
-                   startSpin(1);
-                } else if(orientation>90){
+                } else if (wouldBounce) {
+                   startSpin(1, thisDirection);
+                } else if(thisDirection>90){
                     slide(1);
                 } else {
                     slide(-1);
                 }
                 break;
             case 2:
-                if(orientation>270-SLIDE_ANGLE){
+                if(thisDirection>270-SLIDE_ANGLE){
                     tempOrientation = 270;
-                } else if (orientation < 90 + SLIDE_ANGLE) {
+                } else if (thisDirection < 90 + SLIDE_ANGLE) {
                     tempOrientation = 90;
-                } else if (speed > BOUNCE_SPEED) {
-                    startSpin(2);
-                } else if(orientation>180){
+                } else if (wouldBounce) {
+                    startSpin(2, thisDirection);
+                } else if(thisDirection>180){
                     slide(1);              
                 } else {
                     slide(-1); 
                 }
                 break;   
             case 3:
-                if(orientation-180<SLIDE_ANGLE){
+                if(thisDirection-180<SLIDE_ANGLE){
                     tempOrientation = 180;
-                } else if(360 - orientation < SLIDE_ANGLE){
+                } else if(360 - thisDirection < SLIDE_ANGLE){
                     tempOrientation = 0;
-                } else if (speed > BOUNCE_SPEED) {
-                   startSpin(3);
-                } else if(orientation>270){                   
+                } else if (wouldBounce) {
+                   startSpin(3,thisDirection);
+                } else if(thisDirection>270){                   
                     slide(1);
                 } else{
                     slide(-1);
@@ -529,40 +537,40 @@ public class BunnyController {
                 break;          
         }
         
-        if (speed > 0) {
+        if (speed > FRICTION_SLOWDOWN) {
             speed -= FRICTION_SLOWDOWN ;
         }
     }
  
-    private void startSpin(int headingFrom){
+    private void startSpin(int headingFrom, int thisDirection){
         switch(headingFrom) {
             case 0:
-                direction = (360-orientation)%360;
-                    if(orientation>270){                           
+                direction = (360-thisDirection)%360;
+                    if(thisDirection>270){                           
                         spinDirection = "right";
                     } else {
                         spinDirection = "left";
                     }  
             break;
             case 1:
-                 direction = 90 + 90 - orientation;
-                    if(orientation<90) {                        
+                 direction = 90 + 90 - thisDirection;
+                    if(thisDirection<90) {                        
                         spinDirection = "right";
                     } else {
                         spinDirection = "left";
                     }
             break;
             case 2:
-                direction = 180 + 180 - orientation;
-                    if(orientation<180){                                   
+                direction = 180 + 180 - thisDirection;
+                    if(thisDirection<180){                                   
                         spinDirection = "right";
                     } else {
                         spinDirection = "left";
                     }
             break;
             case 3:
-                 direction = 270 + (270 - orientation);
-                    if(orientation<270){                            
+                 direction = 270 + (270 - thisDirection);
+                    if(thisDirection<270){                            
                         spinDirection="right";
                     } else {
                         spinDirection = "left";
@@ -571,7 +579,12 @@ public class BunnyController {
         }                 
  
         tempSpeed =speed;
-        speed = BOUNCE_AMOUNT * speed;
+        
+        if (speed > 0) {
+            speed = BOUNCE_AMOUNT * speed;
+        } else {
+            speed = BOUNCE_AMOUNT * speed * (-1);
+        }
         
     }
     
@@ -603,24 +616,37 @@ public class BunnyController {
         tempOrientation = orientation + (i * SLIDE_AMOUNT);
     }
     
+    private int adjustThisDirection(){
+        if(speed <0) {
+               return (180 + direction)%360;
+           } else {
+               return orientation;
+           }
+    }
+    
     public void setHitBounds(Rectangle rectangle) {
-        hitBounds = rectangle;        
+        int newX = (int)(rectangle.getMinX() - radius);
+        int newY = (int)(rectangle.getMinY() - radius);
+        int newWidth = (int)(rectangle.getWidth() + radius + radius);
+        int newHeight = (int) (rectangle.getHeight() + radius + radius);
+        hitBounds = new Rectangle(newX, newY, newWidth, newHeight);        
     }
         
+    public void hasBeenShot(){
+        health --;
+        System.out.println(health);
+        if (health <= 0){
+            
+           //Nice animation of dying bunny, and gameover
+       
+        }
+    }
+    
     public int getX() { return (int) x; }
 
     public int getY() { return (int) y; }
     
     public Point getCoordinates() { return (new Point(getX(), getY())); }
-
-    /*
-     * A orientation is a circular *movement* of an object around a center (or point) of orientation 
-     * source: wikipedia
-     * 
-     * @deprecated use {@link getOrientation()} instead
-     */
-    @Deprecated
-    public int getRotation()      { return getOrientation(); }
     
     public int getOrientation()   { return orientation; }
     

@@ -152,7 +152,7 @@ class ShowCanvas extends JPanel implements MouseListener {
         AffineTransform af = new AffineTransform();
 
         af.translate(controller.getX(), controller.getY());
-        af.rotate((90 + controller.getRotation()) * Math.PI / 180);
+        af.rotate((90 + controller.getOrientation()) * Math.PI / 180);
         af.translate(-bunny.getWidth() / 2, -bunny.getHeight() / 2);
 
         for (Slime s : environment.getSlimes()) {
