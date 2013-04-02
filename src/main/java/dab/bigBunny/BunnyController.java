@@ -2,6 +2,8 @@ package dab.bigBunny;
 
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Point2D;
 
 public class BunnyController {
     // number of degrees to rotate per step
@@ -42,6 +44,8 @@ public class BunnyController {
     private int health;
     private Rectangle bounds, hitBounds;
     
+    private Ellipse2D.Double hitableCircle;
+    
     
 
     /* 
@@ -62,7 +66,9 @@ public class BunnyController {
         orientation = 0;
         speed = 0;
         
-        health = 100;
+        health = 100;      
+        
+       
     }
     
     BunnyController(Environment environment, int radius) {
@@ -259,7 +265,8 @@ public class BunnyController {
       
         //to check if intersectig with something - be that bounds or components
         checkInBounds(); 
-        chekIntersects(x0, y0);
+        checkIntersectsSquare(x0, y0);
+        checkIntersectsCircle(x0, y0);
     }
 
       private void updateXY(int thisDirection){
@@ -298,21 +305,67 @@ public class BunnyController {
         }     
     }
     
-    public void chekIntersects(double x0, double y0){
+    public void checkIntersectsCircle(double x0, double y0){
+      double dx,dy,dr,D, r, x1, x2, y1, y2, xa,  xb, ya, yb, discriminant;
+      
+      x1 = changeCoordinateSystemX(x0, -1);
+      x2 = changeCoordinateSystemX(x, -1);
+      y1 = changeCoordinateSystemY(y0, -1);
+      y2 = changeCoordinateSystemY(y, -1);
+       r = hitableCircle.getHeight()/2;
+      
+      dx = x2 - x1;
+      dy = y2 - y1;
+      dr = Math.sqrt(dx*dx + dy*dy);
+      D = (x1*y2) - (x2*y1);
+      discriminant = r*r*dr*dr - D*D;
+      
+      if(Point.distance(x2, y2, 0, 0)<r){
+         System.out.println("distance " + Point.distance(x1, y1, x2, y2));
+      if(discriminant > 0) {
+          xa = (D * dy + Math.signum(dy) * dx * Math.sqrt(discriminant))/(dr*dr);
+          xb = (D * dy - Math.signum(dy) * dx * Math.sqrt(discriminant))/(dr*dr);
+          ya = (-D * dx + modulus(dy) * Math.sqrt(discriminant))/(dr*dr);
+          yb = (-D * dx - modulus(dy) * Math.sqrt(discriminant))/(dr*dr);
+          
+          xa += hitableCircle.getCenterX();
+          xb +=  hitableCircle.getCenterX();
+          ya += hitableCircle.getCenterY();
+          yb +=  hitableCircle.getCenterY();
+          
+          System.out.println("hit at x " + xa + " " + xb + " y " + ya + " " + yb);
+      
+          
+      } }
+        
+          
+        
+    }  
+
+    private double changeCoordinateSystemX (double theX, int i){
+        return (theX + i * hitableCircle.getCenterX());
+    }
+    
+    private double changeCoordinateSystemY (double theY, int i){
+        return (theY + i * hitableCircle.getCenterY());
+    }
+    
+    public void checkIntersectsSquare(double x0, double y0){
         double x2, y2, halfHeight, halfWidth;
         int thisDirection;
+ 
         
-        //latter make these for multiple thingies
+         /* 
+         * Checks if the square thingy is hit. Incomplete and messy.
+         * Those are for sqaues.We dont even have squares, its just for "playing around". 
+         * latter make these for multiple thingies
+         */
+        
         x2 = hitBounds.getCenterX();                    
         y2 = hitBounds.getCenterY();
         halfHeight = hitBounds.getHeight() / 2;
         halfWidth = hitBounds.getWidth() / 2;
-        
-        /* 
-         * first proposition checks if new coordinates of the bunny are inside the hitable object,
-         * second one checks if the bunny jumps over the hitable object, i.e. the line between its
-         * previous coordinates and the new ones intersects the object. 
-         */
+       
         if((hit(y2, x2, halfHeight, halfWidth))){
       
         //ToDo: use that with actual bounds, not the expanded ones. So that the bunny wouldn't jump over the thing
@@ -624,6 +677,7 @@ public class BunnyController {
            }
     }
     
+    //now this is set from bunnyinterface, its just to play around, but if we had hitable rectangles, it could be set using those
     public void setHitBounds(Rectangle rectangle) {
         int newX = (int)(rectangle.getMinX() - radius);
         int newY = (int)(rectangle.getMinY() - radius);
@@ -631,6 +685,16 @@ public class BunnyController {
         int newHeight = (int) (rectangle.getHeight() + radius + radius);
         hitBounds = new Rectangle(newX, newY, newWidth, newHeight);        
     }
+    
+    //now this is set from bunnyinterface, its just to play around,but it could be set using pumps in the future 
+    public void setCircle(Ellipse2D.Double circle) {
+       double newX = circle.getX() - radius;
+       double newY = circle.getY() - radius;
+       double newWidth = circle.getWidth()+radius + radius;
+       double newHeight = circle.getHeight() + radius + radius;
+       hitableCircle = new Ellipse2D.Double(newX, newY, newWidth, newHeight);       
+    }
+    
         
     public void hasBeenShot(){
         health --;
@@ -665,4 +729,12 @@ public class BunnyController {
     private double tangent(int alfa){
         return Math.tan(Math.toRadians(alfa));
     }
+    
+    private double modulus (double i){
+        if (i < 0) {return -i;}
+        else { return i;}
+    }
+    
+    
+   
 }

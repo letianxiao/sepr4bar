@@ -40,7 +40,7 @@ public class Environment {
             int x = rnd.nextInt(width);
             int y = rnd.nextInt(height);
             slimes.addFirst(new Slime(x, y, 3000));
-            System.out.println("new slime " + x + " " + y);
+           //System.out.println("new slime " + x + " " + y);
         }
             
         

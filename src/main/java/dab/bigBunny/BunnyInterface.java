@@ -108,6 +108,7 @@ class ShowCanvas extends JPanel implements MouseListener {
     private Rectangle bounds;
     private JLabel box;
     private ImageIcon boxToHit;
+    private Ellipse2D.Double hitableCircle;
 
     ShowCanvas(BunnyController controller, Environment environment, int dimX, int dimY) {
         this.controller = controller;
@@ -128,6 +129,9 @@ class ShowCanvas extends JPanel implements MouseListener {
         this.add(box);
         box.setVisible(true);
         controller.setHitBounds(box.getBounds());
+       
+        hitableCircle = new Ellipse2D.Double(300, 300, 40,40);
+        controller.setCircle(hitableCircle);      
 
         //to call this on the reactorPannel, not on this thing
         bounds = this.getBounds();
@@ -177,6 +181,11 @@ class ShowCanvas extends JPanel implements MouseListener {
         g2D.drawImage(bunny, af, this);
         g2D.setColor(Color.black);
         g2D.draw(circle);
+        
+        
+        g2D.setColor(Color.GREEN);
+        g2D.fill(hitableCircle);
+        
 
         bar.setValue(controller.getHealth());
     }
