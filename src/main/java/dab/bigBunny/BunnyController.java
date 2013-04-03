@@ -308,11 +308,13 @@ public class BunnyController {
     public void checkIntersectsCircle(double x0, double y0){
       double dx,dy,dr,D, r, x1, x2, y1, y2, xa,  xb, ya, yb, discriminant;
       
-      x1 = changeCoordinateSystemX(x0, -1);
-      x2 = changeCoordinateSystemX(x, -1);
-      y1 = changeCoordinateSystemY(y0, -1);
-      y2 = changeCoordinateSystemY(y, -1);
-       r = hitableCircle.getHeight()/2;
+      
+      //get hitable circles, ie pumps, and "for" them  
+      x1 = changeCoordinateSystemX(x0, -1,hitableCircle);
+      x2 = changeCoordinateSystemX(x, -1, hitableCircle);
+      y1 = changeCoordinateSystemY(y0, -1, hitableCircle);
+      y2 = changeCoordinateSystemY(y, -1, hitableCircle);
+      r = hitableCircle.getHeight()/2;
       
       dx = x2 - x1;
       dy = y2 - y1;
@@ -321,19 +323,35 @@ public class BunnyController {
       discriminant = r*r*dr*dr - D*D;
       
       if(Point.distance(x2, y2, 0, 0)<r){
-         System.out.println("distance " + Point.distance(x1, y1, x2, y2));
-      if(discriminant > 0) {
-          xa = (D * dy + Math.signum(dy) * dx * Math.sqrt(discriminant))/(dr*dr);
-          xb = (D * dy - Math.signum(dy) * dx * Math.sqrt(discriminant))/(dr*dr);
-          ya = (-D * dx + modulus(dy) * Math.sqrt(discriminant))/(dr*dr);
-          yb = (-D * dx - modulus(dy) * Math.sqrt(discriminant))/(dr*dr);
+         //break component
+          //give headacke
+                   
+         if(discriminant > 0) {
+            int thisDirection;
+            thisDirection = adjustThisDirection(); 
+  
+            xa = (D * dy + sgn(dy) * dx * Math.sqrt(discriminant))/(dr*dr);
+            xb = (D * dy - sgn(dy) * dx * Math.sqrt(discriminant))/(dr*dr);
+            ya = (-D * dx + modulus(dy) * Math.sqrt(discriminant))/(dr*dr);
+            yb = (-D * dx - modulus(dy) * Math.sqrt(discriminant))/(dr*dr);
           
-          xa += hitableCircle.getCenterX();
-          xb +=  hitableCircle.getCenterX();
-          ya += hitableCircle.getCenterY();
-          yb +=  hitableCircle.getCenterY();
+            if((thisDirection> 90)&& (thisDirection <270)){
+                x2 = Math.max(xa, xb);
+            } else {
+                x2 = Math.min(xa, xb);
+            }
+            
+            if (thisDirection >180) {
+                y2 = Math.max(ya,yb);
+            } else {
+                y2 = Math.min(ya,yb);
+            }
+            
+            x = changeCoordinateSystemX(x2, 1, hitableCircle);
+            y = changeCoordinateSystemY(y2, 1, hitableCircle);
+           
           
-          System.out.println("hit at x " + xa + " " + xb + " y " + ya + " " + yb);
+          
       
           
       } }
@@ -341,12 +359,14 @@ public class BunnyController {
           
         
     }  
+    
+   
 
-    private double changeCoordinateSystemX (double theX, int i){
+    private double changeCoordinateSystemX (double theX, int i, Ellipse2D.Double hitableCircle){
         return (theX + i * hitableCircle.getCenterX());
     }
     
-    private double changeCoordinateSystemY (double theY, int i){
+    private double changeCoordinateSystemY (double theY, int i, Ellipse2D.Double hitableCircle){
         return (theY + i * hitableCircle.getCenterY());
     }
     
@@ -735,6 +755,9 @@ public class BunnyController {
         else { return i;}
     }
     
-    
+     private int sgn(double i){
+        if(i>0) { return 1; }
+        else { return -1; }
+    }
    
 }
