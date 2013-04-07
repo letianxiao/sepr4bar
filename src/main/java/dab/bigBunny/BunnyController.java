@@ -285,21 +285,21 @@ public class BunnyController {
         if(!bounds.contains(x,y)){    
             if(bounds.getMinX() > x){
                 x = bounds.getMinX();
-                adjustOrientation("right", 180);
+                adjustOrientation("all", 180);
                // adjustOrientation(2);
             } else if (bounds.getMaxX() < x){
                 x = bounds.getMaxX();
-                adjustOrientation("left", 0);
+                adjustOrientation("all", 0);
                // adjustOrientation(0);
             }
             
             if(bounds.getMinY() > y){
                 y = bounds.getMinY();
-                adjustOrientation("down", 90);
+                adjustOrientation("all", 270);
                 //adjustOrientation(3);
             } else if (bounds.getMaxY() < y){
                 y = bounds.getMaxY();
-                adjustOrientation("up", 270);
+                adjustOrientation("all", 90);
                 //adjustOrientation(1);
             }        
         orientation=tempOrientation;
@@ -350,19 +350,8 @@ public class BunnyController {
             
             x = changeCoordinateSystemX(x2, 1, hitableCircle);
             y = changeCoordinateSystemY(y2, 1, hitableCircle);
-           
-            int angle =0;
+                      
             
-          /*  if (new Point2D.Double(x, y) != new Point2D.Double(x0, y0)){
-                angle = calculateAngle(x0,  y0, x, y, hitableCircle.getCenterX(), hitableCircle.getCenterY());
-                System.out.println("angle " + angle + " x0 " + x0 + " y0 " + y0 + " x " + x + " y " + y) ;
-               
-                if (angle != 1000){
-                    tempAngle = 180 - angle;
-                    System.out.println("Tempangle " + tempAngle);
-                }
-                * }
-           */ 
           int perpendicularAngle = calculateAngle(x, y, hitableCircle.getCenterX(), hitableCircle.getCenterY(), hitableCircle.getCenterX()+1, hitableCircle.getCenterY());
             
             if(y<hitableCircle.getCenterY()){
@@ -371,18 +360,8 @@ public class BunnyController {
          
             perpendicularAngle = (perpendicularAngle + 180)%360;
             
-            System.out.println("perpAnngle " + perpendicularAngle);
-          
-            int newDirection;
-            newDirection = (360 +(thisDirection - (thisDirection - perpendicularAngle)*2))%360;
-            System.out.println(newDirection);
-            
-           
             adjustOrientation("circle", perpendicularAngle);
-         
-            
-          
-            
+               
         } 
       }
         
@@ -600,12 +579,28 @@ public class BunnyController {
         boolean wouldBounce = (speed > BOUNCE_SPEED || speed< -BOUNCE_SPEED);
         System.out.println("speed " + speed + " wouldBounce " + wouldBounce);
                
-        thisDirection = adjustThisDirection();
+        thisDirection = adjustThisDirection();       
+        startSpin(perpendicularAngle, thisDirection);
+        System.out.println("spin direction " + spinDirection);
 
         switch(headingFrom){
+            case "all":
+                if((90 - modulus(thisDirection - perpendicularAngle))<SLIDE_ANGLE) {
+                    if(spinDirection.equalsIgnoreCase("left")){
+                       tempOrientation = (perpendicularAngle + 90)%360;
+                       System.out.println("perpen " + perpendicularAngle + " temp Or " + tempOrientation);
+                    } else {
+                       tempOrientation = perpendicularAngle - 90;
+                    }
+                } else if (wouldBounce) {
+                    bounce();
+                }
+                break;
+            
+            
             case "left":
                 if((90-thisDirection<SLIDE_ANGLE)&&(90-thisDirection >0)){
-                    tempOrientation = 90;
+                    tempOrientation = perpendicularAngle + 90;
                 } else if ((thisDirection-270<SLIDE_ANGLE)&&(thisDirection-270>0)){
                     tempOrientation = 270;
                 } else if(wouldBounce){
@@ -617,10 +612,10 @@ public class BunnyController {
                 }
                 break;
             case "up": 
-                if(thisDirection <SLIDE_ANGLE){
-                    tempOrientation =0;
-                } else if (thisDirection > perpendicularAngle+90-SLIDE_ANGLE){
-                    tempOrientation = perpendicularAngle+90;
+                if(thisDirection<SLIDE_ANGLE){
+                    tempOrientation = perpendicularAngle + 90;
+                } else if (thisDirection > 180-SLIDE_ANGLE){
+                    tempOrientation = perpendicularAngle - 90;
                 } else if (wouldBounce) {
                    startSpin(90, thisDirection);
                 } else if(thisDirection>90){
@@ -669,6 +664,7 @@ public class BunnyController {
  
     private void startSpin(int perpendicularDirection, int thisDirection){
        int newDirection = (thisDirection - (thisDirection - perpendicularDirection)*2);
+       System.out.println("perp " + perpendicularDirection);
        direction = (360 + newDirection)%360;
 
        if((newDirection<-270)||(thisDirection<perpendicularDirection)) {
@@ -678,36 +674,18 @@ public class BunnyController {
                spinDirection = "left";
        }  
        
-        tempSpeed =speed;      
+              
+    }
+    
+    private void bounce(){
+         tempSpeed =speed;      
         if (speed > 0) {
             speed = BOUNCE_AMOUNT * speed;
         } else {
             speed = BOUNCE_AMOUNT * speed * (-1);
-        }        
+        } 
     }
     
-    private void spin2(){
-        double spinCoef;
-        int angle;
-        double a,b,c,d;
-        a=0.0001;        
-        b=0.4;
-        c= -1.4;
-        d = 5;
-       
-        double speedCoef = b*tempSpeed*tempSpeed +c*tempSpeed + d;
-     
-        if(spinDirection.equalsIgnoreCase("left")){
-            angle = tempAngle%90;
-            spinCoef = a*angle*angle ;
-            orientation -= speedCoef*spinCoef;
-       } else {
-            angle = (90 - tempAngle%90)%90;
-            spinCoef = a*angle*angle ;
-           orientation += speedCoef*spinCoef;
-       }       
-       System.out.println("angle: " + angle + " spincoef: " + spinCoef + " speed: " + speed); 
-    }
     
     
     //<<<<Play around with numbers to make for the most fun bouncing.>>>>>   
