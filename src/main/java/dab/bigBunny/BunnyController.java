@@ -35,7 +35,7 @@ public class BunnyController {
       
     private int orientation, tempOrientation, direction,perpendicularAngle;
     private String spinDirection;
-    private double x, y, speed,tempSpeed;
+    private double x, y, speed;
     private boolean movingForward, rotatingLeft, rotatingRight, braking;
     private boolean softwareFailure;
 
@@ -66,9 +66,7 @@ public class BunnyController {
         orientation = 0;
         speed = 0;
         
-        health = 100;      
-        
-       
+        health = 100;           
     }
     
     BunnyController(Environment environment, int radius) {
@@ -77,29 +75,26 @@ public class BunnyController {
 
     public void step() {
         softwareFailure = environment.getSoftwareFailure();
-        //updateMovement();
-        moveForward();
-        doRotateLeft();
-        doRotateRight();     
+        updateMovement();    
     }
     
     /*
      * calculate acceleration depending on the state
      * (running, braking, intersecting slime)
-     * <<<<<<look at the acceleration computation below. That one is not finished either, but it has more stuff
-     * than this>>>>>
-     */
-    
+     */    
     private double computeAcceleration() {
         double acceleration;
-        if (movingForward && !braking) {
+       if (movingForward && !braking && speed >=0) {
             acceleration = DEF_ACCELERATION;
         } else if (braking) {
-            acceleration = BRAKING_ACCELERATION;
-        } else {
-            acceleration = NORMAL_STOPPING;
-        }
+            acceleration = BRAKING_ACCELERATION * Math.signum(speed);   //math.signums - if moving backwards control
+        } else if (movingForward && speed <0) {
+            acceleration = -NORMAL_STOPPING + DEF_ACCELERATION;
+        } else { 
+            acceleration = NORMAL_STOPPING * Math.signum(speed);        
+        } 
         
+       //ToDo: after this is fixed, add for the backwards speed control
         Slime intersected = environment.intersectWithSlime(new Point(getX(), getY()), radius);
         if (intersected != null) {
            // System.out.println("Intersected with " + intersected.toString());
@@ -114,40 +109,32 @@ public class BunnyController {
         return acceleration;
     }
     
-    //<<<<<this is awesome, except for newX, as it would require a lot of refactoring of later things
-    //but if you insist that x can't be readjusted a few times.. Go ahead :P Refactor :P I tried and broke stuff :D >>>>
     protected void updateMovement() {
-        double acceleration = computeAcceleration();
-        double newX, newY;
-        
-        // no not allow backwards movement
-        //<<<<<Yes, allow backwards movements for awesome bouncing :P>>>>>>>>>
+        double acceleration = computeAcceleration();       
+        Point2D.Double newLocation;
+               
         speed += acceleration;
-        if (speed < 0) {
-            speed = 0;
+        if((speed>-1)&& speed<0){speed =0;}
+        
+        if(speed>=0) {
+            tempOrientation = orientation;
+            newLocation = updateXY(orientation);   
+        } else {                    
+            newLocation = updateXY(direction); 
+            spin(); 
         }
-
-        // calculate predicted coordonates        
-        newX = x + speed * Math.cos(Math.toRadians(orientation));
-        newY = y + speed * Math.sin(Math.toRadians(orientation));  
+     
+      
+        //to check if intersectig with something - be that bounds or components
+        newLocation = checkInBounds(newLocation); 
+        //checkIntersectsSquare(newLocation.getX(), newLocation.get);
+        newLocation = checkIntersectsCircle(newLocation);
         
-        // check for solid collisions (including bounding box)
-        
-        // update orientation (orientation)
-        // TODO: should we update the orientation first and then the coordonates?
-        
-        //<<<<<<<<<<<<<<This is BAD, orientation shouldnt go from -360 to 360. 
-        //Why dont you want to call the methods I wrote, with SF from here? 
-        //They're not pretty, could use improvements, but at least they're not
-        //calculating it wrongly as those are..>>>>>>>>>>>>>>
-        if (rotatingLeft)
-            orientation = (orientation - ROTATION_AMOUNT) % 360;
-        if (rotatingRight) 
-            orientation = (orientation + ROTATION_AMOUNT) % 360;
+        rotate();
         
         // calculate new coordonates
-        x = newX;
-        y = newY;
+        x = newLocation.getX();
+        y = newLocation.getY();
     }
 
     public void startForward()     { movingForward = true;  }
@@ -161,28 +148,6 @@ public class BunnyController {
 
     public void startRotateRight() { rotatingRight = true;  }
     public void stopRotateRight()  { rotatingRight = false; }
-
-    /*
-     * see {@link moveForward()} for reasons
-     */
-    @Deprecated
-    public void doRotateLeft() {
-        if (rotatingLeft) { 
-            if(!softwareFailure){ rotateLeft(); }
-            else { rotateRight(); }
-        }
-    }
-
-    /*
-     * see {@link moveForward()} for reasons
-     */
-    @Deprecated
-    public void doRotateRight() {
-        if (rotatingRight) {
-            if(!softwareFailure){ rotateRight(); }
-            else { rotateLeft(); }
-        }       
-    }
     
     public void rotate(){
         if (rotatingLeft) { 
@@ -206,115 +171,51 @@ public class BunnyController {
                 }
     }
 
-    /*
-     * move bunny forward according to forward/braking state + slime slow down
-     * reason for deprecating: 
-     *   doesn't scale very well (need to call other functions for bound checking)
-     *   it doesn't allow for easy changes in orientation 
-     *     (think what happens if we colide with a component at a very small angle)
-     * 
-     * <<<<<<<Fixed the sliding, have no idea what the rest of the comment mean :(  
-     * Do what you want, but please at least look at what I did first. Would appreciate if refactoring wouldnt
-     * mean you rewriting stuff from scratch, I can fix my mistakes or you can fix them, but incomplete things
-     * shouldnt be dissmissed only when they're incomplete :PPPPPP >>>>>>>>>>>
-     * 
-     * @deprecated use {@link updateMovement()} instead
-     */
-    //Do not Go outside the game!!
-    @Deprecated
-    public void moveForward() {
-        double acceleration, x0, y0;
-        if (movingForward && !braking) {
-            acceleration = DEF_ACCELERATION;
-        } else if (braking && (speed >0)) {
-            acceleration = BRAKING_ACCELERATION;
-        } else if(speed >0){
-            acceleration = NORMAL_STOPPING;
-        } else if (speed < 0){
-            acceleration = -BRAKING_ACCELERATION;
-        } else {acceleration = 0;}
-        
-       // System.out.println("speed "+ speed);
-        
-        Slime intersected = environment.intersectWithSlime(new Point(getX(), getY()), radius);
-        if (intersected != null) {
-           // System.out.println("Intersected with " + intersected.toString());
-            // BAD CODE!!!
-            if (speed > 2) {
-                acceleration = -1 * (intersected.getFreshness() + 0.5);
-            } else if (speed < -2){
-                acceleration = intersected.getFreshness() + 0.5;
-            } else  {
-                acceleration /= 2;
-            }
-        }      
-        
-        x0 = x;
-        y0 = y;
-       // System.out.println(String.format("speed: %f, acc: %f", speed, acceleration));     
-        speed += acceleration;
-        if((speed>-1)&& speed<0){speed =0;}
-        
-        if(speed>=0) {
-            tempOrientation = orientation;
-            updateXY(tempOrientation);   
-        } else {
-            spin();
-           // spin2();
-             updateXY(direction); 
-        }
-      
-        //to check if intersectig with something - be that bounds or components
-        checkInBounds(); 
-        checkIntersectsSquare(x0, y0);
-        checkIntersectsCircle(x0, y0);
+    private Point2D.Double updateXY(int thisDirection){
+        double newX,newY;
+        newX = x + speed * Math.cos(Math.toRadians(thisDirection));
+        newY = y + speed * Math.sin(Math.toRadians(thisDirection));
+        return (new Point2D.Double(newX, newY) );
     }
-
-      private void updateXY(int thisDirection){
-        x += speed * Math.cos(Math.toRadians(thisDirection));
-        y += speed * Math.sin(Math.toRadians(thisDirection));
-    }
-    
-    
-    
-  
-    
-    //<<<<<geting weird stuff when trying to use strings in cases. Will fix it later, as lazy to google now 8)>>>>>
-    private void checkInBounds(){
-
-        if(!bounds.contains(x,y)){    
-            if(bounds.getMinX() > x){
-                x = bounds.getMinX();
-                adjustOrientation("all", 180);
-               // adjustOrientation(2);
-            } else if (bounds.getMaxX() < x){
-                x = bounds.getMaxX();
-                adjustOrientation("all", 0);
-               // adjustOrientation(0);
+     
+    private Point2D.Double checkInBounds(double newX, double newY ){
+            
+        if(!bounds.contains(newX, newY)){    
+            if(bounds.getMinX() > newX){
+                newX = bounds.getMinX();
+                adjustBunnyWhenHit(180);
+            } else if (bounds.getMaxX() < newX){
+                newX = bounds.getMaxX();
+                adjustBunnyWhenHit(0);
             }
             
-            if(bounds.getMinY() > y){
-                y = bounds.getMinY();
-                adjustOrientation("all", 270);
-                //adjustOrientation(3);
-            } else if (bounds.getMaxY() < y){
-                y = bounds.getMaxY();
-                adjustOrientation("all", 90);
-                //adjustOrientation(1);
+            if(bounds.getMinY() > newY){
+                newY = bounds.getMinY();
+                adjustBunnyWhenHit(270);
+            } else if (bounds.getMaxY() < newY){
+                newY = bounds.getMaxY();
+                adjustBunnyWhenHit(90);
             }        
         orientation=tempOrientation;
-        }     
+        }  
+       
+        return (new Point2D.Double(newX, newY));       
     }
     
-    public void checkIntersectsCircle(double x0, double y0){
+    private Point2D.Double checkInBounds(Point2D.Double point){
+        return (checkInBounds(point.getX(), point.getY()));
+    }
+       
+    public Point2D.Double checkIntersectsCircle(double newX, double newY){
       double dx,dy,dr,D, r, x1, x2, y1, y2, xa,  xb, ya, yb, discriminant;
+          
+      //ToDO: get hitable circles, ie pumps, and "for" them 
       
-      
-      //get hitable circles, ie pumps, and "for" them  
-      x1 = changeCoordinateSystemX(x0, -1,hitableCircle);
-      x2 = changeCoordinateSystemX(x, -1, hitableCircle);
-      y1 = changeCoordinateSystemY(y0, -1, hitableCircle);
-      y2 = changeCoordinateSystemY(y, -1, hitableCircle);
+      //change coordinates so that the centre of the circle would be at (0;0)
+      x1 = x - hitableCircle.getCenterX();                           // (x1;y1) is the point from where the bunny starts moving
+      y1 = y - hitableCircle.getCenterY();              
+      x2 = newX - hitableCircle.getCenterX();                        // (x2;y2) is the predicted coordinates (new coordinates) of the bunny     
+      y2 = newY - hitableCircle.getCenterY();
       r = hitableCircle.getHeight()/2;
       
       dx = x2 - x1;
@@ -323,6 +224,7 @@ public class BunnyController {
       D = (x1*y2) - (x2*y1);
       discriminant = r*r*dr*dr - D*D;
       
+      //distance between the new coordinates and the centre of the circle smaller than radius
       if(Point.distance(x2, y2, 0, 0)<r){
          //break component
           //give headacke
@@ -348,57 +250,52 @@ public class BunnyController {
                 y2 = Math.min(ya,yb);
             }
             
-            x = changeCoordinateSystemX(x2, 1, hitableCircle);
-            y = changeCoordinateSystemY(y2, 1, hitableCircle);
-                      
-            
-          perpendicularAngle = calculateAngle(x, y, hitableCircle.getCenterX(), hitableCircle.getCenterY(), hitableCircle.getCenterX()+1, hitableCircle.getCenterY());
-            
-            if(y<hitableCircle.getCenterY()){
-                perpendicularAngle = 360 - perpendicularAngle;
-            }
-         
-            perpendicularAngle = (perpendicularAngle + 180)%360;
-            
-            adjustOrientation("circle", perpendicularAngle);
+            //switch back to the proper coordinate system
+            newX = x2 + hitableCircle.getCenterX(); 
+            newY = y2 + hitableCircle.getCenterY();
                
+              //this is because if the angle that is provided is the one that is <180, without consideration of direction
+            // so if the circle is hit from above, it has to be reajusted           
+            boolean angleWouldNeedToBeAjusted = (newY<hitableCircle.getCenterY());
+            
+            //get the perpendicular angle to the hitpoint
+            perpendicularAngle = calculateAngle(newX, newY, hitableCircle.getCenterX(), hitableCircle.getCenterY(), 
+                    hitableCircle.getCenterX()+1, hitableCircle.getCenterY(), angleWouldNeedToBeAjusted);         
+            adjustBunnyWhenHit(perpendicularAngle);              
         } 
          
          orientation = tempOrientation; 
       }
         
-         
-        
+      return (new Point2D.Double(newX, newY));    
     }  
     
-    private int calculateAngle(double x0,  double y0, double x1, double y1, double x2, double y2){
-        double x3, y3,dotProduct, lengths;
-        x3 = x2 - x1;
-        y3 = y2 - y1;
-        x0 -= x1;
-        y0 -=y1;
-        dotProduct = x0*x3 + y0*y3;
-        lengths = Point2D.distance(0, 0, x0, y0) * Point2D.distance(0, 0, x3, y3);
+    private Point2D.Double checkIntersectsCircle(Point2D.Double point){
+        return (checkIntersectsCircle(point.getX(), point.getY()));
+    }
+    
+    private int calculateAngle(double x0,  double y0, double x1, double y1, double x2, double y2, boolean angleWouldNeedToBeAjusted){
+        double dotProduct, lengths;
+        int angle;
+        //adust coordintes so that the point at (x1,y1) would be shifted to (0,0) and everything else shifted too.
+        x0 -= x1;       
+        y0 -=y1;        
+        x2 -= x1;        
+        y2 -= y1;       
+        dotProduct = x0*x2 + y0*y2;
+        lengths = Point2D.distance(0, 0, x0, y0) * Point2D.distance(0, 0, x2, y2);
         
-       // System.out.println("dotProduct " + dotProduct + " lengths " + lengths);
-       // System.out.println("theAngle " + Math.toDegrees(Math.acos(dotProduct/lengths)));
-        if (lengths == 0) {return 1000;}                           //Think about this, just temp. 
-        else {
-            return ((int) Math.toDegrees(Math.acos(dotProduct/lengths)));
-        }
+         //TODO: Think about this, just temp. I.e exception?
+        if (lengths == 0) {angle = 1000;}                          
+        else { angle =  (int) Math.toDegrees(Math.acos(dotProduct/lengths)); }
+ 
+        if(angleWouldNeedToBeAjusted){ angle = 360 - angle; }                   
+        angle = (angle + 180)%360;  
+        
+        return angle;       
     }
     
-   
-
-    private double changeCoordinateSystemX (double theX, int i, Ellipse2D.Double hitableCircle){
-        return (theX + i * hitableCircle.getCenterX());
-    }
-    
-    private double changeCoordinateSystemY (double theY, int i, Ellipse2D.Double hitableCircle){
-        return (theY + i * hitableCircle.getCenterY());
-    }
-    
-    public void checkIntersectsSquare(double x0, double y0){
+    public void checkIntersectsSquare2(double x0, double y0){
         double x2, y2, halfHeight, halfWidth;
         int thisDirection;
  
@@ -451,29 +348,25 @@ public class BunnyController {
     /*set y to be at the upper border of the hittable object */
     private void handleHitFromAbove(double y2, double halfHeight){
         y = y2 - halfHeight;
-        adjustOrientation("up", 270);
-        //adjustOrientation(1);
+        adjustBunnyWhenHit(270);
     }
     
     /*set x to be at the left border of the hittable object */
     private void handleHitFromLeft(double x2, double halfWidth){
         x = x2 - halfWidth;
-        adjustOrientation("left", 0);
-        //adjustOrientation(0);
+        adjustBunnyWhenHit(0);
     }
     
     /*set x to be at the right border of the hittable object */
     private void handleHitFromRight(double x2, double halfWidth){
         x = x2 + halfWidth;
-        adjustOrientation("right", 180);
-        //adjustOrientation(2);
+        adjustBunnyWhenHit(180);
     }
     
     /*set x to be at the bottom border of the hittable object */
     private void handleHitFromBelow(double y2, double halfHeight){
         y = y2 + halfHeight;
-        adjustOrientation("down", 90);
-        //adjustOrientation(3);
+        adjustBunnyWhenHit(90);
     }
     
     /*check if the object is hit from above or from the side*/
@@ -576,15 +469,13 @@ public class BunnyController {
         y = y0 + ((x-x0)* tangent(orientation*i));    
     }
     
-    private void adjustOrientation(String headingFrom, int thisAngle){
+    private void adjustBunnyWhenHit(int thisAngle){
         int thisDirection;
         perpendicularAngle = thisAngle;
         boolean wouldBounce = (speed > BOUNCE_SPEED || speed< -BOUNCE_SPEED);
-        //System.out.println("speed " + speed + " wouldBounce " + wouldBounce);
                
         thisDirection = adjustThisDirection();       
-        startSpin(perpendicularAngle, thisDirection);
-        //System.out.println("spin direction " + spinDirection);
+        ajustOrientation(perpendicularAngle, thisDirection);
 
         System.out.println("this direction " + thisDirection + " perpAngle " + perpendicularAngle);
         if (modulus(90 - modulus(thisDirection - perpendicularAngle)) < SLIDE_ANGLE) {
@@ -610,31 +501,21 @@ public class BunnyController {
         }
     }
  
-    private void startSpin(int perpendicularDirection, int thisDirection){
-       int newDirection = (thisDirection - (thisDirection - perpendicularDirection)*2);
-       //System.out.println("perp " + perpendicularDirection);
-       direction = (720 + newDirection)%360;
+    private void ajustOrientation(int perpendicularDirection, int thisDirection){
+       int newDirection = (thisDirection - (thisDirection - perpendicularDirection)*2);   //current direction shifted to the opposite side of the perpendicular angle by the angle between them
+       direction = (720 + newDirection)%360;                //720 just to prevent from ever getting negative
 
        if((newDirection<-270)||(thisDirection<perpendicularDirection)) {
                spinDirection = "right";
                
        } else {
                spinDirection = "left";
-       }  
-       
-              
+       }             
     }
     
-    private void bounce(){
-         tempSpeed =speed;      
-        if (speed > 0) {
-            speed = BOUNCE_AMOUNT * speed;
-        } else {
-            speed = BOUNCE_AMOUNT * speed * (-1);
-        } 
+    private void bounce(){     
+         speed = BOUNCE_AMOUNT * speed * sgn(speed);      
     }
-    
-    
     
     //<<<<Play around with numbers to make for the most fun bouncing.>>>>>   
     private void spin(){
@@ -642,11 +523,11 @@ public class BunnyController {
         int angle;
         double a,b,c,d;
         a=0.0001;        
-        b=0.4;
-        c= -1.4;
+        b=1;
+        c= 3;
         d = 5;
        
-        double speedCoef = b*tempSpeed*tempSpeed +c*tempSpeed + d;
+        double speedCoef = b*speed*speed +c*speed + d;
      
         if(spinDirection.equalsIgnoreCase("left")){
             angle = (360 + perpendicularAngle- direction)%360;
@@ -657,7 +538,6 @@ public class BunnyController {
             spinCoef = a*angle*angle ;
            orientation += speedCoef*spinCoef;
        }       
-      // System.out.println("angle: " + angle + " spincoef: " + spinCoef + " speed: " + speed); 
     }
     
     private void slide(int i){
@@ -689,8 +569,7 @@ public class BunnyController {
        double newHeight = circle.getHeight() + radius + radius;
        hitableCircle = new Ellipse2D.Double(newX, newY, newWidth, newHeight);       
     }
-    
-        
+           
     public void hasBeenShot(){
         health --;
         System.out.println(health);
