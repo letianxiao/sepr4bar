@@ -307,19 +307,35 @@ public class BunnyController {
         halfHeight = hitBounds.getHeight() / 2;
         halfWidth = hitBounds.getWidth() / 2;
         
-        if(hit(newX, newY, y2, x2, halfHeight, halfWidth)){
+        if (hit(newX, newY, y2, x2, halfHeight, halfWidth)) {
             //break component. add headacke
-           thisDirection = adjustThisDirection();
-           
-            
-           newLocation = handleHit(newX, newY, x2, y2, halfHeight, halfWidth, thisDirection);
-  
-           orientation = tempOrientation;  
+            thisDirection = adjustThisDirection();
+
+
+            if (hitFromBelowOrAbove(x, x2, y, y2, halfHeight, halfWidth, thisDirection)) {      // do the circle stuff latter   
+                if (thisDirection > 180) {
+                    thisDirection = 270;
+                } else {
+                    thisDirection = 90;
+                }
+                newY = handleHitWall(y2, halfHeight, thisDirection);
+                newX = adjustX(newY);
+            } else {
+                System.out.print("side");
+                if ((thisDirection < 270) && (thisDirection > 90)) {
+                    thisDirection = 180;
+                } else {
+                    thisDirection = 0;
+                }
+                newX = handleHitWall(x2, halfWidth, thisDirection);
+                newY = adjustY(newX, sgn(179 - thisDirection));
+            }
+
+            orientation = tempOrientation;
         }
         
-        return newLocation;
-        
-        
+        newLocation.setLocation(newX, newY);
+        return newLocation;    
     }
     
      
@@ -329,24 +345,7 @@ public class BunnyController {
         return newZ;
     }
     
-   private Point2D.Double handleHit(double newX, double newY, double x2, double y2, double halfHeight, double halfWidth, int thisDirection){
-       if(hitFromBelow(x, x2, y, y2, halfHeight, halfWidth)) {      // do the circle stuff latter   
-           if(thisDirection>180){
-               thisDirection = 270;
-           } else {
-               thisDirection = 90;
-           }
-           System.out.println("below");
-           newY = handleHitWall(y2, halfHeight, thisDirection);
-           newX = adjustX(newY);
-       } else {
-           newX = handleHitWall(x2, halfWidth, thisDirection);
-           newY = adjustY(newX, sgn(179-thisDirection));
-       }
-       return (new Point2D.Double (newX, newY));
-   }
-    
-
+   
     
     /*a check that the circle(bunny) has hit the the hittable object */
     private boolean hit(double newX, double newY,double y2, double x2, double halfHeight, double halfWidth){
@@ -370,14 +369,21 @@ public class BunnyController {
      * if the x is in the bounds of the width of object. If it is not - the object is still not hit
      * and would get hit from the side.
      */
- 
    
     /*same as hitFromAbove, just checks for the thing from above */
-    private boolean hitFromBelow(double x0, double x2,double y0, double y2, double halfHeight, double halfWidth){
-       double deltaY = y0 - (y2 + halfHeight);
-       double newX;
-       newX = x0 + (deltaY * tangent(orientation-90));        
-       return (hitOnWidth(newX, x2, halfWidth));
+    private boolean hitFromBelowOrAbove(double x0, double x2,double y0, double y2, double halfHeight, double halfWidth, int thisDirection){
+       
+        if(thisDirection >= 180){
+            double deltaY = y0 - (y2 + halfHeight);
+            double newX;
+            newX = x0 + (deltaY * tangent(thisDirection-90));        
+            return (hitOnWidth(newX, x2, halfWidth));
+       } else {
+            double deltaY = (y2 - halfHeight) - y0;
+            double newX;
+            newX = x0 + (deltaY * tangent(90-thisDirection));
+            return (hitOnWidth(newX, x2, halfWidth));
+       }
     }
     
     /* 
@@ -470,6 +476,7 @@ public class BunnyController {
        }       
     }
     
+    // <<<<<what should this really do?>>>>
     private void slide(int i){
         tempOrientation = orientation + (i * SLIDE_AMOUNT);
     }
