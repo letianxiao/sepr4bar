@@ -3,6 +3,7 @@ package dab.bigBunny;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.geom.Ellipse2D;
+import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 
 public class BunnyController {
@@ -127,7 +128,7 @@ public class BunnyController {
       
         //to check if intersectig with something - be that bounds or components
         newLocation = checkInBounds(newLocation); 
-        //checkIntersectsSquare(newLocation.getX(), newLocation.get);
+        newLocation = checkIntersectsSquare(newLocation);
         newLocation = checkIntersectsCircle(newLocation);
         
         rotate();
@@ -295,137 +296,71 @@ public class BunnyController {
         return angle;       
     }
     
-    public void checkIntersectsSquare2(double x0, double y0){
-        double x2, y2, halfHeight, halfWidth;
+    public Point2D.Double checkIntersectsSquare (Point2D.Double newLocation){
+        double x2, y2, halfHeight, halfWidth, newX, newY;
         int thisDirection;
- 
         
-         /* 
-         * Checks if the square thingy is hit. Incomplete and messy.
-         * Those are for sqaues.We dont even have squares, its just for "playing around". 
-         * latter make these for multiple thingies
-         */
-        
+        newX = newLocation.getX();
+        newY = newLocation.getY();
         x2 = hitBounds.getCenterX();                    
         y2 = hitBounds.getCenterY();
         halfHeight = hitBounds.getHeight() / 2;
         halfWidth = hitBounds.getWidth() / 2;
-       
-        if((hit(y2, x2, halfHeight, halfWidth))){
-      
-        //ToDo: use that with actual bounds, not the expanded ones. So that the bunny wouldn't jump over the thing
-        //(hitBounds.intersectsLine(x0, y0, x, y))
-            
-            
-            //Break the component         
-            //give headake
-           
+        
+        if(hit(newX, newY, y2, x2, halfHeight, halfWidth)){
+            //break component. add headacke
            thisDirection = adjustThisDirection();
-         
+           
             
-            if (thisDirection == 0) {
-                handleHitFromLeft(x2, halfWidth);
-            } else if(thisDirection == 90){
-                handleHitFromAbove(y2, halfHeight);
-            } else if (thisDirection == 180){
-                handleHitFromRight(x2, halfWidth);
-            } else if (thisDirection == 270){
-                handleHitFromBelow(y2, halfHeight);
-            } else if(thisDirection<90) {                    
-                handleTopLeft(x0,x2,y0,y2,halfHeight,halfWidth);                                        
-            } else if(thisDirection < 180){
-                handleTopRight(x0,x2,y0,y2,halfHeight,halfWidth);
-            } else if(thisDirection < 270){
-                handleBottomRight(x0,x2,y0,y2,halfHeight,halfWidth);
-            } else {
-                handleBottomLeft(x0,x2,y0,y2,halfHeight,halfWidth);
-            }
-         orientation = tempOrientation;
-        }        
-    }
-   
-    
-    /*set y to be at the upper border of the hittable object */
-    private void handleHitFromAbove(double y2, double halfHeight){
-        y = y2 - halfHeight;
-        adjustBunnyWhenHit(270);
-    }
-    
-    /*set x to be at the left border of the hittable object */
-    private void handleHitFromLeft(double x2, double halfWidth){
-        x = x2 - halfWidth;
-        adjustBunnyWhenHit(0);
-    }
-    
-    /*set x to be at the right border of the hittable object */
-    private void handleHitFromRight(double x2, double halfWidth){
-        x = x2 + halfWidth;
-        adjustBunnyWhenHit(180);
-    }
-    
-    /*set x to be at the bottom border of the hittable object */
-    private void handleHitFromBelow(double y2, double halfHeight){
-        y = y2 + halfHeight;
-        adjustBunnyWhenHit(90);
-    }
-    
-    /*check if the object is hit from above or from the side*/
-    private void handleTopLeft(double x0, double x2, double y0, double y2, double halfHeight, double halfWidth){       
-        if(hitFromAbove(x0, x2, y0, y2, halfHeight, halfWidth)){
-            handleHitFromAbove(y2, halfHeight);
-            adjustX(x0, y0);      
-        } else{           
-            handleHitFromLeft(x2, halfWidth);
-            adjustY(x0, y0, 1);           
+           newLocation = handleHit(newX, newY, x2, y2, halfHeight, halfWidth, thisDirection);
+  
+           orientation = tempOrientation;  
         }
+        
+        return newLocation;
+        
+        
     }
     
-    /*check if the object is hit from above or from the side */
-    private void handleTopRight(double x0, double x2, double y0, double y2, double halfHeight, double halfWidth){        
-        if(hitFromAbove(x0, x2, y0, y2, halfHeight, halfWidth)){
-            handleHitFromAbove(y2, halfHeight);
-            adjustX(x0, y0);  
-        } else{
-            handleHitFromRight(x2, halfWidth);
-            adjustY(x0, y0, -1);
-        }    
+     
+    private double handleHitWall(double z, double distance, int thisDirection){
+        double newZ = z + distance * sgn(thisDirection - 179);
+        adjustBunnyWhenHit(thisDirection);
+        return newZ;
     }
     
-    /*check if the object is hit from bellow or from the side */
-    private void handleBottomLeft(double x0, double x2, double y0, double y2, double halfHeight, double halfWidth){        
-        if(hitFromBelow(x0, x2, y0, y2, halfHeight, halfWidth)){
-           handleHitFromBelow(y2, halfHeight);
-           adjustX(x0, y0);  
-        } else{
-           handleHitFromLeft(x2, halfWidth);
-           adjustY(x0, y0, 1);
-        }     
-    }
+   private Point2D.Double handleHit(double newX, double newY, double x2, double y2, double halfHeight, double halfWidth, int thisDirection){
+       if(hitFromBelow(x, x2, y, y2, halfHeight, halfWidth)) {      // do the circle stuff latter   
+           if(thisDirection>180){
+               thisDirection = 270;
+           } else {
+               thisDirection = 90;
+           }
+           System.out.println("below");
+           newY = handleHitWall(y2, halfHeight, thisDirection);
+           newX = adjustX(newY);
+       } else {
+           newX = handleHitWall(x2, halfWidth, thisDirection);
+           newY = adjustY(newX, sgn(179-thisDirection));
+       }
+       return (new Point2D.Double (newX, newY));
+   }
     
-    /*check if the object is hit from bellow or from the side */
-    private void handleBottomRight(double x0, double x2, double y0, double y2, double halfHeight, double halfWidth){  
-        if(hitFromBelow(x0, x2, y0, y2, halfHeight, halfWidth)){
-            handleHitFromBelow(y2, halfHeight);
-            adjustX(x0, y0);  
-        } else{           
-            handleHitFromRight(x2, halfWidth);
-            adjustY(x0, y0, -1);
-        }
-    }
+
     
     /*a check that the circle(bunny) has hit the the hittable object */
-    private boolean hit(double y2, double x2, double halfHeight, double halfWidth){
-        return((hitOnHeight(y, y2,halfHeight))&&hitOnWidth(x, x2, halfWidth));
+    private boolean hit(double newX, double newY,double y2, double x2, double halfHeight, double halfWidth){
+        return((hitOnHeight(newY, y2,halfHeight))&&hitOnWidth(newX, x2, halfWidth));
     }
     
     /*a check if the circle is between the height coordinates of the hittable object */
-    private boolean hitOnHeight(double theY, double y2, double halfHeight){
-        return ((theY > y2 - halfHeight)&&(theY < y2 + halfHeight));
+    private boolean hitOnHeight(double y1, double y2, double halfHeight){
+        return ((y1 > y2 - halfHeight)&&(y1 < y2 + halfHeight));
     }
     
     /*a check if the circle is between the width coordinates of the hittable object */
-    private boolean hitOnWidth(double theX,double x2, double halfWidth){
-        return((theX > x2 - halfWidth)&&(theX < x2 + halfWidth));
+    private boolean hitOnWidth(double x1,double x2, double halfWidth){
+        return((x1 > x2 - halfWidth)&&(x1 < x2 + halfWidth));
     }
         
     /* 
@@ -435,12 +370,7 @@ public class BunnyController {
      * if the x is in the bounds of the width of object. If it is not - the object is still not hit
      * and would get hit from the side.
      */
-    private boolean hitFromAbove(double x0, double x2,double y0, double y2, double halfHeight, double halfWidth) {
-        double deltaY = (y2 - halfHeight) - y0;
-        double newX;
-        newX = x0 + (deltaY * tangent(90-orientation));
-        return (hitOnWidth(newX, x2, halfWidth));
-    }
+ 
    
     /*same as hitFromAbove, just checks for the thing from above */
     private boolean hitFromBelow(double x0, double x2,double y0, double y2, double halfHeight, double halfWidth){
@@ -455,8 +385,8 @@ public class BunnyController {
      * it is counted using dX = dY * tan(alfa), where dX and dY is the difference between bunny starting point 
      * and hit-point (i.e. the edges of triangle), and alfa is the angle of the corner oposite to x.  
      */
-    private void adjustX(double x0, double y0){
-        x = x0 + ((y-y0)*tangent(90-orientation));
+    private double adjustX(double newY){
+        return (x + ((newY-y)*tangent(90-orientation)));
     }
     
     /* 
@@ -465,8 +395,8 @@ public class BunnyController {
      * and hit-point (i.e. the edges of triangle), and alfa is the angle of the corner oposite to y. i is either 1
      * or -1 used only for angle direction adjustment. 
      */
-    private void adjustY(double x0, double y0, int i){
-        y = y0 + ((x-x0)* tangent(orientation*i));    
+    private double adjustY(double newX, int i){
+        return (y + ((newX-x)* tangent(orientation*i)));    
     }
     
     private void adjustBunnyWhenHit(int thisAngle){
