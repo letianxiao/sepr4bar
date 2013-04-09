@@ -23,7 +23,7 @@ public class BunnyInterface extends JFrame implements KeyListener {
         resolution = new Dimension(800, 600);
         environment = new Environment(resolution.width, resolution.height);
         //Change radius according to image
-        controller = new BunnyController(environment, 10);
+        controller = new BunnyController(environment, 10);        
         Container container = frame.getContentPane();
         canvas = new ShowCanvas(controller, environment, resolution.width, resolution.height);
         container.setLayout(null);
