@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.util.Random;
 import java.util.StringTokenizer;
 
+
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -125,7 +126,7 @@ class CvStory extends Canvas
         beforeRotate = new double [300000][3];
         pixels3D = new double [300000][3];
 
-        stars = new int [80][4];
+        /*stars = new int [80][4];
 
         for (int a = 0; a < stars.length; a++)
         {
@@ -134,7 +135,7 @@ class CvStory extends Canvas
 
             stars[a][0] = (Math.abs (generator.nextInt ()) % 599) + 10;
             stars[a][1] = (Math.abs (generator.nextInt ()) % 499) + 10;
-        }
+        }*/
 
         BufferedImage bufferImg = new BufferedImage (650, 900,
                 Image.SCALE_DEFAULT);
