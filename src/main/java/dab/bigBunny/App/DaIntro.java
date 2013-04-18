@@ -40,38 +40,34 @@ public class DaIntro extends JPanel implements ActionListener, KeyListener {
     private Timer animator;   
     private MainWindow mw;
     private BufferedImage background;
-    private BufferedImage storyImage;
     // each element stores the 3 coordinates of a pixel
     // [][0] = x axis - from left to right
     // [][1] = y axis - from top to bottom
     // [][2] = z axis - from viewer to back
-    private double [][] story3DPixels;
-            
+    private StoryReader story;
+    private double aspectRatio;    
     
     public DaIntro(MainWindow x) {
         this.mw = x;
         animator = new Timer(1000/FPS, this);
         setFocusable(true);
+
         
-        System.out.println(DaIntro.class.getResource("WelcomeStory.txt").getFile());
+        story = new StoryReader("WelcomeStory.txt");
+        
         try {
-            InputStreamReader storyFileStream =
-                new InputStreamReader(
-                    DaIntro.class.getResourceAsStream("WelcomeStory.txt"), Charset.forName("US-ASCII")); // charset of welcome story is (better be) ASCII
-            
-            
+            // load background raw img
             BufferedImage tempImg = ImageIO.read(DaIntro.class.getResourceAsStream("background.png"));
-            background = makeBackground(tempImg);
-            storyImage = makeStoryImage(storyFileStream);
             
-        } catch (FileNotFoundException e) {
-            System.err.println(e);
+            // make actual background img
+            background = makeBackground(tempImg);
+            aspectRatio = (double)background.getWidth() / (double)background.getHeight();
+        } catch (FileNotFoundException e) { // fatal errors, throw them as runtime exceptions
+            throw new RuntimeException(e);
         } catch (IOException e) {
-            System.err.println(e);
+            throw new RuntimeException(e);
         }
-        
-        
-        
+                
         // load story
         // load background
         // create story 2d image (enlarged text)
@@ -93,36 +89,23 @@ public class DaIntro extends JPanel implements ActionListener, KeyListener {
         return temp;
     }
     
-    private BufferedImage makeStoryImage(InputStreamReader storyStream) throws IOException{
-        // read story
-        // create 2d image (enlarged text)
-        LineNumberReader story = new LineNumberReader(storyStream);
-        BufferedImage    image = new BufferedImage(650, 900, Image.SCALE_DEFAULT);
-        int imageMidPoint = image.getWidth() / 2; // used for centering text
+    /*
+    private double[][] makeStoryPixels(BufferedImage storyImage) {
+        // determine min x and y, and max x and y
+        // crop the image so that it starts from (0,0) and goes to max x,y - min x,y
+        int x, y;
+        int h = storyImage.getHeight();
+        int w = storyImage.getWidth();
+        int blackColor = Color.BLACK.getRGB();
+        return null;
         
-        Graphics gTemp = image.getGraphics();
-        gTemp.setFont(new Font ("Bookman Old Style", Font.BOLD, 20));
-        
-        String line;
-        line = story.readLine();
-        while(line != null) {
-            // we want each line to be centered
-            int halfLineWidth = gTemp.getFontMetrics().stringWidth(line) / 2;
-            int lineHeight    = gTemp.getFontMetrics().getHeight();
+        for (y = 0; y < h; ++y)
+            for (x = 0; x < w; ++x)
+                if (storyImage.getRGB(x, y) != Color.BLACK.getRGB())
             
-            // 10 pixels between lines
-            gTemp.drawString(line, imageMidPoint - halfLineWidth, (lineHeight + 10) * story.getLineNumber());
-            
-            line = story.readLine();
-        }
-        gTemp.dispose();
         
-        return image;
-        
-        
-        
-        
-    }
+        return null;
+    }*/
     
     public void start() {
         animator.start();
@@ -158,10 +141,46 @@ public class DaIntro extends JPanel implements ActionListener, KeyListener {
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
+        int bgApparentWidth = (int)(getHeight() * aspectRatio);
         int midX = (getWidth() / 2);
-        // proper setup of background img
-        g.drawImage(background, midX - background.getWidth() / 2, 0, background.getWidth(), getHeight(), null);
-        //g.drawImage(storyImage, 0, 0, null);
+        
+        // background is black
+        g.setColor(Color.black);
+        g.fillRect(0, 0, getWidth(), getHeight());
+        
+        // proper setup of background img (maintains aspect ratio)
+        g.drawImage(background, midX - bgApparentWidth / 2, 0, bgApparentWidth, getHeight(), null);
+        
+        draw3DPixels(g);
+        
+        //g.drawImage(story.getImage(), 0, 0, null);
+    }
+    
+    private void draw3DPixels(Graphics g) {
+        double [][] pixels = story.get3DPixels();
+        int numPixels = story.getNumPixels();
+        int i;
+        /*int viewPointX = (int)(getHeight() * aspectRatio / 2); // halfway of the background
+        int viewPointY = (int)(getHeight() / 2);*/
+        int viewPointX = getWidth() / 2;
+        int viewPointY = getHeight() / 2;
+        
+        g.setColor(Color.WHITE);
+        for (i = 0; i < numPixels; ++i) {
+            double x = pixels[i][0], y = pixels[i][1], z = pixels[i][2];
+            
+            // translate z by 1
+            x /= z / 1000 + 1;
+            y /= z / 1000 + 1;
+            // manual translation, JUST FOR TESTING
+            x += viewPointX;
+            y += getHeight();
+            //System.out.println("x: " + x + "y: " + y);
+            
+            
+            g.fillRect((int)x, (int)y, 1, 1);
+            
+        }
     }
 
 
