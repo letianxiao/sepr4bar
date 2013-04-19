@@ -54,7 +54,8 @@ public class DaIntro extends JPanel implements ActionListener, KeyListener {
 
         
         story = new StoryReader("WelcomeStory.txt");
-        
+        story.rotateX(Math.PI / 8);
+        story.move(250, 500, -500);
         try {
             // load background raw img
             BufferedImage tempImg = ImageIO.read(DaIntro.class.getResourceAsStream("background.png"));
@@ -135,6 +136,7 @@ public class DaIntro extends JPanel implements ActionListener, KeyListener {
     @Override
     public void actionPerformed(ActionEvent ae) {
         // update 3d story position
+        story.move(0, -1, 1);
         repaint();
     }
                         
@@ -156,29 +158,38 @@ public class DaIntro extends JPanel implements ActionListener, KeyListener {
         //g.drawImage(story.getImage(), 0, 0, null);
     }
     
+    private int getBackgroundWidth() {
+        return (int)(getHeight() * aspectRatio);
+    }
+    
     private void draw3DPixels(Graphics g) {
         double [][] pixels = story.get3DPixels();
         int numPixels = story.getNumPixels();
         int i;
         /*int viewPointX = (int)(getHeight() * aspectRatio / 2); // halfway of the background
         int viewPointY = (int)(getHeight() / 2);*/
-        int viewPointX = getWidth() / 2;
+        int viewPointX = getWidth()  / 2;
         int viewPointY = getHeight() / 2;
         
         g.setColor(Color.WHITE);
         for (i = 0; i < numPixels; ++i) {
-            double x = pixels[i][0], y = pixels[i][1], z = pixels[i][2];
+            double x = pixels[i][0], y = pixels[i][1], z = pixels[i][2]; // negative z is towards the back
+            double scaleFactor = z / getBackgroundWidth() + 1;
             
             // translate z by 1
-            x /= z / 1000 + 1;
-            y /= z / 1000 + 1;
+            x /= scaleFactor;
+            y /= scaleFactor;
+            
             // manual translation, JUST FOR TESTING
             x += viewPointX;
             y += getHeight();
             //System.out.println("x: " + x + "y: " + y);
             
+            if (scaleFactor < 1)
+                g.fillRect((int)x, (int)y, 2, 2);
+            else
+                g.fillRect((int)x, (int)y, 1, 1);
             
-            g.fillRect((int)x, (int)y, 1, 1);
             
         }
     }

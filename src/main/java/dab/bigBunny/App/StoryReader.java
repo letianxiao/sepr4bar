@@ -41,10 +41,7 @@ class StoryReader {
             height = storyImage.getHeight();
             width  = storyImage.getWidth();
             
-            pixels3D   = compute3DPixels(storyImage);
-            rotatePixelsFail(-Math.PI / 6);
-            //rotatePixelsFail(-0.01);
-            
+            pixels3D   = compute3DPixels(storyImage);   
         } catch (IOException e) {
             System.out.println(e);
             // non-fatal error; make image blank
@@ -178,7 +175,7 @@ class StoryReader {
                 if (img.getRGB(x, y) != bgColor) {
                     pixels[numPixels][0] = x - midX;
                     pixels[numPixels][1] = y - getHeight();
-                    pixels[numPixels][2] = 0; // z is 1 for now
+                    pixels[numPixels][2] = 0;
                     ++numPixels;
                 }
             }
@@ -187,12 +184,32 @@ class StoryReader {
         return pixels;
     }
     
+    /*
+     * x' = [cos -sin][x]
+     * y' = [sin  cos][y]
+     * --------------------
+     * We want a rotation on the X axis
+     * z' = cosA z - sinA y
+     * y' = sinA z + cosA y
+     * 
+     * WARNING: be very careful on the positive and negative orientations on the axes
+     */
     
-    private void rotatePixelsFail(double radians) {
+    public void rotateX(double radians) {
         int i;
         for (i = 0; i < numPixels; ++i) {
-            pixels3D[i][Z_AXIS] = Math.sin(radians) * pixels3D[i][Y_AXIS];
-            pixels3D[i][Y_AXIS] = Math.cos(radians) * pixels3D[i][Y_AXIS];
+            pixels3D[i][Z_AXIS] = Math.cos(radians) * pixels3D[i][Z_AXIS] - Math.sin(radians) * pixels3D[i][Y_AXIS];
+            pixels3D[i][Y_AXIS] = Math.sin(radians) * pixels3D[i][Z_AXIS] + Math.cos(radians) * pixels3D[i][Y_AXIS];
         }
     }
+    
+    public void move(double x, double y, double z) {
+        int i;
+        for (i = 0; i < numPixels; ++i) {
+            pixels3D[i][X_AXIS] += x;
+            pixels3D[i][Y_AXIS] += y;
+            pixels3D[i][Z_AXIS] += z;
+        }
+    }
+    
 }
