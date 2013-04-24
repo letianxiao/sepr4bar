@@ -47,7 +47,7 @@ public class BunnyController {
     /* 
      * BunnyController: Environment, position, size
     */    
-    BunnyController(Environment e, Point p, int size) {
+    public BunnyController(Environment e, Point p, int size) {
         this.environment = e;
         this.radius = size;
         
@@ -65,7 +65,7 @@ public class BunnyController {
         health = 100;
     }
     
-    BunnyController(Environment environment, int radius) {
+    public BunnyController(Environment environment, int radius) {
         this(environment, new Point(100, 100), radius);
     }
 

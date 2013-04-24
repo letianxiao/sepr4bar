@@ -68,13 +68,11 @@ public class DaIntro extends JPanel implements ActionListener, KeyListener {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-                
-        // load story
-        // load background
-        // create story 2d image (enlarged text)
-        // create 3d story (rotate)
-        // position 3d story with center aligned with screen 
-        // calculate 3d story movement vector (3d)
+        
+        animator.setInitialDelay(300);
+        //animator.start();
+        //addKeyListener(this);
+        
     }
     
     private BufferedImage makeBackground(BufferedImage rawImg) {
@@ -115,7 +113,10 @@ public class DaIntro extends JPanel implements ActionListener, KeyListener {
     
     private void stop() {
         animator.stop();
-        mw.setCurrentPanel("menu");
+        removeKeyListener(this);
+        setVisible(false);
+        mw.showMenu();
+        
         
     }
     

@@ -10,6 +10,7 @@ package dab.bigBunny.App;
  */
 
 import dab.engine.simulator.Simulator;
+import dab.gui.InterfaceController;
 
 import dab.gui.sound.Sounds;
 import java.awt.Color;
@@ -42,47 +43,48 @@ import javax.swing.JScrollPane;
  *
  */
 public class DaMMenu extends JPanel {
-    public boolean pressed = false;
-    private Simulator simulator;
-    private Sounds music;
-
-    public DaMMenu() {
+    MainWindow mainWindow;
+    
+    public DaMMenu(MainWindow mw) {
+        this.mainWindow = mw;
+        
         setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
-        JButton new_game = new JButton("asdf");
+        JButton new_game = new JButton("new game");
         new_game.setContentAreaFilled(true);
         new_game.setBorderPainted(true);
         //new_game.setBorder(BorderFactory.createEmptyBorder());
         //new_game.setContentAreaFilled(false);
         //new_game.setBorderPainted(false);
         //new_game.setAlignmentX(Component.CENTER_ALIGNMENT);
-        /*new_game.addActionListener(new ActionListener() {
+        new_game.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e){
-                //create a new simulator and let the player enter his name
-                System.err.println("create new game mfka!");
+                Simulator sim = new Simulator();
+                sim.setUsername("muah");
+                mainWindow.startSinglePlayer(sim);
             }
-        });*/
+        });
 
         /*JButton load_game = new JButton();
         load_game.setContentAreaFilled(false);
         load_game.setBorderPainted(false);
-        load_game.setAlignmentX(Component.CENTER_ALIGNMENT);
+        load_game.setAlignmentX(Component.CENTER_ALIGNMENT);*/
 
 
-        JButton help = new JButton();
-        help.setContentAreaFilled(false);
-        help.setBorderPainted(false);
-        help.setAlignmentX(Component.CENTER_ALIGNMENT);
+        JButton help = new JButton("bunny rabbit");
+        help.setContentAreaFilled(true);
+        help.setBorderPainted(true);
+        //help.setAlignmentX(Component.CENTER_ALIGNMENT);
         help.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e){
-                setVisible(false);
-                System.err.println("Show menu");
+                
+                mainWindow.startTwoPlayer();
             }
         });
-
+        /*
         JButton exit_game = new JButton();
         exit_game.setContentAreaFilled(false);
         exit_game.setBorderPainted(false);
@@ -105,6 +107,6 @@ public class DaMMenu extends JPanel {
         setVisible(true);*/
         setBackground(Color.BLACK);
         add(new_game);
-        
+        add(help);
     }
 }
