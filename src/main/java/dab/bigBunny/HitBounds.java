@@ -5,6 +5,7 @@
 package dab.bigBunny;
 
 import dab.engine.simulator.FailableComponent;
+import java.awt.Rectangle;
 
 /**
  *
@@ -13,14 +14,15 @@ import dab.engine.simulator.FailableComponent;
 public abstract class HitBounds {
     
     protected FailableComponent component;
-    protected int x,y, width;
+    protected int x,y, width, height;
     
     
-    public HitBounds(FailableComponent component, int x, int y, int width){
+    public HitBounds(FailableComponent component, int x, int y, int width, int height){
         this.component = component;
         this.x = x;
         this.y = y;
         this.width = width;
+        this.height = height;
     }
     
     public FailableComponent getComponent(){
@@ -37,6 +39,14 @@ public abstract class HitBounds {
     
     public int getWidth(){
         return width;
+    }
+    
+    public int getHeight(){
+        return height;
+    }
+    
+    public Rectangle getDimensions(){
+        return new Rectangle(x, y, width, height);
     }
     
     protected abstract void adjustCoordinates();

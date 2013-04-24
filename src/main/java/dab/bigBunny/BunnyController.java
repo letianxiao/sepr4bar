@@ -1,9 +1,11 @@
 package dab.bigBunny;
 
+import dab.engine.simulator.FailableComponent;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
 
 public class BunnyController {
     // number of degrees to rotate per step
@@ -39,19 +41,20 @@ public class BunnyController {
     private boolean softwareFailure;
 
     private Environment environment;
+    private HitBoundsController hitController;
     private int radius;
     private int health;
-    private Rectangle bounds, hitBounds;   
-    private Ellipse2D.Double hitableCircle;
-    
-    
+    private Rectangle bounds;   
+     
 
     /* 
      * BunnyController: Environment, position, size
     */    
-    BunnyController(Environment e, Point p, int size) {
+    BunnyController(Environment e, HitBoundsController h, Point p, int size) {
         this.environment = e;
+        this.hitController = h;
         this.radius = size;
+        
         
         this.x = p.x;
         this.y = p.y;
@@ -67,8 +70,8 @@ public class BunnyController {
         health = 100;           
     }
     
-    BunnyController(Environment environment, int radius) {
-        this(environment, new Point(100, 100), radius);
+    BunnyController(Environment environment, HitBoundsController hitBoundsController, int radius) {
+        this(environment, hitBoundsController, new Point(100, 100), radius);
     }
 
     public void step() {
@@ -125,8 +128,7 @@ public class BunnyController {
       
         //to check if intersectig with something - be that bounds or components
         newLocation = checkInBounds(newLocation); 
-        newLocation = checkIntersectsSquare(newLocation);
-        newLocation = checkIntersectsCircle(newLocation);
+        newLocation = checkIntersects(newLocation);
         
         //let the bunny rotate if it was trying to (i.e. if arrows were pressed)
         rotate();
@@ -174,6 +176,21 @@ public class BunnyController {
         return (new Point2D.Double(newX, newY) );
     }
      
+    private Point2D.Double checkIntersects(Point2D.Double point){
+       Point2D.Double coordinates = point;
+        
+      for (HitBounds h : hitController.getHittableComponents()){
+            if(h.getClass().getSimpleName().equals("Circle")){
+                coordinates = checkIntersectsCircle(coordinates, h);
+            } else{
+                coordinates = checkIntersectsSquare(coordinates, h);
+            }
+       }
+      
+      
+    return coordinates;
+    }
+    
     private Point2D.Double checkInBounds(double newX, double newY ){
             
         if(!bounds.contains(newX, newY)){    
@@ -192,7 +209,7 @@ public class BunnyController {
                 newY = bounds.getMaxY();
                 adjustBunnyWhenHit(90);
             }        
-        orientation=tempOrientation;
+        orientation=fixOrientation(tempOrientation);
         }  
        
         return (new Point2D.Double(newX, newY));       
@@ -202,8 +219,9 @@ public class BunnyController {
         return (checkInBounds(point.getX(), point.getY()));
     }
        
-    public Point2D.Double checkIntersectsCircle(double newX, double newY){
+    public Point2D.Double checkIntersectsCircle(double newX, double newY, HitBounds h){
       double dx,dy,dr,D, r, x1, x2, y1, y2, xa,  xb, ya, yb, discriminant,centreX, centreY;
+      Ellipse2D.Double hitableCircle = setCircle(h.getDimensions());
           
       //ToDO: get hitable circles, ie pumps, and "for" them !!!!
       
@@ -263,14 +281,15 @@ public class BunnyController {
             adjustBunnyWhenHit(perpendicularAngle);              
         } 
          
-         orientation = tempOrientation; 
+         orientation = fixOrientation(tempOrientation); 
+         
       }
         
       return (new Point2D.Double(newX, newY));    
     }  
     
-    private Point2D.Double checkIntersectsCircle(Point2D.Double point){
-        return (checkIntersectsCircle(point.getX(), point.getY()));
+    private Point2D.Double checkIntersectsCircle(Point2D.Double point, HitBounds h){
+        return (checkIntersectsCircle(point.getX(), point.getY(), h));
     }
     
     private int calculateAngle(double x0,  double y0, double x1, double y1, double x2, double y2, boolean angleWouldNeedToBeAjusted){
@@ -294,9 +313,10 @@ public class BunnyController {
         return angle;       
     }
     
-    public Point2D.Double checkIntersectsSquare (Point2D.Double newLocation){
+    public Point2D.Double checkIntersectsSquare (Point2D.Double newLocation, HitBounds h){
         double centreX, centreY, halfHeight, halfWidth, newX, newY;
         int thisDirection;
+        Rectangle hitBounds = setHitBounds(h.getDimensions());
         
         newX = newLocation.getX();
         newY = newLocation.getY();
@@ -328,7 +348,7 @@ public class BunnyController {
                 newY = adjustY(newX, sgn(179 - perpendicularAngle), thisDirection);
             }
 
-            orientation = tempOrientation;
+            orientation = fixOrientation(tempOrientation);
         }
         
         newLocation.setLocation(newX, newY);
@@ -487,21 +507,21 @@ public class BunnyController {
     }
     
     //now this is set from bunnyinterface, its just to play around, but if we had hitable rectangles, it could be set using those
-    public void setHitBounds(Rectangle rectangle) {
+    public Rectangle setHitBounds(Rectangle rectangle) {
         int newX = (int)(rectangle.getMinX() - radius);
         int newY = (int)(rectangle.getMinY() - radius);
         int newWidth = (int)(rectangle.getWidth() + radius + radius);
         int newHeight = (int) (rectangle.getHeight() + radius + radius);
-        hitBounds = new Rectangle(newX, newY, newWidth, newHeight);        
+        return new Rectangle(newX, newY, newWidth, newHeight);        
     }
     
     //now this is set from bunnyinterface, its just to play around,but it could be set using pumps in the future 
-    public void setCircle(Ellipse2D.Double circle) {
+    public Ellipse2D.Double setCircle(Rectangle circle) {
        double newX = circle.getX() - radius;
        double newY = circle.getY() - radius;
        double newWidth = circle.getWidth()+radius + radius;
-       double newHeight = circle.getWidth() + radius + radius;
-       hitableCircle = new Ellipse2D.Double(newX, newY, newWidth, newHeight);       
+       double newHeight = circle.getHeight() + radius + radius;
+       return new Ellipse2D.Double(newX, newY, newWidth, newHeight);       
     }
            
     public void hasBeenShot(){

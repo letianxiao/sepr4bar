@@ -14,8 +14,8 @@ public class Circle extends HitBounds{
     
     private FailableComponent component;
     
-    public Circle(FailableComponent component, int width, int x, int y){
-      super(component, x, y, width);
+    public Circle(FailableComponent component, int x, int y, int width, int height){
+      super(component, x, y, width, height);
     }
     
     //TODO: adjust the differences depending on how much bigger the picture frame is from 
@@ -24,6 +24,8 @@ public class Circle extends HitBounds{
     protected void adjustCoordinates(){
         
     }
+    
+   
     
     
 }
