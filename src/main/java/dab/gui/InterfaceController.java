@@ -61,7 +61,7 @@ public class InterfaceController extends JPanel implements Observer, FixObserver
     private ButtonPanel buttonPanel;
     private InfoPanel infoPanel;
     private Timer time;
-    private final Pressure condenserWarningPressure = new Pressure(25530000);
+    public static final Pressure CONDENSER_WARNING_PRESSURE = new Pressure(25530000);
     private GameOver gameOver;
 
     public static InterfaceController instance(){
@@ -93,34 +93,10 @@ public class InterfaceController extends JPanel implements Observer, FixObserver
                     } catch (CannotRepairException e) {}
                     catch (KeyNotFoundException e) {}
                     */
-                     
-                    infoPanel.setText("<html>Control Rod Position "+ (Integer.parseInt((simulator.controlRodPosition().toString()))*2)+"<br>"+  //this lines throws a NullPointerException at the moment
-                            "<br>"+   "Reactor Water Level "+ simulator.reactorWaterLevel()+"<br>"+"Reactor Temperature "+ simulator.reactorTemperature()+
-                            "<br>"+"Reactor Pressure "+ simulator.reactorPressure()+"<br>"+ "<br>"+"Condenser Water Level "+ simulator.condenserWaterLevel()+
-                            "<br>"+"Condenser Temperature "+ simulator.condenserTemperature()+"<br>"+"Condenser Pressure " + simulator.condenserPressure()+
-                            "<br>"+"<br>"+"ENERGY GENERATED "+ simulator.energyGenerated()+"</html>");
-                    String temp = "<html>";
-                    if (simulator.reactorTemperature().inCelsius() > 150) {
-                        temp = temp + "WARNING, "+simulator.getUsername()+": REACTOR TEMPERATURE TOO HIGH" + "<br>";
-                    }
-
-                    if (simulator.condenserPressure().greaterThan(condenserWarningPressure))
-                        temp = temp + "WARNING, "+simulator.getUsername()+": CONDENSER PRESSURE TOO HIGH" + "<br>";
-
-                    if (simulator.listFailedComponents().length > 0){
-                        for (String ChangingComponent : simulator.listFailedComponents()){
-                            if(ChangingComponent.equals("Pump 1")){
-                                temp = temp + "WARNING, "+simulator.getUsername()+": The Water pump HAS FAILED<br>";
-
-                            } else if (ChangingComponent.equals("Pump 2")){
-                                temp = temp + "WARNING, "+simulator.getUsername()+": The coolant pump HAS FAILED<br>";
-
-                            } else temp = temp + "WARNING, "+simulator.getUsername()+": " + ChangingComponent + " HAS FAILED<br>";
-                        }}
-                    if (!simulator.getSoftFailReport().getFailBool())
-                        temp = temp + "WARNING, "+simulator.getUsername()+": A software failure has occured!";
-                    temp = temp + "</html>";
-                    obamaPanel.setText(temp);
+                    
+                    infoPanel.updateText(simulator);
+                   
+                    obamaPanel.updateText(simulator);
                     // update all of the GUI according to the physical model
                     screenUpdate();
                     repaint();
@@ -199,15 +175,16 @@ public class InterfaceController extends JPanel implements Observer, FixObserver
         topLevelSplitPane.setResizeWeight(0.73);
         add(topLevelSplitPane);
 
-        JPanel leftPanel = new JPanel();
-        topLevelSplitPane.setLeftComponent(leftPanel);
-        leftPanel.setLayout(new BorderLayout(0, 0));
+        //JPanel leftPanel = new JPanel();
+        //topLevelSplitPane.setLeftComponent(leftPanel);
+        //leftPanel.setLayout(new BorderLayout(0, 0));
         JSplitPane leftPane = new JSplitPane();
         leftPane.setDividerSize(0);
         leftPane.setBorder(new EmptyBorder(0, 0, 0, 0));
         leftPane.setResizeWeight(0.8);
         leftPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
-        leftPanel.add(leftPane);
+        topLevelSplitPane.setLeftComponent(leftPane);
+        //leftPanel.add(leftPane);
 
         reactorPanel = new ReactorPanel();
         leftPane.setLeftComponent(reactorPanel);
