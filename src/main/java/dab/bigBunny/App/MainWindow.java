@@ -36,7 +36,20 @@ import javax.swing.Timer;
  * @author eduard
  */
 public class MainWindow extends JFrame {
-    
+    	static{
+		//Registers relevant items to repective factories
+		//See their static{} blocks.
+            // aka java voodoo need to call the exorcist
+		try{
+			Class.forName("dab.gui.PumpButton");
+			Class.forName("dab.gui.ValveButton");
+			
+			Class.forName("dab.gui.Component");
+			Class.forName("dab.gui.ControlRods");
+		}catch(ClassNotFoundException e){
+			e.printStackTrace();
+		}
+	}
     public static void main(String[] args) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
