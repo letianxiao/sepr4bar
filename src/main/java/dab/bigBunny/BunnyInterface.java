@@ -1,5 +1,6 @@
 package dab.bigBunny;
 
+import dab.engine.simulator.Pump;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.AffineTransform;
@@ -16,6 +17,7 @@ public class BunnyInterface extends JFrame implements KeyListener {
     private Environment environment;
     private Dimension resolution;
     private JFrame frame;
+    
 
     public BunnyInterface() {
         frame = new JFrame("MockGui");
@@ -109,12 +111,15 @@ class ShowCanvas extends JPanel implements MouseListener {
     private JLabel box;
     private ImageIcon boxToHit;
     private Ellipse2D.Double hitableCircle;
+    private HitBoundsController hitBoundsController;
 
     ShowCanvas(BunnyController controller, Environment environment, int dimX, int dimY) {
         this.controller = controller;
         this.environment = environment;
         this.setSize(dimX, dimY);
         this.setLayout(null);
+        hitBoundsController = new HitBoundsController();
+        
         setBackground(Color.WHITE);
         bar = new JProgressBar(0, controller.getHealth());
         this.add(bar);
@@ -131,7 +136,10 @@ class ShowCanvas extends JPanel implements MouseListener {
         controller.setHitBounds(box.getBounds());
        
         hitableCircle = new Ellipse2D.Double(300, 300, 40,40);
-        controller.setCircle(hitableCircle);      
+        controller.setCircle(hitableCircle);   
+        // new Pump just temprorary, and the numbers. Use for the real ones latter
+        hitBoundsController.addHitBounds(new Circle(new Pump(null, null) ,300, 40, 40));
+        
 
         //to call this on the reactorPannel, not on this thing
         bounds = this.getBounds();
@@ -145,8 +153,6 @@ class ShowCanvas extends JPanel implements MouseListener {
         } catch (Exception e) {
             System.err.println("Image not found");
         }
-
-
     }
 
     @Override

@@ -500,7 +500,7 @@ public class BunnyController {
        double newX = circle.getX() - radius;
        double newY = circle.getY() - radius;
        double newWidth = circle.getWidth()+radius + radius;
-       double newHeight = circle.getHeight() + radius + radius;
+       double newHeight = circle.getWidth() + radius + radius;
        hitableCircle = new Ellipse2D.Double(newX, newY, newWidth, newHeight);       
     }
            
