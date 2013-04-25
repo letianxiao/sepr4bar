@@ -265,49 +265,27 @@ public class BunnyController {
             
             //switch back to the proper coordinate system
             newX = x2 + centreX; 
-            newY = y2 + centreY;
-               
-            //this is because the angle is the one that is <180, without consideration of direction
-            // so if the circle is hit from above, the angle has to be reajusted           
-            boolean angleWouldNeedToBeAjusted = (newY<centreY);
+            newY = y2 + centreY;              
             
             //get the perpendicular angle to the hitpoint
-            perpendicularAngle = calculateAngle(newX, newY,centreX, centreY, centreX+1,
-                    centreY, angleWouldNeedToBeAjusted);         
-           
+            perpendicularAngle = calculateAngle(newX, newY,centreX, centreY, centreX+1,centreY);                   
             newLocation = adjustBunnyWhenHit(perpendicularAngle, newX, newY);
-        } 
-         
+        }          
          orientation = fixOrientation(tempOrientation);         
-      }
-   
+      }  
       return newLocation;    
     }  
     
-    private int calculateAngle(double x0,  double y0, double x1, double y1, double x2, double y2, boolean angleWouldNeedToBeAjusted){
-        double dotProduct, lengths;
-        int angle, angle2;
+    private int calculateAngle(double x0,  double y0, double x1, double y1, double x2, double y2){
+        int angle;
         //adust coordintes so that the point at (x1,y1) would be shifted to (0,0) and everything else shifted too.
         x0 -= x1;       
         y0 -=y1;        
         x2 -= x1;        
         y2 -= y1;       
-        dotProduct = x0*x2 + y0*y2;
-        lengths = Point2D.distance(0, 0, x0, y0) * Point2D.distance(0, 0, x2, y2);
-        
-         //TODO: Think about this, just temp. I.e exception?
-        if (lengths == 0) {angle = 1000;}                          
-        else { angle =  (int) Math.toDegrees(Math.acos(dotProduct/lengths)); }
- 
-        int signedAngle = (int) Math.toDegrees(Math.atan2(y0, x0) - Math.atan2(y2, x2));
-        
-       // angle2 = angle;
-        if(angleWouldNeedToBeAjusted){ angle = 360 - angle; }                   
-       // angle2 = (angle2 + 180)%360; 
-        angle = (angle + 180)%360; 
-        //angle = fixOrientation(signedAngle + 180);
-       // System.out.println("angle2 " + angle2 + " signed angle " + angle);
- 
+
+        angle = (int) Math.toDegrees(Math.atan2(y0, x0) - Math.atan2(y2, x2));
+        angle = fixOrientation(angle + 180);
         return angle;       
     }
     
@@ -324,11 +302,11 @@ public class BunnyController {
         halfWidth = hitBounds.getWidth() / 2;
         
         if (hit(newX, newY, centreY, centreX, halfHeight, halfWidth)) {
-            //break component. add headacke
+            //break component. add headacke            
             thisDirection = adjustThisDirection();
 
 
-            if (hitFromBelowOrAbove(x, centreX, y, centreY, halfHeight, halfWidth, thisDirection)) {      // do the circle stuff here  
+            if (hitFromBelowOrAbove(x, centreX, y, centreY, halfHeight, halfWidth, thisDirection)) {      
                 if (thisDirection > 180) {
                     perpendicularAngle = 270;
                 } else {
@@ -354,9 +332,7 @@ public class BunnyController {
         newLocation.setLocation(newX, newY);
         return newLocation;    
     }
-    
-    
-     
+       
     private double handleHitWall(double z, double distance, int thisDirection){
         double newZ = z + distance * sgn(thisDirection - 179);
         return newZ;
@@ -437,16 +413,10 @@ public class BunnyController {
             tempOrientation = fixOrientation(tempOrientation);
         } else if (wouldBounce) {
             bounce();       
-            System.out.println("bounce");
-            System.out.println("speed " + speed);
         } else {  
-            System.out.println("slide");
-            System.out.println("speed " + speed);
-           // newCoordinates = slide(spinDirection, newCoordinates, perpendicularAngle);
-         //   checkIntersects(newCoordinates);
+            newCoordinates = slide(spinDirection, newCoordinates, perpendicularAngle);
         }
         
-
         if (speed > FRICTION_SLOWDOWN) {
             speed -= FRICTION_SLOWDOWN ;
         }
@@ -459,12 +429,12 @@ public class BunnyController {
        direction = fixOrientation(newDirection);              
     }
     
-    private int calculateSpinDirection (int perpendicularDirection, int thisDirection){
-        if((thisDirection - perpendicularDirection>90)||(thisDirection<perpendicularDirection)) {
-            return -1;          //spin right
-        } else {
-            return 1;           //spin left
+    private int calculateSpinDirection (int perpendicularDirection, int thisDirection){ 
+        int diff = (thisDirection - perpendicularDirection);
+        if (modulus(diff) >90) {       //this handles if one of the directions is in one side of 0/360, and another - on the other
+            diff = -1*diff;
         }
+        return sgn(diff);
     }
     
     private void bounce(){     
@@ -494,9 +464,7 @@ public class BunnyController {
     }
          
     private Point2D.Double slide(int i, Point2D.Double newCoordinates, int theAngle){       
-        System.out.println(theAngle);
         newCoordinates = updateXY(fixOrientation(theAngle + 90 * i));  
-     //   checkIntersects(newCoordinates);
         return newCoordinates;                                                     
     }
     
