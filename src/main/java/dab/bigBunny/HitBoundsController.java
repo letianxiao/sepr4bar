@@ -17,11 +17,11 @@ public class HitBoundsController {
         hittableComponents = new ArrayList<HittableComponent>();
     }
     
-    public void addHitBounds(TheRectangle rectangle){
+    public void addHitableComponent(TheRectangle rectangle){
         hittableComponents.add(rectangle);
     }
     
-    public void addHitBounds(Circle circle){
+    public void addHitableComponent(Circle circle){
         hittableComponents.add(circle);
     }
     

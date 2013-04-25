@@ -30,14 +30,14 @@ public class BunnyInterface extends JFrame implements KeyListener {
         //this Has to be before the bunnyController initialisation
         hitBoundsController = new HitBoundsController();
         // new Pump just temprorary, and the numbers. Use the real ones later
-        hitBoundsController.addHitBounds(new Circle(new Pump(null, null) ,300, 300, 40,40));
-        hitBoundsController.addHitBounds(new Circle(new Pump(null, null) ,200, 200, 73, 73));
-        hitBoundsController.addHitBounds(new TheRectangle(new Condenser(), 500, 500, 40, 40));
+        hitBoundsController.addHitableComponent(new Circle(new Pump(null, null) ,300, 300, 40,40));
+        hitBoundsController.addHitableComponent(new Circle(new Pump(null, null) ,200, 200, 73, 73));
+        hitBoundsController.addHitableComponent(new TheRectangle(new Condenser(), 500, 500, 40, 40));
         
         
         
         //Change radius according to image
-        bunnyController = new BunnyController(environment, hitBoundsController, 10);        
+        bunnyController = new BunnyController(environment, hitBoundsController, 20);        
         Container container = frame.getContentPane();
         canvas = new ShowCanvas(bunnyController, environment, resolution.width, resolution.height, hitBoundsController);
         container.setLayout(null);
@@ -168,7 +168,7 @@ class ShowCanvas extends JPanel implements MouseListener {
         addMouseListener(this);
 
         try {
-            bunny = ImageIO.read(new File("resources/bunny.jpg"));
+            bunny = ImageIO.read(new File("resources/bunny2.jpg"));
         } catch (Exception e) {
             System.err.println("Image not found");
         }
@@ -202,7 +202,7 @@ class ShowCanvas extends JPanel implements MouseListener {
             g2D.fill(circle);
         }
 
-        Ellipse2D.Double circle = new Ellipse2D.Double((double) bunnyController.getX() - 10, (double) bunnyController.getY() - 10, 20.0, 20.0);
+        Ellipse2D.Double circle = new Ellipse2D.Double((double) bunnyController.getX() - 20, (double) bunnyController.getY() - 20, 40.0, 40.0);
         g2D.drawImage(bunny, af, this);
         g2D.setColor(Color.black);
         g2D.draw(circle);
