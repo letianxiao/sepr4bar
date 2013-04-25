@@ -5,30 +5,14 @@
 package dab.bigBunny.App;
 
 import dab.bigBunny.BunnyController;
-import dab.bigBunny.BunnyInterface;
 import dab.bigBunny.Environment;
 import dab.bigBunny.TwoPlayerScreen;
 import dab.engine.simulator.Simulator;
 import dab.gui.InterfaceController;
-import dab.gui.Menu;
-import java.awt.BorderLayout;
-import java.awt.Canvas;
-import java.awt.CardLayout;
 import java.awt.Component;
-import java.awt.Graphics;
-import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.image.BufferedImage;
 import javax.swing.JFrame;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.Timer;
-
 
 
 /**
@@ -36,62 +20,66 @@ import javax.swing.Timer;
  * @author eduard
  */
 public class MainWindow extends JFrame {
-    	static{
-		//Registers relevant items to repective factories
-		//See their static{} blocks.
-            // aka java voodoo need to call the exorcist
-		try{
-			Class.forName("dab.gui.PumpButton");
-			Class.forName("dab.gui.ValveButton");
-			
-			Class.forName("dab.gui.Component");
-			Class.forName("dab.gui.ControlRods");
-		}catch(ClassNotFoundException e){
-			e.printStackTrace();
-		}
-	}
+
+    static {
+        //Registers relevant items to repective factories
+        //See their static{} blocks.
+        // aka java voodoo need to call the exorcist
+        try {
+            Class.forName("dab.gui.PumpButton");
+            Class.forName("dab.gui.ValveButton");
+
+            Class.forName("dab.gui.Component");
+            Class.forName("dab.gui.ControlRods");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
     public static void main(String[] args) {
         java.awt.EventQueue.invokeLater(new Runnable() {
+
             @Override
-            public void run() { 
+            public void run() {
                 MainWindow mw = new MainWindow();
+                mw.setExtendedState(MainWindow.MAXIMIZED_BOTH);
                 mw.setVisible(true);
-                
+
                 mw.showIntro();
-                
+
             }
         });
     }
-    
     private DaMMenu menu;
     private Component currentComponent = null;
-    
+
     public MainWindow() {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        
-        // add the stuff
-        menu  = new DaMMenu(this);
+        setSize(1366, 768);
+
+        // create the menu
+        menu = new DaMMenu(this);
     }
-    
+
     public void showIntro() {
         DaIntro intro = new DaIntro(this);
         changeToPanel(intro);
         intro.start();
     }
-    
+
     public void showMenu() {
         changeToPanel(menu);
     }
-    
+
     public void startSinglePlayer(Simulator sim) {
         InterfaceController ic = InterfaceController.instance();
         ic.setup(sim);
         changeToPanel(ic);
     }
-    
+
     public void startTwoPlayer() {
         //BunnyInterface bi = new BunnyInterface();
-        
+
         Environment env = new Environment(getWidth(), getHeight());
         BunnyController bc = new BunnyController(env, new Point(100, 100), 10);
         bc.setBounds(new Rectangle(getWidth(), getHeight()));
@@ -100,7 +88,7 @@ public class MainWindow extends JFrame {
         addMouseListener(tps);
         changeToPanel(tps);
     }
-    
+
     private void changeToPanel(Component p) {
         if (currentComponent != null) {
             currentComponent.setVisible(false);
@@ -109,11 +97,6 @@ public class MainWindow extends JFrame {
         getContentPane().add(p);
         currentComponent = p;
         p.setVisible(true);
-        
-    }
-    
-    protected void setCurrentPanel(String name) {
-        CardLayout layout = (CardLayout)getContentPane().getLayout();
-        layout.show(getContentPane(), name);        
+
     }
 }

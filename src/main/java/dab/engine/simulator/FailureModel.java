@@ -36,16 +36,17 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class FailureModel implements PlantController, PlantStatus {
 
     @JsonProperty
-    PlantController controller;
+    private PlantController controller;
     @JsonProperty
-    PlantStatus status;
-    private Random failChance = new Random();
+    private PlantStatus status;
     @JsonProperty
     private int numberOfTimesWaterLevelIsTooLow;
-    private static int reactorOverheatThreshold = 8;
+   
+    private final int reactorOverheatThreshold = 8;
     private final Pressure condenserMaxPressure = new Pressure(30662500);
     private SoftFailReport lastFailReport = new SoftFailReport();
-    private ArrayList<FailableComponent> repairList = new ArrayList<FailableComponent>();
+    private Random failChance = new Random();
+    //private ArrayList<FailableComponent> repairList = new ArrayList<>();
 
     private FailureModel() {
     }
@@ -246,7 +247,7 @@ public class FailureModel implements PlantController, PlantStatus {
      */
     private void checkReactorWaterLevel() {
         if (status.reactorWaterLevel().points() < status.reactorMinimumWaterLevel().points()) {
-            System.out.println(numberOfTimesWaterLevelIsTooLow);
+            //System.out.println(numberOfTimesWaterLevelIsTooLow);
             numberOfTimesWaterLevelIsTooLow += 1;
             if (numberOfTimesWaterLevelIsTooLow > reactorOverheatThreshold) {
                 controller.failReactor();
@@ -309,7 +310,7 @@ public class FailureModel implements PlantController, PlantStatus {
         switch (command) {
             case TURNON:
             case TURNOFF:
-                System.out.println(rand.nextInt(2) + 1);
+                //System.out.println(rand.nextInt(2) + 1);
                 return rand.nextInt(2) + 1;
             case OPEN:
             case CLOSE:

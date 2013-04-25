@@ -12,7 +12,6 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 
 /**
@@ -43,7 +42,7 @@ class StoryReader {
             
             pixels3D   = compute3DPixels(storyImage);   
         } catch (IOException e) {
-            System.out.println(e);
+            System.err.println(e);
             // non-fatal error; make image blank
             storyImage = new BufferedImage(100, 200, Image.SCALE_DEFAULT);
         }

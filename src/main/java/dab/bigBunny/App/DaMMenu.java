@@ -10,27 +10,13 @@ package dab.bigBunny.App;
  */
 
 import dab.engine.simulator.Simulator;
-import dab.gui.InterfaceController;
-
-import dab.gui.sound.Sounds;
 import java.awt.Color;
-
-import java.awt.Component;
-import java.awt.Dimension;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
-import javax.swing.BorderFactory;
-import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JList;
-import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
+
 
 /**
  * The main menu for the game, has new game, load game, help and quit buttons.

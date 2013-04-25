@@ -129,7 +129,7 @@ public class TwoPlayerScreen extends JPanel implements MouseListener, KeyListene
         //if it is - subtrackt that amount and call this:
         double distance = clicked.distance(controller.getCoordinates());
         if (distance <= controller.getRadius()) {
-            System.out.println("Bunny has been shot");
+            //System.out.println("Bunny has been shot");
             controller.hasBeenShot();
             //Animation of shot bunny 
         } else {
