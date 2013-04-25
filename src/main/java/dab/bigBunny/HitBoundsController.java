@@ -11,10 +11,10 @@ import java.util.ArrayList;
  * @author Aiste
  */
 public class HitBoundsController {
-    private ArrayList<HitBounds> hittableComponents;
+    private ArrayList<HittableComponent> hittableComponents;
     
     public HitBoundsController() {
-        hittableComponents = new ArrayList<HitBounds>();
+        hittableComponents = new ArrayList<HittableComponent>();
     }
     
     public void addHitBounds(TheRectangle rectangle){
@@ -25,7 +25,7 @@ public class HitBoundsController {
         hittableComponents.add(circle);
     }
     
-   public ArrayList<HitBounds> getHittableComponents(){
+   public ArrayList<HittableComponent> getHittableComponents(){
        return hittableComponents;
    }
 }

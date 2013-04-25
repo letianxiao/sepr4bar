@@ -10,7 +10,7 @@ import dab.engine.simulator.FailableComponent;
  *
  * @author Aiste
  */
-public class Circle extends HitBounds{
+public class Circle extends HittableComponent{
     
     private FailableComponent component;
     

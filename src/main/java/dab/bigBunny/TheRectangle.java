@@ -10,7 +10,7 @@ import dab.engine.simulator.FailableComponent;
  *
  * @author Aiste
  */
-public class TheRectangle extends HitBounds{
+public class TheRectangle extends HittableComponent{
     
     public TheRectangle(FailableComponent component, int x, int y, int width, int height){
         super(component, x, y, width, height);

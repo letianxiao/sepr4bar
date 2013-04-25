@@ -11,13 +11,13 @@ import java.awt.Rectangle;
  *
  * @author Aiste
  */
-public abstract class HitBounds {
+public abstract class HittableComponent {
     
     protected FailableComponent component;
     protected int x,y, width, height;
     
     
-    public HitBounds(FailableComponent component, int x, int y, int width, int height){
+    public HittableComponent(FailableComponent component, int x, int y, int width, int height){
         this.component = component;
         this.x = x;
         this.y = y;
