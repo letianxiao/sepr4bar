@@ -64,7 +64,6 @@ public class MainWindow extends JFrame {
     public void showIntro() {
         DaIntro intro = new DaIntro(this);
         changeToPanel(intro);
-        intro.start();
     }
 
     public void showMenu() {
@@ -84,8 +83,7 @@ public class MainWindow extends JFrame {
         BunnyController bc = new BunnyController(env, new Point(100, 100), 10);
         bc.setBounds(new Rectangle(getWidth(), getHeight()));
         TwoPlayerScreen tps = new TwoPlayerScreen(bc, env);
-        addKeyListener(tps);
-        addMouseListener(tps);
+        
         changeToPanel(tps);
     }
 
@@ -97,6 +95,9 @@ public class MainWindow extends JFrame {
         getContentPane().add(p);
         currentComponent = p;
         p.setVisible(true);
+        
+        // put the new component in focus
+        p.requestFocusInWindow();
 
     }
 }

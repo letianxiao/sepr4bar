@@ -58,9 +58,10 @@ public class DaIntro extends JPanel implements ActionListener, KeyListener {
             throw new RuntimeException(e);
         }
         
+        
         animator.setInitialDelay(300);
-        //animator.start();
-        //addKeyListener(this);
+        animator.start();
+        addKeyListener(this);
         
     }
     
@@ -77,41 +78,15 @@ public class DaIntro extends JPanel implements ActionListener, KeyListener {
         return temp;
     }
     
-    /*
-    private double[][] makeStoryPixels(BufferedImage storyImage) {
-        // determine min x and y, and max x and y
-        // crop the image so that it starts from (0,0) and goes to max x,y - min x,y
-        int x, y;
-        int h = storyImage.getHeight();
-        int w = storyImage.getWidth();
-        int blackColor = Color.BLACK.getRGB();
-        return null;
-        
-        for (y = 0; y < h; ++y)
-            for (x = 0; x < w; ++x)
-                if (storyImage.getRGB(x, y) != Color.BLACK.getRGB())
-            
-        
-        return null;
-    }*/
-    
-    public void start() {
-        animator.start();
-        addKeyListener(this);
-    }
     
     private void stop() {
         animator.stop();
         removeKeyListener(this);
-        setVisible(false);
         mw.showMenu();
-        
-        
     }
     
     @Override
     public void keyPressed(KeyEvent ke) {
-        
         if (ke.getKeyCode() == KeyEvent.VK_SPACE) {
             stop();
         }
@@ -144,8 +119,6 @@ public class DaIntro extends JPanel implements ActionListener, KeyListener {
         g.drawImage(background, midX - bgApparentWidth / 2, 0, bgApparentWidth, getHeight(), null);
         
         draw3DPixels(g);
-        
-        //g.drawImage(story.getImage(), 0, 0, null);
     }
     
     private int getBackgroundWidth() {
@@ -173,7 +146,6 @@ public class DaIntro extends JPanel implements ActionListener, KeyListener {
             // manual translation, JUST FOR TESTING
             x += viewPointX;
             y += getHeight();
-            //System.out.println("x: " + x + "y: " + y);
             
             if (scaleFactor < 1)
                 g.fillRect((int)x, (int)y, 2, 2);

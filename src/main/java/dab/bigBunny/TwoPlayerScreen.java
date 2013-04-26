@@ -46,6 +46,9 @@ public class TwoPlayerScreen extends JPanel implements MouseListener, KeyListene
         this.environment = environment;
         this.animator = new Timer(1000/30, this);
         
+        setFocusable(true);
+        //requestFocusInWindow();
+        
         //this.setSize(dimX, dimY);
         this.setLayout(null);
         setBackground(Color.WHITE);
@@ -69,8 +72,8 @@ public class TwoPlayerScreen extends JPanel implements MouseListener, KeyListene
         //controller.setBounds(bounds);
 
         //This needs to be added to the ReactorPannel, so that only on reactor pannel we could shoot
-        /*addMouseListener(this);
-        addKeyListener(this);*/
+        addMouseListener(this);
+        addKeyListener(this);
 
         try {
             bunny = ImageIO.read(new File("resources/bunny.jpg"));
