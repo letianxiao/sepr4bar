@@ -116,7 +116,7 @@ public class Reactor extends FailableComponent {
      */
     public void step() throws GameOverException {
 
-        System.out.println(inputPort.mass.inKilograms());
+       // System.out.println(inputPort.mass.inKilograms());
         if (steamMass.inKilograms() > inputPort.mass.inKilograms()) {
             steamMass = steamMass.minus(inputPort.mass);
             waterMass = waterMass.plus(inputPort.mass);
@@ -145,7 +145,7 @@ public class Reactor extends FailableComponent {
         // the pressure accumulates
         boilingPtAtPressure = boilingPointOfWater + 10 * Math.log(pressure.inPascals() / atmosphericPressure);
         if (boilingPtAtPressure - old < 0.3)
-            System.out.println("BROKE");
+           // System.out.println("BROKE");
         
         neededEnergy = (boilingPtAtPressure - temperature.inKelvin()) * waterMass.inKilograms() * specificHeatOfWater;
 

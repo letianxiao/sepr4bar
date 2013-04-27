@@ -88,6 +88,18 @@ public class PhysicalModel implements PlantController, PlantStatus {
         allPumps.put(2, heatsinkToCondenser);
 
     }
+    
+    public FailableComponent getCondenser(){
+        return condenser;
+    }
+    
+    public FailableComponent getTurbine(){
+        return turbine;
+    }
+    
+    public FailableComponent getPump(int i){
+        return allPumps.get(i);
+    }
 
     @Override
     public String[] listFailedComponents() {

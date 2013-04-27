@@ -1,5 +1,7 @@
 package dab.gui;
 
+import dab.engine.simulator.CannotRepairException;
+import dab.engine.simulator.FailableComponent;
 import java.awt.Color;
 import java.util.ArrayList;
 
@@ -17,6 +19,7 @@ public abstract class FixButton extends JButton implements ObservableFix {
     private int maximum;
     private int counter;
     private boolean fixed;
+    private FailableComponent component;
 
     /**
      * 
@@ -24,18 +27,20 @@ public abstract class FixButton extends JButton implements ObservableFix {
      * @param coordY Y coordinate to initialise the button at
      * @param initialCounter the starting amount of clicks required to fix a component.
      */
-    public FixButton(int coordX, int coordY, int initialCounter)
+    public FixButton(int coordX, int coordY,  FailableComponent component)
     {
     	observers = new ArrayList<FixObserver>();
-        this.maximum = initialCounter;
-        this.counter = initialCounter;
-        this.fixed = false;
+        //this.maximum = initialCounter;
+        //this.counter = initialCounter;
+        //this.fixed = false;
+        this.component = component;
+       
         
         setBounds(coordX,coordY,87,30);
         setVisible(false);
         this.setIcon(new ImageIcon("resources/mainInterface/wrench.png"));
         this.setBackground(Color.WHITE);
-        setText(""+initialCounter);
+        //setText(""+initialCounter);
         this.setHorizontalTextPosition(JButton.CENTER);
         this.setVerticalTextPosition(JButton.CENTER);
     }
@@ -60,7 +65,10 @@ public abstract class FixButton extends JButton implements ObservableFix {
      * Sets the button to active
      */
     public void fail(){
-    	fixed = false;
+    	//fixed = false;
+//       System.out.println("component " + component.toString());
+        
+        setText(""+component.getDamage());
     	setVisible(true);
     }
     
@@ -69,15 +77,15 @@ public abstract class FixButton extends JButton implements ObservableFix {
      * also checks if the button has hit the number of required clicks]
      * and updates accordingly
      */
-    protected void pressed(){
-    	counter--;
-    	if (counter <= 0){
-    		maximum += 2;
-    		counter = maximum;
-    		fixed = true;
+    protected void pressed() throws CannotRepairException{
+    	component.fixingDamage();
+        
+        System.out.println("health" + component.getDamage());
+        
+    	if (!component.hasFailed()){
     		setVisible(false);
     	}	
-    	setText(""+counter);
+    	setText(""+component.getDamage());
     }
     
     /**
@@ -85,7 +93,7 @@ public abstract class FixButton extends JButton implements ObservableFix {
      * @return Whether the button has hit the click requirement
      */
     public boolean getFixed(){
-    	return fixed;
+    	return component.hasFailed();
     }
 
 }

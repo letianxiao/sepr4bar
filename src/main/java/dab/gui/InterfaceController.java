@@ -209,7 +209,7 @@ public class InterfaceController extends JPanel implements Observer, FixObserver
         leftPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
         leftPanel.add(leftPane);
 
-        reactorPanel = new ReactorPanel();
+        reactorPanel = new ReactorPanel(simulator);
         leftPane.setLeftComponent(reactorPanel);
 
         obamaPanel = new ObamaPanel();

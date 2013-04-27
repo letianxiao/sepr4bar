@@ -36,7 +36,20 @@ public class Simulator implements PlantController, PlantStatus, GameManager {
         failureModel = new FailureModel(physicalModel, physicalModel);
         userName = "";
     }
+    
 
+    public FailableComponent getCondenser(){
+        return physicalModel.getCondenser();
+    }
+    
+    public FailableComponent getTurbine(){
+        return physicalModel.getTurbine();
+    }
+    
+    public FailableComponent getPump(int i){
+        return physicalModel.getPump(i);
+    }
+    
     /**
      *
      * @param String user Name

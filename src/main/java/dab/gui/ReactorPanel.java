@@ -1,5 +1,7 @@
 package dab.gui;
 
+import dab.engine.simulator.PhysicalModel;
+import dab.engine.simulator.Simulator;
 import java.awt.Color;
 
 import javax.swing.ImageIcon;
@@ -18,10 +20,13 @@ public class ReactorPanel extends JPanel {
     private ComponentController reactor, condenser, turbine;
     private DynamicImage condenserPipe, generator, controlRods;
     private FixButton condenserFixButton, turbineFixButton, pump1FixButton, pump2FixButton;
+    private Simulator simulator;
     
 
-    public ReactorPanel(){
-    	setBackground(Color.WHITE);
+    public ReactorPanel(Simulator simulator){
+    	this.simulator = simulator;
+        
+        setBackground(Color.WHITE);
     	setLayout(null);
     	 systemImage = new JLabel("");
          systemImage.setBounds(0, -19, 970, 635);
@@ -30,16 +35,16 @@ public class ReactorPanel extends JPanel {
          systemImage.setAutoscrolls(true);
          systemImage.setIcon(new ImageIcon("resources/mainInterface/BACKGROUNDCOMPONENTS.png"));
          
-         turbineFixButton = new TurbineFixButton(360, 137,5);
+         turbineFixButton = new TurbineFixButton(360, 137, simulator.getTurbine());
          turbineFixButton.attachFixObserver(InterfaceController.instance());
          systemImage.add(turbineFixButton);
-         condenserFixButton = new CondenserFixButton(450, 274,5);
+         condenserFixButton = new CondenserFixButton(450, 274, simulator.getCondenser());
          condenserFixButton.attachFixObserver(InterfaceController.instance());
          systemImage.add(condenserFixButton);
-         pump1FixButton = new PumpFixButton(342, 550,5);
+         pump1FixButton = new PumpFixButton(342, 550, simulator.getPump(1));
          pump1FixButton.attachFixObserver(InterfaceController.instance());
          systemImage.add(pump1FixButton);
-         pump2FixButton = new PumpFixButton(660, 485,5);
+         pump2FixButton = new PumpFixButton(660, 485, simulator.getPump(2));
          pump2FixButton.attachFixObserver(InterfaceController.instance());
          systemImage.add(pump2FixButton);
          

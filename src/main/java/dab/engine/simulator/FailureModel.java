@@ -233,7 +233,7 @@ public class FailureModel implements PlantController, PlantStatus {
      */
     private void checkReactorWaterLevel() {
         if (status.reactorWaterLevel().points() < status.reactorMinimumWaterLevel().points()) {
-            System.out.println(numberOfTimesWaterLevelIsTooLow);
+           // System.out.println(numberOfTimesWaterLevelIsTooLow);
             numberOfTimesWaterLevelIsTooLow += 1;
             if (numberOfTimesWaterLevelIsTooLow > reactorOverheatThreshold) {
                 controller.failReactor();
@@ -294,7 +294,7 @@ public class FailureModel implements PlantController, PlantStatus {
         switch(command) {
             case TURNON:
             case TURNOFF:
-                System.out.println(rand.nextInt(2)+1);
+                //System.out.println(rand.nextInt(2)+1);
                 return rand.nextInt(2)+1;
             case OPEN:
             case CLOSE:
