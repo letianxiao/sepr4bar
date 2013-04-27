@@ -49,6 +49,8 @@ import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import dab.bigBunny.App.GamePanel;
+import dab.bigBunny.App.SinglePlayerPanel;
 
 public class InterfaceController extends JPanel implements Observer, FixObserver {
 
@@ -57,7 +59,7 @@ public class InterfaceController extends JPanel implements Observer, FixObserver
     private Sounds music;
     public final int MAX_SIZE_WIDTH = 1366;
     public final int MAX_SIZE_HEIGHT = 768;
-    private ReactorPanel reactorPanel;
+    private SinglePlayerPanel reactorPanel;
     private ObamaPanel obamaPanel;
     private ButtonPanel buttonPanel;
     private InfoPanel infoPanel;
@@ -174,13 +176,13 @@ public class InterfaceController extends JPanel implements Observer, FixObserver
         //topLevelSplitPane.setBorder(new EmptyBorder(0, 0, 0, 0));
         topLevelSplitPane.setPreferredSize(new Dimension(MAX_SIZE_WIDTH, MAX_SIZE_HEIGHT));
         topLevelSplitPane.setMinimumSize(new Dimension(MAX_SIZE_WIDTH, MAX_SIZE_HEIGHT));
-        topLevelSplitPane.setResizeWeight(0.73);
+        //topLevelSplitPane.setResizeWeight(0.73);
         add(topLevelSplitPane);
 
         JSplitPane leftPane = new JSplitPane();
         leftPane.setDividerSize(0);
         //leftPane.setBorder(new EmptyBorder(0, 0, 0, 0));
-        leftPane.setResizeWeight(0.8);
+        //leftPane.setResizeWeight(0.8);
         leftPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
         topLevelSplitPane.setLeftComponent(leftPane);
 
@@ -191,7 +193,7 @@ public class InterfaceController extends JPanel implements Observer, FixObserver
         rightSplitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
         topLevelSplitPane.setRightComponent(rightSplitPane);
         
-        reactorPanel = new ReactorPanel();
+        reactorPanel = new SinglePlayerPanel(simulator);
         leftPane.setLeftComponent(reactorPanel);
 
         obamaPanel = new ObamaPanel();
@@ -208,47 +210,37 @@ public class InterfaceController extends JPanel implements Observer, FixObserver
     }
 
     public void screenUpdate() {
+        reactorPanel.screenUpdate();
+        
         try {
             if (!simulator.getPumpFailed(1)) {
                 if (simulator.pumpIsActive(1)) {
                     buttonPanel.setPumpButtonStatus(1, ButtonState.ON);
-                    reactorPanel.setPump1State(1);
                 } else {
                     buttonPanel.setPumpButtonStatus(1, ButtonState.OFF);
-                    reactorPanel.setPump1State(2);
                 }
             } else {
                 buttonPanel.setPumpButtonStatus(1, ButtonState.BROKEN);
-                reactorPanel.setPump1State(0);
-                reactorPanel.failPump1FixButton();
             }
 
             if (!simulator.getPumpFailed(2)) {
                 if (simulator.pumpIsActive(2)) {
                     buttonPanel.setPumpButtonStatus(2, ButtonState.ON);
-                    reactorPanel.setPump2State(1);
                 } else {
                     buttonPanel.setPumpButtonStatus(2, ButtonState.OFF);
-                    reactorPanel.setPump2State(2);
                 }
             } else {
                 buttonPanel.setPumpButtonStatus(2, ButtonState.BROKEN);
-                reactorPanel.setPump2State(0);
-                reactorPanel.failPump2FixButton();
             }
             if (simulator.valveIsOpen(1)) {
                 buttonPanel.setValveButtonStatus(1, ButtonState.ON);
-                reactorPanel.setValve1State(1);
             } else {
                 buttonPanel.setValveButtonStatus(1, ButtonState.OFF);
-                reactorPanel.setValve1State(0);
             }
             if (simulator.valveIsOpen(2)) {
                 buttonPanel.setValveButtonStatus(2, ButtonState.ON);
-                reactorPanel.setValve2State(1);
             } else {
                 buttonPanel.setValveButtonStatus(2, ButtonState.OFF);
-                reactorPanel.setValve2State(0);
             }
         } catch (KeyNotFoundException e) {
             e.printStackTrace();
@@ -259,29 +251,6 @@ public class InterfaceController extends JPanel implements Observer, FixObserver
             // change the control rod slider to its actual position
             // why? no idea....
             buttonPanel.setSliderValue((int) simulator.controlRodPosition().points());
-        }
-
-        // move the control rod image on the reactor according to the actual rod position
-        reactorPanel.setControlRodHeight((int) simulator.controlRodPosition().points());
-
-        if (getFailed("Turbine")) {
-            reactorPanel.setTurbineState(0);
-            reactorPanel.failTurbineFixButton();
-        } else {
-            reactorPanel.setTurbineState(1);
-        }
-
-        if (getFailed("Reactor")) {
-            reactorPanel.setReactorState(0);
-        } else {
-            reactorPanel.setReactorState(1);
-        }
-
-        if (getFailed("Condenser")) {
-            reactorPanel.setCondenserState(0);
-            reactorPanel.failCondenserFixButton();
-        } else {
-            reactorPanel.setCondenserState(1);
         }
     }
 
@@ -517,7 +486,7 @@ public class InterfaceController extends JPanel implements Observer, FixObserver
 
     @Override
     public void update() {
-        try {
+        /*try {
             if (reactorPanel.getTurbineFixed()) {
                 simulator.repairTurbine();
             }
@@ -534,6 +503,6 @@ public class InterfaceController extends JPanel implements Observer, FixObserver
             //do nothing
         } catch (KeyNotFoundException e) {
             e.printStackTrace();
-        }
+        }*/
     }
 }

@@ -47,14 +47,12 @@ public class DaIntro extends JPanel implements ActionListener, KeyListener {
         story.move(250, 500, -500);
         try {
             // load background raw img
-            BufferedImage tempImg = ImageIO.read(DaIntro.class.getResourceAsStream("background.png"));
+            BufferedImage tempImg = ImageIO.read(DaIntro.class.getResourceAsStream("intro_bkg.png"));
             
             // make actual background img
             background = makeBackground(tempImg);
             aspectRatio = (double)background.getWidth() / (double)background.getHeight();
-        } catch (FileNotFoundException e) { // fatal errors, throw them as runtime exceptions
-            throw new RuntimeException(e);
-        } catch (IOException e) {
+        } catch (IOException e) { // fatal errors, throw them as runtime exceptions
             throw new RuntimeException(e);
         }
         

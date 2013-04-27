@@ -45,7 +45,7 @@ public class MainWindow extends JFrame {
                 mw.setExtendedState(MainWindow.MAXIMIZED_BOTH);
                 mw.setVisible(true);
 
-                mw.showIntro();
+                mw.startSinglePlayer();
 
             }
         });
@@ -70,6 +70,13 @@ public class MainWindow extends JFrame {
         changeToPanel(menu);
     }
 
+    public void startSinglePlayer() {
+        Simulator sim = new Simulator();
+        sim.setUsername("willy-wanka");
+        startSinglePlayer(sim);
+        
+    }
+    
     public void startSinglePlayer(Simulator sim) {
         InterfaceController ic = InterfaceController.instance();
         ic.setup(sim);
