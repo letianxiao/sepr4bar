@@ -2,7 +2,6 @@ package dab.bigBunny;
 
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 
 public class BunnyController {
@@ -29,7 +28,10 @@ public class BunnyController {
     
     //the amount of bouncing 
     private final double BOUNCE_AMOUNT = -0.7;
-      
+     
+    //the amout to minimize the damage to the component
+    private final double HIT_DAMAGE = 0.3;
+    
     private int orientation, tempOrientation, direction,perpendicularAngle;
     private double x, y, speed;
     private boolean movingForward, rotatingLeft, rotatingRight, braking;
@@ -45,11 +47,10 @@ public class BunnyController {
     /* 
      * BunnyController: Environment, position, size
     */    
-    public BunnyController(Environment e, HitBoundsController h, Point p, int size) {
+    public BunnyController(Environment e, HitBoundsController h, Point p) {
         this.environment = e;
         this.hitController = h;
-        this.radius = size;
-        
+        this.radius = 10;
         
         this.x = p.x;
         this.y = p.y;
@@ -66,7 +67,7 @@ public class BunnyController {
     }
     
     BunnyController(Environment environment, HitBoundsController hitBoundsController, int radius) {
-        this(environment, hitBoundsController, new Point(100, 100), radius);
+        this(environment, hitBoundsController, new Point(100, 100));
     }
 
     public void step() {
@@ -220,8 +221,8 @@ public class BunnyController {
       double newX, newY;
       newX = newLocation.getX();
       newY = newLocation.getY();
-      
-      Ellipse2D.Double hitableCircle = setCircle(h.getDimensions());         
+           
+      Rectangle hitableCircle = h.getDimensions(radius);
       
       centreX= hitableCircle.getCenterX();
       centreY = hitableCircle.getCenterY();
@@ -242,9 +243,12 @@ public class BunnyController {
       //distance between the new newLocation and the centre of the circle smaller than radius
       if(Point.distance(x2, y2, 0, 0)<r){
          
+          //break the component
+          int damage = (int)(speed * HIT_DAMAGE);
           
           
-          //break component
+          h.getComponent().fail(damage);
+          
           //give headacke
                    
          if(discriminant > 0) {
@@ -297,7 +301,7 @@ public class BunnyController {
     public Point2D.Double checkIntersectsSquare (Point2D.Double newLocation, HittableComponent h){
         double centreX, centreY, halfHeight, halfWidth, newX, newY;
         int thisDirection;
-        Rectangle hitBounds = setHitBounds(h.getDimensions());
+        Rectangle hitBounds= h.getDimensions(radius);
         
         newX = newLocation.getX();
         newY = newLocation.getY();
@@ -491,23 +495,9 @@ public class BunnyController {
         return thisOrientation;
     }
     
-    //now this is set from bunnyinterface, its just to play around, but if we had hitable rectangles, it could be set using those
-    public Rectangle setHitBounds(Rectangle rectangle) {
-        int newX = (int)(rectangle.getMinX() - radius);
-        int newY = (int)(rectangle.getMinY() - radius);
-        int newWidth = (int)(rectangle.getWidth() + radius + radius);
-        int newHeight = (int) (rectangle.getHeight() + radius + radius);
-        return new Rectangle(newX, newY, newWidth, newHeight);        
-    }
+
     
-    //now this is set from bunnyinterface, its just to play around,but it could be set using pumps in the future 
-    public Ellipse2D.Double setCircle(Rectangle circle) {
-       double newX = circle.getX() - radius;
-       double newY = circle.getY() - radius;
-       double newWidth = circle.getWidth()+radius + radius;
-       double newHeight = circle.getHeight() + radius + radius;
-       return new Ellipse2D.Double(newX, newY, newWidth, newHeight);       
-    }
+    
            
     public void hasBeenShot(){
         health --;

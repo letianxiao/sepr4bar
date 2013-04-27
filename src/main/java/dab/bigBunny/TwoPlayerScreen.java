@@ -64,7 +64,7 @@ public class TwoPlayerScreen extends JPanel implements MouseListener, KeyListene
         box.setBounds(500, 500, 40, 40);
         this.add(box);
         box.setVisible(true);
-        controller.setHitBounds(box.getBounds());
+     //   controller.setHitBounds(box.getBounds());
 
         //to call this on the reactorPannel, not on this thing
         //bounds = new Rectangle(getWidth(), getHeight());

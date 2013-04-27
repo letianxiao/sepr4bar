@@ -170,19 +170,20 @@ class ShowCanvas extends JPanel implements MouseListener {
         box = new JLabel("Box");
         boxToHit = new ImageIcon("resources/HitableBox.png");
         box.setIcon(boxToHit);
-        box.setBounds(hitBoundsController.getHittableComponents().get(2).getDimensions());
+        
+        box.setBounds(hitBoundsController.getHittableComponents().get(2).getDimensions(10));
         this.add(box);
         box.setVisible(true);
         //controller.setHitBounds(box.getBounds());
            
         pump = new JLabel();
         pump.setIcon(new ImageIcon("resources/mainInterface/MOVINGPUMP_MAIN_SCALED.gif"));  
-        pump.setBounds(hitBoundsController.getHittableComponents().get(1).getDimensions());
+        pump.setBounds(hitBoundsController.getHittableComponents().get(1).getDimensions(10));
         this.add(pump);
-        Rectangle r = new Rectangle(hitBoundsController.getHittableComponents().get(1).getDimensions());
+        Rectangle r = new Rectangle(hitBoundsController.getHittableComponents().get(1).getDimensions(10));
         pumpCircle = new Ellipse2D.Double(r.x, r.y, r.width, r.height);
        
-        r = new Rectangle(hitBoundsController.getHittableComponents().get(0).getDimensions());
+        r = new Rectangle(hitBoundsController.getHittableComponents().get(0).getDimensions(10));
         hitableCircle = new Ellipse2D.Double(r.x, r.y, r.width, r.height);          
 
         //to call this on the reactorPannel, not on this thing

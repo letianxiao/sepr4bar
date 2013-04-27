@@ -29,25 +29,5 @@ public abstract class HittableComponent {
         return component;
     }
     
-    public int getX(){
-        return x;
-    }
-    
-    public int getY(){
-        return y;
-    }
-    
-    public int getWidth(){
-        return width;
-    }
-    
-    public int getHeight(){
-        return height;
-    }
-    
-    public Rectangle getDimensions(){
-        return new Rectangle(x, y, width, height);
-    }
-    
-    protected abstract void adjustCoordinates();
+    protected abstract Rectangle getDimensions(int radius);
 }

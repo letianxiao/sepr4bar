@@ -5,6 +5,9 @@
 package dab.bigBunny;
 
 import dab.engine.simulator.FailableComponent;
+import java.awt.Rectangle;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Rectangle2D;
 
 /**
  *
@@ -20,12 +23,14 @@ public class Circle extends HittableComponent{
     
     //TODO: adjust the differences depending on how much bigger the picture frame is from 
     //the picture itself. And probably check which of the components that is or sth before adjusting
+ 
     @Override
-    protected void adjustCoordinates(){
-        
+    public Rectangle getDimensions(int radius){
+       int newX =  x - radius;
+       int newY = y - radius;
+       int newWidth = width +radius + radius;
+       int newHeight = height + radius + radius;
+       return new Rectangle(newX, newY, newWidth, newHeight);       
     }
-    
-   
-    
-    
+ 
 }
