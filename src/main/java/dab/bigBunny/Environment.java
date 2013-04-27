@@ -36,11 +36,10 @@ public class Environment {
     public void step() {
         stepSoftwareFailure();
         Random rnd = new Random();
-        if (rnd.nextDouble() < 0.01 && slimes.size() < 10) { // 1% chance
+        if (rnd.nextDouble() < 0.1 && slimes.size() < 10) { // 1% chance
             int x = rnd.nextInt(width);
             int y = rnd.nextInt(height);
             slimes.addFirst(new Slime(x, y, 3000));
-           //System.out.println("new slime " + x + " " + y);
         }
             
         

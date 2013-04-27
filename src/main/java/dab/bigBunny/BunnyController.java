@@ -45,7 +45,7 @@ public class BunnyController {
     /* 
      * BunnyController: Environment, position, size
     */    
-    BunnyController(Environment e, HitBoundsController h, Point p, int size) {
+    public BunnyController(Environment e, HitBoundsController h, Point p, int size) {
         this.environment = e;
         this.hitController = h;
         this.radius = size;

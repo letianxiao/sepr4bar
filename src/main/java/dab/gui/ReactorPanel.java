@@ -11,10 +11,12 @@ import javax.swing.SwingConstants;
 
 /**
  * Reactor panel holds all information regarding plant images and fix buttons
+ *
  * @author mb941
  *
  */
 public class ReactorPanel extends JPanel {
+
     private JLabel reactor_bubbles, systemImage;
     private ComponentController pump1, pump2, valve1, valve2;
     private ComponentController reactor, condenser, turbine;
@@ -146,32 +148,32 @@ public class ReactorPanel extends JPanel {
         valve1.showImage(state);
     }
 
-    public void setValve2State(int state){
+    public void setValve2State(int state) {
         valve2.showImage(state);
     }
 
-    public void setPump1State(int state){
+    public void setPump1State(int state) {
         pump1.showImage(state);
     }
 
-    public void setPump2State(int state){
+    public void setPump2State(int state) {
         pump2.showImage(state);
     }
 
-    public void setReactorState(int state){
+    public void setReactorState(int state) {
         reactor.showImage(state);
     }
 
-    public void setCondenserState(int state){
+    public void setCondenserState(int state) {
         condenser.showImage(state);
     }
 
-    public void setTurbineState(int state){
+    public void setTurbineState(int state) {
         turbine.showImage(state);
     }
 
-    public void setControlRodHeight(int height){
+    public void setControlRodHeight(int height) {
         //TODO: Fix me later
-        controlRods.setBounds(44,(int)( controlRods.getHeight()-height/1.5-87), 300, 300);
+        controlRods.setBounds(44, (int) (controlRods.getHeight() - height / 1.5 - 87), 300, 300);
     }
 }

@@ -15,33 +15,38 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * Manages software and hardware failures.
  *
- * The FailureModel is responsible for inducing software and hardware failures in the plant.
+ * The FailureModel is responsible for inducing software and hardware failures
+ * in the plant.
  *
- * Software failures are currently unimplemented; however, as all calls to the PhysicalModel are delegated through the
- * FailureModel, it is easy to alter this delegation in arbitrary ways to simulate control and/or reporting failures.
+ * Software failures are currently unimplemented; however, as all calls to the
+ * PhysicalModel are delegated through the FailureModel, it is easy to alter
+ * this delegation in arbitrary ways to simulate control and/or reporting
+ * failures.
  *
- * Hardware failures are determined by inspecting the PhysicalModel to determine the status, wear, and operating
- * conditions of the various components, and then instructing the PhysicalModel to mark certain components as having
+ * Hardware failures are determined by inspecting the PhysicalModel to determine
+ * the status, wear, and operating conditions of the various components, and
+ * then instructing the PhysicalModel to mark certain components as having
  * failed.
  *
- * Failures are constrained to one per timestep, which is enabled by the delegation of the step() method through the
- * FailureModel.
+ * Failures are constrained to one per timestep, which is enabled by the
+ * delegation of the step() method through the FailureModel.
  *
  * @author Marius Dumitrescu
  */
 public class FailureModel implements PlantController, PlantStatus {
 
     @JsonProperty
-    PlantController controller;
+    private PlantController controller;
     @JsonProperty
-    PlantStatus status;
-    private Random failChance = new Random();
+    private PlantStatus status;
     @JsonProperty
     private int numberOfTimesWaterLevelIsTooLow;
-    private static int reactorOverheatThreshold = 8;
+   
+    private final int reactorOverheatThreshold = 8;
     private final Pressure condenserMaxPressure = new Pressure(30662500);
     private SoftFailReport lastFailReport = new SoftFailReport();
-    private ArrayList<FailableComponent> repairList = new ArrayList<FailableComponent>();
+    private Random failChance = new Random();
+    //private ArrayList<FailableComponent> repairList = new ArrayList<>();
 
     private FailureModel() {
     }
@@ -65,8 +70,7 @@ public class FailureModel implements PlantController, PlantStatus {
         checkCondenserPressure();
         checkTurbineFailure();
     }
-    
-    
+
     @Override
     public void step(int i) throws GameOverException {
         throw new RuntimeException("Oups... shouldn't call this one!");
@@ -85,7 +89,7 @@ public class FailureModel implements PlantController, PlantStatus {
             componentsFailChance += components.get(i).wear().points() / components.size();
             if (componentsFailChance > failValue) {
                 components.get(i).fail();
-                
+
                 break; //We only want to induce one hardware failure! Break here.
             }
 
@@ -101,30 +105,41 @@ public class FailureModel implements PlantController, PlantStatus {
      * @return String[] list of repairing components
      */
     @Override
-    public String[] listRepairingComponents(){
+    public String[] listRepairingComponents() {
         return status.listRepairingComponents();
     }
 
     @Override
     public void moveControlRods(Percentage extracted) {
-        if(softFailCheck(UserCommands.MOVE, extracted.points()))
+        if (softFailCheck(UserCommands.MOVE, extracted.points())) {
             controller.moveControlRods(extracted);
+        }
     }
 
     @Override
     public void changeValveState(int valveNumber, boolean isOpen) throws KeyNotFoundException {
         UserCommands com;
-        if(isOpen) com=UserCommands.OPEN; else com=UserCommands.CLOSE;
-        if(softFailCheck(com, valveNumber))
+        if (isOpen) {
+            com = UserCommands.OPEN;
+        } else {
+            com = UserCommands.CLOSE;
+        }
+        if (softFailCheck(com, valveNumber)) {
             controller.changeValveState(valveNumber, isOpen);
+        }
     }
 
     @Override
     public void changePumpState(int pumpNumber, boolean isPumping) throws CannotControlException, KeyNotFoundException {
         UserCommands com;
-        if(isPumping) com=UserCommands.TURNON; else com=UserCommands.TURNOFF;
-        if(softFailCheck(com, pumpNumber))
+        if (isPumping) {
+            com = UserCommands.TURNON;
+        } else {
+            com = UserCommands.TURNOFF;
+        }
+        if (softFailCheck(com, pumpNumber)) {
             controller.changePumpState(pumpNumber, isPumping);
+        }
     }
 
     @Override
@@ -148,12 +163,12 @@ public class FailureModel implements PlantController, PlantStatus {
     }
 
     @Override
-    public boolean valveIsOpen(int valveNum) throws KeyNotFoundException{
+    public boolean valveIsOpen(int valveNum) throws KeyNotFoundException {
         return status.valveIsOpen(valveNum);
     }
 
     @Override
-    public boolean pumpIsActive(int pumpNum) throws KeyNotFoundException{
+    public boolean pumpIsActive(int pumpNum) throws KeyNotFoundException {
         return status.pumpIsActive(pumpNum);
     }
 
@@ -217,7 +232,6 @@ public class FailureModel implements PlantController, PlantStatus {
         controller.failReactor();
     }
 
-
     @Override
     public boolean turbineHasFailed() {
         return status.turbineHasFailed();
@@ -233,7 +247,7 @@ public class FailureModel implements PlantController, PlantStatus {
      */
     private void checkReactorWaterLevel() {
         if (status.reactorWaterLevel().points() < status.reactorMinimumWaterLevel().points()) {
-           // System.out.println(numberOfTimesWaterLevelIsTooLow);
+            // System.out.println(numberOfTimesWaterLevelIsTooLow);
             numberOfTimesWaterLevelIsTooLow += 1;
             if (numberOfTimesWaterLevelIsTooLow > reactorOverheatThreshold) {
                 controller.failReactor();
@@ -251,6 +265,7 @@ public class FailureModel implements PlantController, PlantStatus {
             controller.failCondenser();
         }
     }
+
     /**
      * Set control rods to 0 if turbine's failed
      */
@@ -259,19 +274,20 @@ public class FailureModel implements PlantController, PlantStatus {
             controller.moveControlRods(percent(0));
         }
     }
+
     /**
      * @param UserCommand
      * @param double target
-     * @return boolean (whether a software failure has occured)
+     * @return boolean (whether a software failure has occurred)
      */
-    public boolean softFailCheck(UserCommands targetCommand, double targetParameter){
+    public boolean softFailCheck(UserCommands targetCommand, double targetParameter) {
         double failRoll = Math.random();
-        if (failRoll<=0.2){ //chance of any failure (incorrect fail = this - unresponsive fail chance)
-            if(failRoll<=0.05){ //chance of unresponsive failure
-                //Unresponive commands do nothing
-                lastFailReport = new SoftFailReport(FailMode.UNRESPONSIVE, targetCommand, targetParameter);
-                return false;
-            }
+        if (failRoll <= 0.05) { //chance of unresponsive failure
+            //Unresponive commands do nothing
+            lastFailReport = new SoftFailReport(FailMode.UNRESPONSIVE, targetCommand, targetParameter);
+            return false;
+        } else if (failRoll <= 0.2) { //chance of any failure (incorrect fail = this - unresponsive fail chance)
+
             //Incorrect commands behave as another command
             UserCommands actualCommand = UserCommands.randomCommand();
             double actualParameter = generateFailedParameter(actualCommand);
@@ -289,63 +305,62 @@ public class FailureModel implements PlantController, PlantStatus {
      * @param UserCommand
      * @return double (a random failure for each command)
      */
-    public double generateFailedParameter(UserCommands command){
+    public double generateFailedParameter(UserCommands command) {
         Random rand = new Random();
-        switch(command) {
+        switch (command) {
             case TURNON:
             case TURNOFF:
-                //System.out.println(rand.nextInt(2)+1);
-                return rand.nextInt(2)+1;
+                //System.out.println(rand.nextInt(2) + 1);
+                return rand.nextInt(2) + 1;
             case OPEN:
             case CLOSE:
-                return rand.nextInt(2)+1;
+                return rand.nextInt(2) + 1;
             case MOVE:
                 return rand.nextInt(51);
             default:
                 return 0;
         }
     }
+
     /**
      * @param UserCommand
-     * @param double paramater
-     * Execute the failed command to the command specified with the parameter specified
+     * @param double paramater Execute the failed command to the command
+     * specified with the parameter specified
      */
-    public void doFailedCommand(UserCommands command, double parameter){
-        try{
-            switch(command){
+    public void doFailedCommand(UserCommands command, double parameter) {
+        try {
+            switch (command) {
                 case TURNON:
-                    controller.changePumpState((int)parameter, true);
+                    controller.changePumpState((int) parameter, true);
                     break;
                 case TURNOFF:
-                    controller.changePumpState((int)parameter, false);
+                    controller.changePumpState((int) parameter, false);
                     break;
                 case OPEN:
-                    controller.changeValveState((int)parameter, true);
+                    controller.changeValveState((int) parameter, true);
                     break;
                 case CLOSE:
-                    controller.changeValveState((int)parameter, false);
+                    controller.changeValveState((int) parameter, false);
                     break;
                 case MOVE:
-                    try{
+                    try {
                         controller.moveControlRods(new Percentage(parameter));
-                    }catch(IllegalArgumentException e){
+                    } catch (IllegalArgumentException e) {
                         e.printStackTrace();
                     }
                     break;
             }
-        }catch(KeyNotFoundException e){
+        } catch (KeyNotFoundException e) {
             e.printStackTrace();
-        }catch(CannotControlException e){
+        } catch (CannotControlException e) {
             //TODO:Might need to do something more here, not sure.
         }
     }
+
     /**
      * @return Software failure report
      */
-    public SoftFailReport getSoftFailReport(){
+    public SoftFailReport getSoftFailReport() {
         return lastFailReport.getCopy();
     }
-
-
 }
-
