@@ -25,7 +25,7 @@ public class Circle extends HittableComponent{
     //the picture itself. And probably check which of the components that is or sth before adjusting
  
     @Override
-    public Rectangle getDimensions(int radius){
+    public Rectangle getHittableBounds(int radius){
        int newX =  x - radius;
        int newY = y - radius;
        int newWidth = width +radius + radius;

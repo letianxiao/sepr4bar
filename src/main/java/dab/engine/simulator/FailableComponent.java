@@ -1,8 +1,7 @@
 package dab.engine.simulator;
 
-import dab.engine.utilities.Percentage;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
+import dab.engine.utilities.Percentage;
 
 /**
  * Base Class for all components which can fail.
@@ -27,8 +26,8 @@ public abstract class FailableComponent {
     private Percentage wear;                //Current wear level - capped at 100%
 
     private int damage;
-    private int maxDamage;
-    private final int INITIAL_DAMAGE = 5;
+    private int maxDamage;  //this should be different for two player mode
+    private final int INITIAL_DAMAGE = 5;   //this should be different for two player mode
     
     /**
      * Constructor for the FailableComponent. Sets default percentage to 0 and a normal FailureState
@@ -48,7 +47,7 @@ public abstract class FailableComponent {
     public void fixingDamage() throws CannotRepairException{
         damage --;
         if (damage <= 0 ){
-            maxDamage += 2;
+            maxDamage += 2;         //this should be different for two player mode
             damage = 0;
             repair();
         }
@@ -65,15 +64,14 @@ public abstract class FailableComponent {
      * set hasFailed to true
      */
     public void fail() {
-        hasFailed = true;
-        stepWear();
-        damage = maxDamage;
+        fail(0);
     }
-    
+
     public void fail(int i){
         hasFailed = true;
-        stepWear();
-        damage = i;
+        stepWear();       
+        damage += i + maxDamage;
+        
         System.out.println("damage" + damage);
     }
 

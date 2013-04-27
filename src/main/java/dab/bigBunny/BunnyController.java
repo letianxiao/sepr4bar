@@ -1,12 +1,13 @@
 package dab.bigBunny;
 
+import dab.engine.simulator.FailableComponent;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.geom.Point2D;
 
 public class BunnyController {
     // number of degrees to rotate per step
-    private final int ROTATION_AMOUNT = 5;
+    private final int ROTATION_AMOUNT = 4;
     
     // default ammount to accelerate
     private final double DEF_ACCELERATION = 0.4;
@@ -29,8 +30,11 @@ public class BunnyController {
     //the amount of bouncing 
     private final double BOUNCE_AMOUNT = -0.7;
      
-    //the amout to minimize the damage to the component
+    //the amout of the damage to the component when bunny hits
     private final double HIT_DAMAGE = 0.3;
+    
+    //max amount of damage that a bunny can do
+    private final int MAX_DAMAGE = 5;
     
     private int orientation, tempOrientation, direction,perpendicularAngle;
     private double x, y, speed;
@@ -122,7 +126,7 @@ public class BunnyController {
         }
            
         //to check if intersectig with something - be that bounds or components       
-        newLocation = checkIntersects(newLocation);
+     //   newLocation = checkIntersects(newLocation);
         
         //let the bunny rotate if it was trying to (i.e. if arrows were pressed)
         rotate();
@@ -156,11 +160,11 @@ public class BunnyController {
     }
     
     private void rotateRight(){
-        orientation = fixOrientation(orientation + ROTATION_AMOUNT);
+        orientation = fixOrientation((int)(orientation + ROTATION_AMOUNT +speed*0.2));
     }
     
     private void rotateLeft(){
-        orientation = fixOrientation(orientation - ROTATION_AMOUNT);            
+        orientation = fixOrientation((int)(orientation - ROTATION_AMOUNT -speed*0.2));            
     }
 
     private Point2D.Double updateXY(int thisDirection){
@@ -171,9 +175,7 @@ public class BunnyController {
     }
      
     private Point2D.Double checkIntersects(Point2D.Double point){
-       Point2D.Double newLocation = point;
-        
-       
+       Point2D.Double newLocation = point;  
        for (HittableComponent h : hitController.getHittableComponents()){
             if(h.getClass().getSimpleName().equals("Circle")){
                 newLocation = checkIntersectsCircle(newLocation, h);
@@ -183,8 +185,6 @@ public class BunnyController {
        }
           
        newLocation = checkInBounds(newLocation);  //check if doesn't hit the walls
-       
-       
     return newLocation;
     }
     
@@ -222,7 +222,7 @@ public class BunnyController {
       newX = newLocation.getX();
       newY = newLocation.getY();
            
-      Rectangle hitableCircle = h.getDimensions(radius);
+      Rectangle hitableCircle = h.getHittableBounds(radius);
       
       centreX= hitableCircle.getCenterX();
       centreY = hitableCircle.getCenterY();
@@ -243,13 +243,8 @@ public class BunnyController {
       //distance between the new newLocation and the centre of the circle smaller than radius
       if(Point.distance(x2, y2, 0, 0)<r){
          
-          //break the component
-          int damage = (int)(speed * HIT_DAMAGE);
-          
-          
-          h.getComponent().fail(damage);
-          
-          //give headacke
+          //break the component         
+          breakComponent(h.getComponent());
                    
          if(discriminant > 0) {
             int thisDirection;
@@ -301,7 +296,7 @@ public class BunnyController {
     public Point2D.Double checkIntersectsSquare (Point2D.Double newLocation, HittableComponent h){
         double centreX, centreY, halfHeight, halfWidth, newX, newY;
         int thisDirection;
-        Rectangle hitBounds= h.getDimensions(radius);
+        Rectangle hitBounds= h.getHittableBounds(radius);
         
         newX = newLocation.getX();
         newY = newLocation.getY();
@@ -310,10 +305,9 @@ public class BunnyController {
         halfHeight = hitBounds.getHeight() / 2;
         halfWidth = hitBounds.getWidth() / 2;
         
-        if (hit(newX, newY, centreY, centreX, halfHeight, halfWidth)) {
-            //break component. add headacke            
+        if (hit(newX, newY, centreY, centreX, halfHeight, halfWidth)) {              
+            breakComponent(h.getComponent());
             thisDirection = adjustThisDirection();
-
 
             if (hitFromBelowOrAbove(x, centreX, y, centreY, halfHeight, halfWidth, thisDirection)) {      
                 if (thisDirection > 180) {
@@ -495,7 +489,14 @@ public class BunnyController {
         return thisOrientation;
     }
     
-
+    private void breakComponent(FailableComponent c){
+        if(!environment.getHeadache()){       
+            int damage = (int)(speed * HIT_DAMAGE);
+            if (damage>MAX_DAMAGE) {damage = MAX_DAMAGE;}         
+            c.fail(damage);
+            environment.startHeadache();
+        }
+    }
     
     
            
