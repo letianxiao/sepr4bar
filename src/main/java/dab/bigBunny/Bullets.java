@@ -18,6 +18,7 @@ public class Bullets {
     public Bullets(Point point){
         location = point;
         toBeVisible = timeToBeSeen;
+        System.out.println("bullet point" + location);
     }
     
     public void step(){

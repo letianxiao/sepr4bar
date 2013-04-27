@@ -172,7 +172,6 @@ public class BunnyController {
     private Point2D.Double checkIntersects(Point2D.Double point){
        Point2D.Double newLocation = point;
         
-       newLocation = checkInBounds(newLocation);  //check if doesn't hit the walls
        
        for (HittableComponent h : hitController.getHittableComponents()){
             if(h.getClass().getSimpleName().equals("Circle")){
@@ -182,6 +181,9 @@ public class BunnyController {
             }
        }
           
+       newLocation = checkInBounds(newLocation);  //check if doesn't hit the walls
+       
+       
     return newLocation;
     }
     
@@ -239,7 +241,10 @@ public class BunnyController {
       
       //distance between the new newLocation and the centre of the circle smaller than radius
       if(Point.distance(x2, y2, 0, 0)<r){
-         //break component
+         
+          
+          
+          //break component
           //give headacke
                    
          if(discriminant > 0) {
