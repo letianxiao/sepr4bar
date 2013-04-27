@@ -36,7 +36,20 @@ public class Simulator implements PlantController, PlantStatus, GameManager {
         failureModel = new FailureModel(physicalModel, physicalModel);
         userName = "";
     }
+    
 
+    public FailableComponent getCondenser(){
+        return physicalModel.getCondenser();
+    }
+    
+    public FailableComponent getTurbine(){
+        return physicalModel.getTurbine();
+    }
+    
+    public FailableComponent getPump(int i){
+        return physicalModel.getPump(i);
+    }
+    
     /**
      *
      * @param String user Name
@@ -345,7 +358,8 @@ public class Simulator implements PlantController, PlantStatus, GameManager {
      */
     @Override
     public ArrayList<FailableComponent> components() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return failureModel.components();
+        //throw new UnsupportedOperationException("Not supported yet.");
     }
 
     /**

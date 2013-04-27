@@ -62,7 +62,7 @@ public class CondenserTest {
         }
     }
 
-  //  @Test
+    @Test
     public void shouldDecreaseTemperatureWhenOnlyHasCoolant() {
         Condenser instance = new Condenser();
         instance.coolantInputPort().mass = kilograms(5);
@@ -155,105 +155,103 @@ public class CondenserTest {
 
     }
 
-    
-     @Test
-     public void shouldReduceTemperatureInsideCondenser() {
+    @Test
+    public void shouldReduceTemperatureInsideCondenser() {
 
-     Condenser condenser = new Condenser();
-     condenser.setWaterMass(kilograms(10));
-     condenser.setTemperature(kelvin(380));
-     //condenser.reduceTemperature(10);
-     condenser.inputPort().mass = kilograms(100);
-     System.out.println("THIS: " +condenser.getTemperature());
-     condenser.step();
-     condenser.step();
-     System.out.println("THIS: " +condenser.getTemperature());
-     assertFalse(kelvin(380).equals(condenser.getTemperature()));
-     }
+        Condenser condenser = new Condenser();
+        condenser.setWaterMass(kilograms(10));
+        condenser.setTemperature(kelvin(380));
+        //condenser.reduceTemperature(10);
+        condenser.inputPort().mass = kilograms(100);
+        System.out.println("THIS: " + condenser.getTemperature());
+        condenser.step();
+        condenser.step();
+        System.out.println("THIS: " + condenser.getTemperature());
+        assertFalse(kelvin(380).equals(condenser.getTemperature()));
+    }
 
-    // @Test
-     public void shouldEqualiseTemperatureIfInputFromTurbine() {
-     Condenser condenser = new Condenser();
-     condenser.inputPort().mass = kilograms(2);
-     condenser.outputPort().mass = kilograms(2);
-     condenser.reacInputPort().mass = kilograms(0);
-     condenser.inputPort().temperature = kelvin(473.15);
-     condenser.step();
-     assertEquals(kelvin(413.15), condenser.getTemperature());
-
-     }
-
-     /*
-     @Test
-     public void shouldEqualiseTemperatureIfInputFromReactor() {
-     Condenser condenser = new Condenser();
-     condenser.inputPort.mass = kilograms(0);
-     condenser.outputPort.mass = kilograms(2);
-     condenser.reactorInputPort.mass = kilograms(2);
-     condenser.reactorInputPort.temperature = kelvin(473.15);
-     condenser.step();
-     assertEquals(kelvin(413.15), condenser.getTemperature());
-
-     }
-    
-     @Test
-     public void shouldSequentiallyEqualiseTemperatureFromTurbineAndReactorInput() {
-     Condenser condenser = new Condenser();
-     condenser.inputPort.mass = kilograms(2);
-     condenser.outputPort.mass = kilograms(2);
-     condenser.reactorInputPort.mass = kilograms(4);
-     condenser.reactorInputPort.temperature = kelvin(473.15);
-     condenser.inputPort.temperature = kelvin(473.15);
-     condenser.step();
-     assertEquals(kelvin(438.15), condenser.getTemperature());
-        
-     }
-    
-    * */
-     @Test
-     public void shouldSequentiallyIncreaseWaterMassFromInputIfExistent()
-     {
-     Condenser condenser = new Condenser();
-     condenser.inputPort().mass = kilograms(2);
-     condenser.outputPort().mass = kilograms(2);
-     condenser.reacInputPort().mass = kilograms(4);
-     //ToDO find out wtf temperature
-     //condenser.reacInputPort().temperature = kelvin(473.15);
-     //condenser.inputPort().temperature = kelvin(473.15);
-     condenser.step();
-     condenser.inputPort().mass = kilograms(2);
-     condenser.reacInputPort().mass = kilograms(4);
-     condenser.step(); 
-     assertEquals(kilograms(14), condenser.getWaterMass());
-     }
-     
-    //Bad, not temperature affects the change
-  //   @Test
-     public void shouldAddToWaterMassAfterTempChange() {
-     Condenser condenser = new Condenser();
-     condenser.inputPort().mass = kilograms(2);
-     condenser.outputPort().mass = kilograms(2);
-     condenser.reacInputPort().mass = kilograms(0);
-   //  condenser.inputPort().temperature = kelvin(473.15);
-     condenser.step();
-     assertEquals(kilograms(4), condenser.getWaterMass());
-        
-     }
     /*
-     @Test
-     public void pressureShouldIncreaseIfWaterMassIncreases() {
-     Condenser condenser = new Condenser();
-     condenser.inputPort.mass = kilograms(20);
-     condenser.outputPort.mass = kilograms(2);
-     condenser.reactorInputPort.mass = kilograms(0);
-     condenser.inputPort.temperature = kelvin(473.15);
-     condenser.step();
-     Pressure first = condenser.getPressure();
-     condenser.inputPort.mass = kilograms(20);
-     condenser.reactorInputPort.mass = kilograms(0);
-     condenser.step();
-     Pressure second = condenser.getPressure();
-     assertTrue(second.greaterThan(first));
-     }
-     */
+    @Test
+    public void shouldEqualiseTemperatureIfInputFromTurbine() {
+        Condenser condenser = new Condenser();
+        condenser.inputPort().mass = kilograms(2);
+        condenser.outputPort().mass = kilograms(2);
+        condenser.reacInputPort().mass = kilograms(0);
+        condenser.inputPort().temperature = kelvin(473.15);
+        condenser.step();
+        assertEquals(kelvin(413.15), condenser.getTemperature());
+
+    }
+
+    @Test
+    public void shouldEqualiseTemperatureIfInputFromReactor() {
+        Condenser condenser = new Condenser();
+        condenser.inputPort.mass = kilograms(0);
+        condenser.outputPort.mass = kilograms(2);
+        condenser.reactorInputPort.mass = kilograms(2);
+        condenser.reactorInputPort.temperature = kelvin(473.15);
+        condenser.step();
+        assertEquals(kelvin(413.15), condenser.getTemperature());
+
+    }
+
+    @Test
+    public void shouldSequentiallyEqualiseTemperatureFromTurbineAndReactorInput() {
+        Condenser condenser = new Condenser();
+        condenser.inputPort.mass = kilograms(2);
+        condenser.outputPort.mass = kilograms(2);
+        condenser.reactorInputPort.mass = kilograms(4);
+        condenser.reactorInputPort.temperature = kelvin(473.15);
+        condenser.inputPort.temperature = kelvin(473.15);
+        condenser.step();
+        assertEquals(kelvin(438.15), condenser.getTemperature());
+
+    }
+
+    @Test
+    public void shouldSequentiallyIncreaseWaterMassFromInputIfExistent() {
+        Condenser condenser = new Condenser();
+        condenser.inputPort().mass = kilograms(2);
+        condenser.outputPort().mass = kilograms(2);
+        condenser.reacInputPort().mass = kilograms(4);
+        //ToDO find out wtf temperature
+        //condenser.reacInputPort().temperature = kelvin(473.15);
+        //condenser.inputPort().temperature = kelvin(473.15);
+        condenser.step();
+        condenser.inputPort().mass = kilograms(2);
+        condenser.reacInputPort().mass = kilograms(4);
+        condenser.step();
+        assertEquals(kilograms(14), condenser.getWaterMass());
+    }
+
+    //Bad, not temperature affects the change
+    @Test
+    public void shouldAddToWaterMassAfterTempChange() {
+        Condenser condenser = new Condenser();
+        condenser.inputPort().mass = kilograms(2);
+        condenser.outputPort().mass = kilograms(2);
+        condenser.reacInputPort().mass = kilograms(0);
+        //  condenser.inputPort().temperature = kelvin(473.15);
+        condenser.step();
+        assertEquals(kilograms(4), condenser.getWaterMass());
+
+    }
+
+    @Test
+    public void pressureShouldIncreaseIfWaterMassIncreases() {
+        Condenser condenser = new Condenser();
+        condenser.inputPort.mass = kilograms(20);
+        condenser.outputPort.mass = kilograms(2);
+        condenser.reactorInputPort.mass = kilograms(0);
+        condenser.inputPort.temperature = kelvin(473.15);
+        condenser.step();
+        Pressure first = condenser.getPressure();
+        condenser.inputPort.mass = kilograms(20);
+        condenser.reactorInputPort.mass = kilograms(0);
+        condenser.step();
+        Pressure second = condenser.getPressure();
+        assertTrue(second.greaterThan(first));
+    }
+    */
+     
 }

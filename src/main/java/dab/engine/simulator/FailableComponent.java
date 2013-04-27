@@ -26,7 +26,10 @@ public abstract class FailableComponent {
     @JsonProperty
     private Percentage wear;                //Current wear level - capped at 100%
 
-
+    private int damage;
+    private int maxDamage;
+    private final int INITIAL_DAMAGE = 5;
+    
     /**
      * Constructor for the FailableComponent. Sets default percentage to 0 and a normal FailureState
      */
@@ -34,8 +37,23 @@ public abstract class FailableComponent {
         //Initialize to a normal state
         hasFailed = false;
         wear = new Percentage(0);
+        damage = 0;
+        maxDamage = INITIAL_DAMAGE;  
     }
 
+    public int getDamage(){
+        return damage;
+    }
+    
+    public void fixingDamage() throws CannotRepairException{
+        damage --;
+        if (damage <= 0 ){
+            maxDamage += 2;
+            damage = 0;
+            repair();
+        }
+    }
+    
     /**
      *  @return hasFailed boolean
      */
@@ -49,6 +67,13 @@ public abstract class FailableComponent {
     public void fail() {
         hasFailed = true;
         stepWear();
+        damage = maxDamage;
+    }
+    
+    public void fail(int i){
+        hasFailed = true;
+        stepWear();
+        damage = i;
     }
 
     /**

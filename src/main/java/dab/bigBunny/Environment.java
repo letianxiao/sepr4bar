@@ -10,32 +10,30 @@ import java.util.Random;
 
 /**
  *
- * @author eduard
+ * @author Eduard Nicodei
+ * @author Aiste Kiskyte
  */
 public class Environment {
-    //private LinkedList<Slime> slimes;
+    private final static int DEFAULT_FAILURE_TIME = 100;
+    private final static int DEFAULT_CANT_FAIL = 300;
+
     private int width;
     private int height;
-    //private LinkedList<Bullets> bullets;
-    
     private TemporaryObjectList<Slime> slimes;
     private TemporaryObjectList<BulletHole> bullets;
-    
     private boolean softwareFailure;
-    private final int DEFAULT_FAILURE_TIME = 100;
-    private final int DEFAULT_CANT_FAIL = 300;
-    private int sfTime, sfCantFailTime;  
-    
+    private int sfTime, sfCantFailTime;
+
     public Environment(int width, int height) {
-        slimes = new TemporaryObjectList<Slime>();
-        bullets = new TemporaryObjectList<BulletHole>();
+        slimes = new TemporaryObjectList<>();
+        bullets = new TemporaryObjectList<>();
         this.width = width;
         this.height = height;
         softwareFailure = false;
         sfTime = 0;
         sfCantFailTime = 0;
     }
-    
+
     // idea: keep them sorted them by freshness
     public void step() {
         stepSoftwareFailure();
@@ -48,54 +46,57 @@ public class Environment {
         }
         slimes.step();
         bullets.step();
-        
+
     }
-    
+
     // return the newest one that intersects
     public Slime intersectWithSlime(Point p, int radius) {
         for (Slime s : slimes.getRawList()) {
-            int sqdistance = (int)p.distanceSq(s.getLocation());
+            int sqdistance = (int) p.distanceSq(s.getLocation());
             int sqSumRadius = (radius + s.getRadius()) * (radius + s.getRadius());
-            if (sqdistance < sqSumRadius) // they intersect
+            if (sqdistance < sqSumRadius) { // they intersect
                 return s;
+            }
         }
-        return null;       
+        return null;
     }
-    
+
     // NOTE: return arrayList;
     public LinkedList<Slime> getSlimes() {
         return slimes.getRawList();
     }
-    
-    public void addBullet(Point location){
+
+    public void addBullet(Point location) {
         bullets.add(new BulletHole(location));
     }
-    
+
     //CopyPasting from Slime. Bad. Sorry. 
-    public LinkedList<BulletHole> getBullets(){
+    public LinkedList<BulletHole> getBullets() {
         return bullets.getRawList();
     }
-    
+
     public void startSoftwareFailure() {
-        if(sfCantFailTime<=0){
+        if (sfCantFailTime <= 0) {
             softwareFailure = true;
             sfTime = DEFAULT_FAILURE_TIME;
             sfCantFailTime = DEFAULT_CANT_FAIL;
             //call software failure in the powerplant
         }
-    } 
-    
-    private void stepSoftwareFailure(){       
-        if(softwareFailure) {
-            sfTime --;
-            if(sfTime <=0){
-               softwareFailure = false; 
+    }
+
+    private void stepSoftwareFailure() {
+        if (softwareFailure) {
+            sfTime--;
+            if (sfTime <= 0) {
+                softwareFailure = false;
             }
         }
-        if(sfCantFailTime>0) {sfCantFailTime --;}
+        if (sfCantFailTime > 0) {
+            sfCantFailTime--;
+        }
     }
-    
-    public boolean getSoftwareFailure(){
+
+    public boolean getSoftwareFailure() {
         return softwareFailure;
     }
 }

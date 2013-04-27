@@ -31,7 +31,7 @@ public class TemperatureTest {
 
     @Test
     public void shouldConvertToStringWithUnits() {
-        assertTrue(temperature.toString().contains("512.85"));
+        assertTrue(temperature.toString().contains("786"));
     }
 
     @Test
