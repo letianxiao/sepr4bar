@@ -37,8 +37,8 @@ public abstract class FailableComponent {
         //Initialize to a normal state
         hasFailed = false;
         wear = new Percentage(0);
-        damage = 1;
-       maxDamage = INITIAL_DAMAGE;  ////TODO To Change This From Current Button thing
+        damage = 0;
+        maxDamage = INITIAL_DAMAGE;  
     }
 
     public int getDamage(){
@@ -49,7 +49,7 @@ public abstract class FailableComponent {
         damage --;
         if (damage <= 0 ){
             maxDamage += 2;
-            damage = 0;
+            //damage = 0;
             repair();
             System.out.println("should be repairing");
         }

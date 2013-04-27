@@ -16,9 +16,6 @@ import javax.swing.JButton;
 public abstract class FixButton extends JButton implements ObservableFix {
 
 	private ArrayList<FixObserver> observers;
-    private int maximum;
-    private int counter;
-    private boolean fixed;
     private FailableComponent component;
 
     /**
@@ -40,7 +37,6 @@ public abstract class FixButton extends JButton implements ObservableFix {
         setVisible(false);
         this.setIcon(new ImageIcon("resources/mainInterface/wrench.png"));
         this.setBackground(Color.WHITE);
-        //setText(""+initialCounter);
         this.setHorizontalTextPosition(JButton.CENTER);
         this.setVerticalTextPosition(JButton.CENTER);
     }
@@ -64,10 +60,7 @@ public abstract class FixButton extends JButton implements ObservableFix {
     /**
      * Sets the button to active
      */
-    public void fail(){
-    	//fixed = false;
-//       System.out.println("component " + component.toString());
-        
+    public void fail(){      
         setText(""+component.getDamage());
     	setVisible(true);
     }
@@ -93,7 +86,7 @@ public abstract class FixButton extends JButton implements ObservableFix {
      * @return Whether the button has hit the click requirement
      */
     public boolean getFixed(){
-    	return component.hasFailed();
+    	return component.getDamage()==0;
     }
 
 }

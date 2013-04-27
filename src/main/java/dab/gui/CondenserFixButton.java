@@ -1,8 +1,11 @@
 package dab.gui;
 
+import dab.engine.simulator.CannotRepairException;
 import dab.engine.simulator.FailableComponent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class CondenserFixButton extends FixButton {
 
@@ -10,7 +13,11 @@ public class CondenserFixButton extends FixButton {
 		super(coordX, coordY, component);
 		addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
-				pressed();
+                        try {
+                            pressed();
+                        } catch (CannotRepairException ex) {
+                            Logger.getLogger(CondenserFixButton.class.getName()).log(Level.SEVERE, null, ex);
+                        }
 				if (getFixed()){
             	    notifyFixObservers();
 				}
