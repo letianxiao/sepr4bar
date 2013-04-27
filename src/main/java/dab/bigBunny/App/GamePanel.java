@@ -23,9 +23,10 @@ import javax.swing.JPanel;
  *
  * @author eduard
  */
-public abstract class GamePanel extends JPanel {
+public class GamePanel extends JPanel {
     protected Simulator simulator;
     protected BufferedImage background;
+    protected UIComponent c1, c2;
     
     public GamePanel(Simulator simulator) {
         this.simulator = simulator;
@@ -46,11 +47,23 @@ public abstract class GamePanel extends JPanel {
         
         setLayout(null);
         
-        add(new UIComponent(simulator.components().get(0), new Point(50, 60), new ImageIcon(GamePanel.class.getResource("pump1.png")).getImage(), new ImageIcon(GamePanel.class.getResource("pump2.gif")).getImage()));
+        
+        c1 = new UIComponent(simulator.getPumps().get(1), new Point(50, 60), new ImageIcon(GamePanel.class.getResource("pump1.png")).getImage(), new ImageIcon(GamePanel.class.getResource("pump2.gif")).getImage());
+        c2 = new UIComponent(simulator.getPumps().get(0), new Point(70, 60), new ImageIcon(GamePanel.class.getResource("pump1.png")).getImage(), new ImageIcon(GamePanel.class.getResource("pump2.gif")).getImage());
+        
+        add(c1);
+        add(c2);
+        
+        c1.setVisible(true);
+        c2.setVisible(true);
+                
+        
+        
     }
     
     public void screenUpdate() {
-        
+        c1.update();
+        c2.update();
     }
     
     @Override

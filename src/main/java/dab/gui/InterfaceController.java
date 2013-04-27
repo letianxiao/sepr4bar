@@ -49,6 +49,7 @@ import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import dab.bigBunny.App.GamePanel;
 
 public class InterfaceController extends JPanel implements Observer, FixObserver {
 
@@ -57,7 +58,7 @@ public class InterfaceController extends JPanel implements Observer, FixObserver
     private Sounds music;
     public final int MAX_SIZE_WIDTH = 1366;
     public final int MAX_SIZE_HEIGHT = 768;
-    private ReactorPanel reactorPanel;
+    private GamePanel reactorPanel;
     private ObamaPanel obamaPanel;
     private ButtonPanel buttonPanel;
     private InfoPanel infoPanel;
@@ -191,7 +192,7 @@ public class InterfaceController extends JPanel implements Observer, FixObserver
         rightSplitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
         topLevelSplitPane.setRightComponent(rightSplitPane);
         
-        reactorPanel = new ReactorPanel();
+        reactorPanel = new GamePanel(simulator);
         leftPane.setLeftComponent(reactorPanel);
 
         obamaPanel = new ObamaPanel();
@@ -208,7 +209,7 @@ public class InterfaceController extends JPanel implements Observer, FixObserver
     }
 
     public void screenUpdate() {
-        //reactorPanel.screenUpdate();
+        reactorPanel.screenUpdate();
         
         try {
             if (!simulator.getPumpFailed(1)) {
