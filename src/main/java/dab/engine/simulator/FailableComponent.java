@@ -49,9 +49,8 @@ public abstract class FailableComponent {
         damage --;
         if (damage <= 0 ){
             maxDamage += 2;
-            //damage = 0;
+            damage = 0;
             repair();
-            System.out.println("should be repairing");
         }
     }
     

@@ -4,7 +4,6 @@ import dab.engine.simulator.CannotRepairException;
 import dab.engine.simulator.FailableComponent;
 import java.awt.Color;
 import java.util.ArrayList;
-
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 
@@ -27,12 +26,7 @@ public abstract class FixButton extends JButton implements ObservableFix {
     public FixButton(int coordX, int coordY,  FailableComponent component)
     {
     	observers = new ArrayList<FixObserver>();
-        //this.maximum = initialCounter;
-        //this.counter = initialCounter;
-        //this.fixed = false;
-        this.component = component;
-       
-        
+        this.component = component; 
         setBounds(coordX,coordY,87,30);
         setVisible(false);
         this.setIcon(new ImageIcon("resources/mainInterface/wrench.png"));
@@ -72,9 +66,6 @@ public abstract class FixButton extends JButton implements ObservableFix {
      */
     protected void pressed() throws CannotRepairException{
     	component.fixingDamage();
-        
-        System.out.println("health" + component.getDamage());
-        
     	if (!component.hasFailed()){
     		setVisible(false);
     	}	
