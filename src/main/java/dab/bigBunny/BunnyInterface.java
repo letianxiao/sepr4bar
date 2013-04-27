@@ -1,13 +1,16 @@
 package dab.bigBunny;
 
+import dab.bigBunny.App.GamePanel;
 import dab.engine.simulator.Condenser;
 import dab.engine.simulator.Pump;
+import dab.engine.simulator.UnusedComponent;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
@@ -16,16 +19,31 @@ public class BunnyInterface extends JFrame implements KeyListener {
     private ShowCanvas canvas;
     private BunnyController bunnyController;
     private Environment environment;
-    private Dimension resolution;
+    private Dimension panelSize;
     private JFrame frame;
     private HitBoundsController hitBoundsController;
+     protected BufferedImage background;
     
 
     public BunnyInterface() {
         frame = new JFrame("MockGui");
-        //for now temproray resolution. The one in haddocks game needs fixing as well
-        resolution = new Dimension(800, 600);
-        environment = new Environment(resolution.width, resolution.height);
+        //for now temproray panelSize. The one in haddocks game needs fixing as well
+        
+          try {
+            background = ImageIO.read(GamePanel.class.getResourceAsStream("gamepanel_bkg.png"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        
+        Dimension panelSize = new Dimension(background.getWidth(), background.getHeight());
+       
+        
+        
+        
+        
+        
+        //resolution = new Dimension(800, 600);
+        environment = new Environment(panelSize.width, panelSize.height);
         
         //this Has to be before the bunnyController initialisation
         hitBoundsController = new HitBoundsController();
@@ -33,18 +51,18 @@ public class BunnyInterface extends JFrame implements KeyListener {
         hitBoundsController.addHitableComponent(new Circle(new Pump(null, null) ,300, 300, 40,40));
         hitBoundsController.addHitableComponent(new Circle(new Pump(null, null) ,200, 200, 73, 73));
         hitBoundsController.addHitableComponent(new TheRectangle(new Condenser(), 500, 500, 40, 40));
-        
+        hitBoundsController.addHitableComponent(new TheRectangle(new UnusedComponent("CoolingUnit"), 765, 337, 160 , 237));
         
         
         //Change radius according to image
-        bunnyController = new BunnyController(environment, hitBoundsController, 20);        
+        bunnyController = new BunnyController(environment, hitBoundsController, 10);        
         Container container = frame.getContentPane();
-        canvas = new ShowCanvas(bunnyController, environment, resolution.width, resolution.height, hitBoundsController);
+        canvas = new ShowCanvas(bunnyController, environment, panelSize.width, panelSize.height, hitBoundsController);
         container.setLayout(null);
         container.add(canvas);
-        container.setMinimumSize(resolution);
-        container.setPreferredSize(resolution);
-        container.setMaximumSize(resolution);
+        container.setMinimumSize(panelSize);
+        container.setPreferredSize(panelSize);
+        container.setMaximumSize(panelSize);
         container.setFocusable(true);
         frame.setResizable(false);
         frame.setVisible(true);
@@ -125,6 +143,7 @@ class ShowCanvas extends JPanel implements MouseListener {
     private JLabel box, pump;
     private ImageIcon boxToHit;
     private Ellipse2D.Double hitableCircle, pumpCircle;
+    protected BufferedImage background;
 
     
     
@@ -135,6 +154,12 @@ class ShowCanvas extends JPanel implements MouseListener {
         this.environment = environment;
         this.setSize(dimX, dimY);
         this.setLayout(null);
+        
+           try {
+            background = ImageIO.read(GamePanel.class.getResourceAsStream("gamepanel_bkg.png"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
                
         setBackground(Color.WHITE);
         bar = new JProgressBar(0, controller.getHealth());
@@ -146,19 +171,20 @@ class ShowCanvas extends JPanel implements MouseListener {
         box = new JLabel("Box");
         boxToHit = new ImageIcon("resources/HitableBox.png");
         box.setIcon(boxToHit);
-        box.setBounds(hitBoundsController.getHittableComponents().get(2).getDimensions());
+        
+        box.setBounds(hitBoundsController.getHittableComponents().get(2).getDimensions(10));
         this.add(box);
         box.setVisible(true);
         //controller.setHitBounds(box.getBounds());
            
         pump = new JLabel();
         pump.setIcon(new ImageIcon("resources/mainInterface/MOVINGPUMP_MAIN_SCALED.gif"));  
-        pump.setBounds(hitBoundsController.getHittableComponents().get(1).getDimensions());
+        pump.setBounds(hitBoundsController.getHittableComponents().get(1).getDimensions(10));
         this.add(pump);
-        Rectangle r = new Rectangle(hitBoundsController.getHittableComponents().get(1).getDimensions());
+        Rectangle r = new Rectangle(hitBoundsController.getHittableComponents().get(1).getDimensions(10));
         pumpCircle = new Ellipse2D.Double(r.x, r.y, r.width, r.height);
        
-        r = new Rectangle(hitBoundsController.getHittableComponents().get(0).getDimensions());
+        r = new Rectangle(hitBoundsController.getHittableComponents().get(0).getDimensions(10));
         hitableCircle = new Ellipse2D.Double(r.x, r.y, r.width, r.height);          
 
         //to call this on the reactorPannel, not on this thing
@@ -203,11 +229,12 @@ class ShowCanvas extends JPanel implements MouseListener {
             g2D.fill(circle);
         }
 
-        Ellipse2D.Double circle = new Ellipse2D.Double((double) bunnyController.getX() - 20, (double) bunnyController.getY() - 20, 40.0, 40.0);
+        Ellipse2D.Double circle = new Ellipse2D.Double((double) bunnyController.getX() - 10, (double) bunnyController.getY() - 10, 20.0, 20.0);
         g2D.drawImage(bunny, af, this);
         g2D.setColor(Color.black);
         g2D.draw(circle);
         
+         g.drawImage(background, 0, 0, null);
         
         g2D.setColor(Color.GREEN);
         g2D.fill(hitableCircle);

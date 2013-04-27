@@ -74,6 +74,7 @@ public abstract class FailableComponent {
         hasFailed = true;
         stepWear();
         damage = i;
+        System.out.println("damage" + damage);
     }
 
     /**

@@ -92,7 +92,7 @@ public class MainWindow extends JFrame {
 
         Environment env = new Environment(getWidth(), getHeight());
         hitboundsController = new HitBoundsController();
-        BunnyController bc = new BunnyController(env, hitboundsController, new Point(100, 100), 10);
+        BunnyController bc = new BunnyController(env, hitboundsController, new Point(100, 100));
         bc.setBounds(new Rectangle(getWidth(), getHeight()));
         TwoPlayerScreen tps = new TwoPlayerScreen(bc, env);
         
