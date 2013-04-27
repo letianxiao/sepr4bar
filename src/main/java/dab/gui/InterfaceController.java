@@ -49,8 +49,6 @@ import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import dab.bigBunny.App.GamePanel;
-import dab.bigBunny.App.SinglePlayerPanel;
 
 public class InterfaceController extends JPanel implements Observer, FixObserver {
 
@@ -59,7 +57,7 @@ public class InterfaceController extends JPanel implements Observer, FixObserver
     private Sounds music;
     public final int MAX_SIZE_WIDTH = 1366;
     public final int MAX_SIZE_HEIGHT = 768;
-    private SinglePlayerPanel reactorPanel;
+    private ReactorPanel reactorPanel;
     private ObamaPanel obamaPanel;
     private ButtonPanel buttonPanel;
     private InfoPanel infoPanel;
@@ -176,13 +174,13 @@ public class InterfaceController extends JPanel implements Observer, FixObserver
         //topLevelSplitPane.setBorder(new EmptyBorder(0, 0, 0, 0));
         topLevelSplitPane.setPreferredSize(new Dimension(MAX_SIZE_WIDTH, MAX_SIZE_HEIGHT));
         topLevelSplitPane.setMinimumSize(new Dimension(MAX_SIZE_WIDTH, MAX_SIZE_HEIGHT));
-        //topLevelSplitPane.setResizeWeight(0.73);
+        topLevelSplitPane.setResizeWeight(0.73);
         add(topLevelSplitPane);
 
         JSplitPane leftPane = new JSplitPane();
         leftPane.setDividerSize(0);
         //leftPane.setBorder(new EmptyBorder(0, 0, 0, 0));
-        //leftPane.setResizeWeight(0.8);
+        leftPane.setResizeWeight(0.8);
         leftPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
         topLevelSplitPane.setLeftComponent(leftPane);
 
@@ -193,7 +191,7 @@ public class InterfaceController extends JPanel implements Observer, FixObserver
         rightSplitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
         topLevelSplitPane.setRightComponent(rightSplitPane);
         
-        reactorPanel = new SinglePlayerPanel(simulator);
+        reactorPanel = new ReactorPanel();
         leftPane.setLeftComponent(reactorPanel);
 
         obamaPanel = new ObamaPanel();
@@ -210,7 +208,7 @@ public class InterfaceController extends JPanel implements Observer, FixObserver
     }
 
     public void screenUpdate() {
-        reactorPanel.screenUpdate();
+        //reactorPanel.screenUpdate();
         
         try {
             if (!simulator.getPumpFailed(1)) {

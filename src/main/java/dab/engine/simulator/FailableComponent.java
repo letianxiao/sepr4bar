@@ -3,6 +3,7 @@ package dab.engine.simulator;
 import dab.engine.utilities.Percentage;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import dab.engine.simulator.views.FailableComponentView;
 
 /**
  * Base Class for all components which can fail.
@@ -19,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * 
  * @author Marius Dumetrescu
  */
-public abstract class FailableComponent {
+public abstract class FailableComponent implements FailableComponentView {
 
     @JsonProperty
     private boolean hasFailed;      //The state of the component

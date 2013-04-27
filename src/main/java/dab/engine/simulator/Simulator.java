@@ -14,6 +14,9 @@ import java.util.ArrayList;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import dab.engine.simulator.views.PumpView;
+import dab.engine.simulator.views.ReactorView;
+import java.util.HashMap;
 
 
 /**
@@ -37,6 +40,19 @@ public class Simulator implements PlantController, PlantStatus, GameManager {
         userName = "";
     }
 
+    public ReactorView getReactor() {
+        return physicalModel.getReactor();
+    }
+    
+    public ArrayList<PumpView> getPumps() {
+        ArrayList<PumpView> pumps = new ArrayList<>();
+        for (Pump p : physicalModel.getPumps()) 
+            pumps.add(p);
+        return pumps;
+    }
+    
+    
+    
     /**
      *
      * @param String user Name
@@ -102,15 +118,6 @@ public class Simulator implements PlantController, PlantStatus, GameManager {
     @Override
     public String[] listFailedComponents() {
         return failureModel.listFailedComponents();
-    }
-
-    /**
-     *
-     * @return String[] repairing components
-     */
-    @Override
-    public String[] listRepairingComponents(){
-        return failureModel.listRepairingComponents();
     }
 
     /**
