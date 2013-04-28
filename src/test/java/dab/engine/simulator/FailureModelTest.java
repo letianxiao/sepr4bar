@@ -27,6 +27,7 @@ public class FailureModelTest {
     private PlantController plantController;
     @Mock
     private PlantStatus plantStatus;
+    
     private FailureModel model;
 
     public FailureModelTest() {
@@ -34,7 +35,7 @@ public class FailureModelTest {
 
     @Before
     public void setup() {
-        //model = new FailureModel(plantController, plantStatus);
+        model = new FailureModel(plantController, plantStatus);
     }
     
     @Test
@@ -43,7 +44,7 @@ public class FailureModelTest {
         
     }
     
-/*
+
     
     @Ignore @Test
     public void testStep_0args() throws Exception {
@@ -122,12 +123,12 @@ public class FailureModelTest {
 
     @Test
     public void repairCondenser() throws Exception {
-        context.checking(new Expectations() {
-            {
+        context.checking(new Expectations() {{
                 oneOf(plantController).repairCondenser();
-            }
-        });
+            }});
         model.repairCondenser();
+        
+        context.assertIsSatisfied();
     }
 
     @Test
@@ -298,12 +299,12 @@ public class FailureModelTest {
     @Ignore @Test
     public void testComponents() {
     }
-*/
+
     
     /*
      * dunno why this failed
      */
-/*    
+    
     @Test
     public void testSoftFailCheck(){
         context.checking(new Expectations() {
@@ -328,25 +329,21 @@ public class FailureModelTest {
     
     @Test
     public void testGenerateFailedParameterTurnOn() {
-        context.checking(new Expectations() {
-            {
-                //model.softFailCheck(UserCommands.TURNON, 2);
-            }
-        });
+        
     	double par = model.generateFailedParameter(UserCommands.TURNON);
 		assertTrue((par>0) && (par<3));
     }
     
     @Test
     public void testGenerateFailedParameterTurnOff() {
-        context.checking(new Expectations() {{}});
+        
     	double par = model.generateFailedParameter(UserCommands.TURNOFF);
 		assertTrue((par>0) && (par<3));
     }
     
     @Test
     public void testGenerateFailedParameterClose() {
-        context.checking(new Expectations() {{}});
+        
     	double par = model.generateFailedParameter(UserCommands.TURNOFF);
 		assertTrue((par>0) && (par<3));
     }
@@ -357,5 +354,5 @@ public class FailureModelTest {
     	double par = model.generateFailedParameter(UserCommands.TURNOFF);
 		assertTrue((par>0) && (par<3));
     }
-*/
+
 }

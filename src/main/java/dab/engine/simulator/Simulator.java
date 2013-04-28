@@ -89,9 +89,9 @@ public class Simulator implements PlantController, PlantStatus, GameManager {
         SaveGame saveGame = new SaveGame(physicalModel, failureModel, userName);
         try {
             saveGame.save();
-        } catch (FileNotFoundException ex) {
-        } catch (IOException ex) {
-        }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } 
     }
     /**
      *
@@ -143,18 +143,8 @@ public class Simulator implements PlantController, PlantStatus, GameManager {
      * 
      */
     public void step() throws GameOverException {
-        try {
             failureModel.step();
-        } catch (GameOverException e) {
-            // FIXME: shouldn't it be sufficient to just throw the gameover exception
-            throw new GameOverException("Dear " + userName + ",\n\n" +
-                    "YOU HAVE FAILED\n\n" +
-                    "The reactor vessel has failed catastrophically,\n"+
-                    "and everyone within a 100km radius is now either\n " +
-                    "dead or dying of radiation\n" +"poisioning.\n\n" +
-                    "However, you did successfully generate \n" + failureModel.energyGenerated() +
-            "\nof energy before this occurred.");
-        }
+        
     }
 
     public void failStateCheck() {

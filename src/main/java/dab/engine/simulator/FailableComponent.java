@@ -26,8 +26,8 @@ public abstract class FailableComponent implements FailableComponentView {
     @JsonProperty
     private int damage;
     @JsonProperty
-    private double maxDamage;  //this should be different for two player mode
-    private double damageIncrease;
+    private double maxDamage = 1;  //this should be different for two player mode
+    private double damageIncrease = 1;
 
     /**
      * Constructor for the FailableComponent. Sets default percentage to 0 and a

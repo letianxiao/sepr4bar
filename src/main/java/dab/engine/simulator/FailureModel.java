@@ -73,10 +73,10 @@ public class FailureModel implements PlantController, PlantStatus {
      */
     public void step() throws GameOverException {
         controller.step(1);
-        failStateCheck();
-        checkReactorWaterLevel();
-        checkCondenserPressure();
-        checkTurbineFailure();
+        //failStateCheck();
+        //checkReactorWaterLevel();
+        //checkCondenserPressure();
+        //checkTurbineFailure();
     }
 
     @Override

@@ -172,19 +172,19 @@ public class PhysicalModelTest {
         assertTrue(model.getPumpStatus(1));
     }
     
-    @Test(expected = KeyNotFoundException.class)
+    @Test(expected = IndexOutOfBoundsException.class)
     public void shouldRefuseToRepairInvalidPump() throws KeyNotFoundException, CannotRepairException {
         PhysicalModel model = new PhysicalModel();
         model.repairPump(100);
     }
 
-    @Test(expected = KeyNotFoundException.class)
+    @Test(expected = IndexOutOfBoundsException.class)
     public void shouldRefuseToControlInvalidPump() throws CannotControlException, KeyNotFoundException {
         PhysicalModel model = new PhysicalModel();
         model.changePumpState(100, true);
     }
 
-    @Test(expected = KeyNotFoundException.class)
+    @Test(expected = IndexOutOfBoundsException.class)
     public void shouldRefuseToControlInvalidValve() throws KeyNotFoundException {
         PhysicalModel model = new PhysicalModel();
         model.changeValveState(100, true);
