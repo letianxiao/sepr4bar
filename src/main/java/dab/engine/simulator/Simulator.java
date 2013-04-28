@@ -6,7 +6,6 @@ import dab.engine.utilities.Energy;
 import dab.engine.utilities.Percentage;
 import dab.engine.utilities.Pressure;
 import dab.engine.utilities.Temperature;
-import dab.engine.seprphase2.GameOverException;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;

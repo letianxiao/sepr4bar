@@ -3,7 +3,6 @@ package dab.engine.simulator;
 import static dab.engine.simulator.PhysicalConstants.*;
 import static dab.engine.utilities.Units.*;
 import dab.engine.utilities.*;
-import dab.engine.seprphase2.GameOverException;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import dab.engine.simulator.views.ReactorView;

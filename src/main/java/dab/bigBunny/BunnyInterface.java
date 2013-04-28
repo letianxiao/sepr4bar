@@ -1,6 +1,6 @@
 package dab.bigBunny;
 
-import dab.bigBunny.App.GamePanel;
+import dab.gui.gamepanel.GamePanel;
 import dab.engine.simulator.Condenser;
 import dab.engine.simulator.Pump;
 import dab.engine.simulator.UnusedComponent;

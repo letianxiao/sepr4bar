@@ -2,7 +2,6 @@ package dab.engine.simulator;
 
 import dab.engine.utilities.*;
 import static dab.engine.utilities.Units.joules;
-import dab.engine.seprphase2.GameOverException;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -1,7 +1,6 @@
 package dab.engine.simulator;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import dab.engine.seprphase2.GameOverException;
 import dab.engine.utilities.Energy;
 import dab.engine.utilities.Percentage;
 import dab.engine.utilities.Pressure;

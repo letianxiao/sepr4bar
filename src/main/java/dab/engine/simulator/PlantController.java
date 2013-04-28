@@ -1,7 +1,6 @@
 package dab.engine.simulator;
 
 import dab.engine.utilities.Percentage;
-import dab.engine.seprphase2.GameOverException;
 
 
 /**
