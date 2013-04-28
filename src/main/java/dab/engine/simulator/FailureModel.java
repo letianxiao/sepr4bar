@@ -1,16 +1,15 @@
 package dab.engine.simulator;
 
-import static dab.engine.utilities.Units.percent;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import dab.engine.seprphase2.GameOverException;
 import dab.engine.utilities.Energy;
 import dab.engine.utilities.Percentage;
 import dab.engine.utilities.Pressure;
 import dab.engine.utilities.Temperature;
-import dab.engine.seprphase2.GameOverException;
+import static dab.engine.utilities.Units.percent;
 
 import java.util.ArrayList;
 import java.util.Random;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Manages software and hardware failures.
@@ -41,20 +40,30 @@ public class FailureModel implements PlantController, PlantStatus {
     private PlantStatus status;
     @JsonProperty
     private int numberOfTimesWaterLevelIsTooLow;
+    
+    @JsonProperty
+    private boolean onePlayerMode;
    
     private final int reactorOverheatThreshold = 8;
     private final Pressure condenserMaxPressure = new Pressure(30662500);
     private SoftFailReport lastFailReport = new SoftFailReport();
     private Random failChance = new Random();
     //private ArrayList<FailableComponent> repairList = new ArrayList<>();
-
-    private FailureModel() {
-    }
+    private final int MAX_DAMAGE1 = 5;
+    private final int MAX_DAMAGE2 = 1;
+    private final int DAMAGE_INCREASE1 = 1;
+    private final int DAMAGE_INCREASE2 = 2; 
+    private int difficulty;
 
     public FailureModel(PlantController plantController,
             PlantStatus plantStatus) {
         this.controller = plantController;
         this.status = plantStatus;
+       // onePlayerMode = controller.getPlayerMode();
+        onePlayerMode = true; //THIS IS TEMP FOR TESTING. use above or sth else to set mode
+        //difficulty = controller.getDifficulty();
+        difficulty = 1; 
+        setDamagesToComponents();
     }
 
     /**
@@ -77,13 +86,32 @@ public class FailureModel implements PlantController, PlantStatus {
         //controller.step(i);
     }
 
+    public final void setDamagesToComponents(){
+        int maxDamage, damageIncrease;
+        if(onePlayerMode){
+            maxDamage = MAX_DAMAGE1;
+            damageIncrease = DAMAGE_INCREASE1;
+        } else {
+            maxDamage = MAX_DAMAGE2;
+            damageIncrease = DAMAGE_INCREASE2;
+        }
+        for(FailableComponent component : status.components()){
+            component.setDamageValues(maxDamage, damageIncrease);
+        }     
+    }
+    
     /**
      * Method to determine failures
      *
      */
     public void failStateCheck() {
         ArrayList<FailableComponent> components = status.components();
-        int failValue = failChance.nextInt(5000);  //A component that is 100% wear will have a 1 in 50 chance of failing
+        int failValue;
+        if(onePlayerMode) {
+            failValue = failChance.nextInt(5000/difficulty);  //A component that is 100% wear will have a 1 in 50 chance of failing
+        } else {
+            failValue = failChance.nextInt(15000/difficulty); //in two player mode failures have 3 times less chance to ocur randomly
+        }
         int componentsFailChance = 0;
         for (int i = 0; i < components.size(); i++) {
             componentsFailChance += components.get(i).wear().points() / components.size();
@@ -92,7 +120,6 @@ public class FailureModel implements PlantController, PlantStatus {
 
                 break; //We only want to induce one hardware failure! Break here.
             }
-
         }
     }
 
@@ -281,24 +308,36 @@ public class FailureModel implements PlantController, PlantStatus {
      * @return boolean (whether a software failure has occurred)
      */
     public boolean softFailCheck(UserCommands targetCommand, double targetParameter) {
-        double failRoll = Math.random();
-        if (failRoll <= 0.05) { //chance of unresponsive failure
-            //Unresponive commands do nothing
-            lastFailReport = new SoftFailReport(FailMode.UNRESPONSIVE, targetCommand, targetParameter);
-            return false;
-        } else if (failRoll <= 0.2) { //chance of any failure (incorrect fail = this - unresponsive fail chance)
+        if(onePlayerMode){
+            double failRoll = Math.random();
+            if (failRoll <= 0.05) { //chance of unresponsive failure
+                //Unresponive commands do nothing
+                lastFailReport = new SoftFailReport(FailMode.UNRESPONSIVE, targetCommand, targetParameter);
+                return false;
+            } else if (failRoll <= 0.2) { //chance of any failure (incorrect fail = this - unresponsive fail chance)
 
-            //Incorrect commands behave as another command
-            UserCommands actualCommand = UserCommands.randomCommand();
-            double actualParameter = generateFailedParameter(actualCommand);
-            doFailedCommand(actualCommand, actualParameter);
-            lastFailReport = new SoftFailReport(FailMode.INCORRECT, targetCommand, targetParameter, actualCommand, actualParameter);
-            return false;
+                //Incorrect commands behave as another command
+                UserCommands actualCommand = UserCommands.randomCommand();
+                double actualParameter = generateFailedParameter(actualCommand);
+                doFailedCommand(actualCommand, actualParameter);
+                lastFailReport = new SoftFailReport(FailMode.INCORRECT, targetCommand, targetParameter, actualCommand, actualParameter);
+                return false;
+            } else {
+                //Working commands behave as intended
+                lastFailReport = new SoftFailReport(FailMode.WORKING, targetCommand, targetParameter);
+                return true;
+            } 
         } else {
-            //Working commands behave as intended
-            lastFailReport = new SoftFailReport(FailMode.WORKING, targetCommand, targetParameter);
+           //Check if the bunny has initiated a SF from Bunnys' environment
+           /*
+            if(environment.getSoftwareFailure) {
+                return false;
+            } else {
+                
+            }
+            */
             return true;
-        }
+        }    
     }
 
     /**

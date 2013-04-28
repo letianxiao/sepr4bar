@@ -21,35 +21,36 @@ import dab.engine.utilities.Percentage;
 public abstract class FailableComponent {
 
     @JsonProperty
-    private boolean hasFailed;      //The state of the component
-    @JsonProperty
     private Percentage wear;                //Current wear level - capped at 100%
-
+    @JsonProperty
     private int damage;
-    private int maxDamage;  //this should be different for two player mode
-    private final int INITIAL_DAMAGE = 5;   //this should be different for two player mode
-    
+    @JsonProperty
+    private double maxDamage;  //this should be different for two player mode
+    private double damageIncrease;
+            
     /**
      * Constructor for the FailableComponent. Sets default percentage to 0 and a normal FailureState
      */
     public FailableComponent() {
         //Initialize to a normal state
-        hasFailed = false;
         wear = new Percentage(0);
         damage = 0;
-        maxDamage = INITIAL_DAMAGE;  
     }
 
+    public void setDamageValues(int maxDamage, int damageIncrease){
+        this.maxDamage = maxDamage;
+        this.damageIncrease = damageIncrease;
+    }
+    
     public int getDamage(){
         return damage;
     }
     
     public void fixingDamage() throws CannotRepairException{
         damage --;
-        if (damage <= 0 ){
-            maxDamage += 2;         //this should be different for two player mode
+        if (damage <= 0 ){           
+            maxDamage += damageIncrease;                 
             damage = 0;
-            repair();
         }
     }
     
@@ -57,7 +58,7 @@ public abstract class FailableComponent {
      *  @return hasFailed boolean
      */
     public boolean hasFailed() {
-        return hasFailed;
+        return (damage>0);
     }
 
     /**
@@ -68,9 +69,8 @@ public abstract class FailableComponent {
     }
 
     public void fail(int i){
-        hasFailed = true;
         stepWear();       
-        damage += i + maxDamage;
+        damage = (int)(damage +i + maxDamage);
         
         System.out.println("damage" + damage);
     }
@@ -79,7 +79,7 @@ public abstract class FailableComponent {
      * set hasFailed to false
      */
     public void repair() throws CannotRepairException {
-        hasFailed = false;
+        damage = 0;
     }
 
     /**
