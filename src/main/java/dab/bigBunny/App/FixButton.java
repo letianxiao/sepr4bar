@@ -43,9 +43,10 @@ public class FixButton extends JButton {
     }
     
     public void update() {
+        setText(String.valueOf(linkedComponent.getDamage()));
         if (linkedComponent.hasFailed()) {
             setVisible(true);
-            setText(String.valueOf(linkedComponent.getDamage()));
+            
         } else {
             setVisible(true);
         }

@@ -13,8 +13,8 @@ import java.awt.Point;
  */
 public class UIReactor extends UIComponent {
 
-    public UIReactor(FailableComponentView component, Point location, String stdImgPath, String dmgImgPath) {
-        super(component, location, stdImgPath, dmgImgPath);
+    public UIReactor(GamePanel parent, FailableComponentView component, Point location, String stdImgPath, String dmgImgPath) {
+        super(parent, component, location, stdImgPath, dmgImgPath);
         
         //also do stuff regarding the control rods and what not
     }

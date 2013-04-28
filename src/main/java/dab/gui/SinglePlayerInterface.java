@@ -52,6 +52,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import dab.bigBunny.App.GamePanel;
 import dab.bigBunny.App.MainWindow;
 import dab.bigBunny.App.SinglePlayerPanel;
+import java.awt.FlowLayout;
 
 public class SinglePlayerInterface extends JPanel {
 
@@ -92,24 +93,36 @@ public class SinglePlayerInterface extends JPanel {
     }
     
     private void setupPanels() {
+        setLayout(new BorderLayout());
         JSplitPane topLevelSplitPane, leftPane, rightPane;
         
         topLevelSplitPane = new JSplitPane();
-        topLevelSplitPane.setDividerSize(0);
-        add(topLevelSplitPane);
+        topLevelSplitPane.setDividerSize(5);
+        //topLevelSplitPane.setResizeWeight(0.2);
         
         leftPane = new JSplitPane();
-        leftPane.setDividerSize(0);
+        leftPane.setDividerSize(5);
         leftPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
         
         rightPane = new JSplitPane();
-        rightPane.setDividerSize(0);
+        rightPane.setDividerSize(5);
         rightPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
+        rightPane.setResizeWeight(0.5);
         
         gamePanel = new SinglePlayerPanel(simulator);
         obamaPanel = new ObamaPanel(simulator);
         infoPanel = new InfoPanel(simulator);
         buttonPanel = new ButtonPanel(simulator);
+        
+                
+        leftPane.setLeftComponent(gamePanel);
+        leftPane.setRightComponent(obamaPanel);
+        rightPane.setLeftComponent(infoPanel);
+        rightPane.setRightComponent(buttonPanel);        
+        
+        topLevelSplitPane.setLeftComponent(leftPane);
+        topLevelSplitPane.setRightComponent(rightPane);
+        add(topLevelSplitPane);
         
         //topLevelSplitPane.setBorder(new EmptyBorder(0, 0, 0, 0));
         //topLevelSplitPane.setPreferredSize(new Dimension(MAX_SIZE_WIDTH, MAX_SIZE_HEIGHT));
@@ -126,14 +139,7 @@ public class SinglePlayerInterface extends JPanel {
 
         //rightSplitPane.setBorder(new EmptyBorder(0, 0, 0, 0));
         //rightPane.setResizeWeight(0.4);
-        
-        leftPane.setLeftComponent(gamePanel);
-        leftPane.setRightComponent(obamaPanel);
-        rightPane.setLeftComponent(infoPanel);
-        rightPane.setRightComponent(buttonPanel);        
-        
-        topLevelSplitPane.setLeftComponent(leftPane);
-        topLevelSplitPane.setRightComponent(rightPane);
+
     }
 
     private void setupKeyboardActions() {
@@ -189,10 +195,11 @@ public class SinglePlayerInterface extends JPanel {
                     infoPanel.update();
                     obamaPanel.update();
                     gamePanel.updateComponents();
+                    buttonPanel.update();
 
                     // soon there will be no need to screenUpdate
-                    screenUpdate();
-                    repaint();
+                    //screenUpdate();
+                    //repaint();
                 } catch (GameOverException e) {
 
                     // stop the game loop when game over
@@ -212,40 +219,6 @@ public class SinglePlayerInterface extends JPanel {
     }
 
     public void screenUpdate() {
-
-        try {
-            if (!simulator.getPumpFailed(1)) {
-                if (simulator.pumpIsActive(1)) {
-                    buttonPanel.setPumpButtonStatus(1, ButtonState.ON);
-                } else {
-                    buttonPanel.setPumpButtonStatus(1, ButtonState.OFF);
-                }
-            } else {
-                buttonPanel.setPumpButtonStatus(1, ButtonState.BROKEN);
-            }
-
-            if (!simulator.getPumpFailed(2)) {
-                if (simulator.pumpIsActive(2)) {
-                    buttonPanel.setPumpButtonStatus(2, ButtonState.ON);
-                } else {
-                    buttonPanel.setPumpButtonStatus(2, ButtonState.OFF);
-                }
-            } else {
-                buttonPanel.setPumpButtonStatus(2, ButtonState.BROKEN);
-            }
-            if (simulator.valveIsOpen(1)) {
-                buttonPanel.setValveButtonStatus(1, ButtonState.ON);
-            } else {
-                buttonPanel.setValveButtonStatus(1, ButtonState.OFF);
-            }
-            if (simulator.valveIsOpen(2)) {
-                buttonPanel.setValveButtonStatus(2, ButtonState.ON);
-            } else {
-                buttonPanel.setValveButtonStatus(2, ButtonState.OFF);
-            }
-        } catch (KeyNotFoundException e) {
-            e.printStackTrace();
-        }
 
         if (getFailed("Turbine") || (simulator.getSoftFailReport().getFailMode() != FailMode.WORKING)) {
             // if there is a software failure or the turbine has failed,

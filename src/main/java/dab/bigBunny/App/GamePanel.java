@@ -50,11 +50,11 @@ public class GamePanel extends JPanel {
         setLayout(null);
         
         
-        uiComponents.add(new UIComponent(simulator.getPumps().get(1), new Point(200, 100), "pump1.png", "pump2.gif"));
-        uiComponents.add(new UIComponent(simulator.getPumps().get(0), new Point(200, 200), "pump1.png", "pump2.gif"));
-        uiComponents.add(new UIComponent(simulator.getTurbine(),      new Point(200, 300), "pump1.png", "pump2.gif"));
-        uiComponents.add(new UIComponent(simulator.getCondenser(),    new Point(200, 400), "pump1.png", "pump2.gif"));
-        uiComponents.add(new UIComponent(simulator.getReactor(),      new Point(200, 500), "pump1.png", "pump2.gif"));
+        uiComponents.add(new UIComponent(this, simulator.getPumps().get(1), new Point(200, 100), "pump1.png", "pump2.gif"));
+        uiComponents.add(new UIComponent(this, simulator.getPumps().get(0), new Point(200, 200), "pump1.png", "pump2.gif"));
+        uiComponents.add(new UIComponent(this, simulator.getTurbine(),      new Point(200, 300), "pump1.png", "pump2.gif"));
+        uiComponents.add(new UIComponent(this, simulator.getCondenser(),    new Point(200, 400), "pump1.png", "pump2.gif"));
+        uiComponents.add(new UIComponent(this, simulator.getReactor(),      new Point(200, 500), "pump1.png", "pump2.gif"));
         
         for (UIComponent c : uiComponents) {
             add(c);

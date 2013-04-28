@@ -50,15 +50,17 @@ public abstract class FailableComponent implements FailableComponentView {
         return damage;
     }
     
-    public void fixDamage() throws CannotRepairException{
-        damage --;
-        if (damage <= 0 ){
-            maxDamage += 2;
-            damage = 0;
-            repair();
+    public void fixDamage() throws CannotRepairException {
+        if (hasFailed) {
+            damage--;
+            if (damage <= 0) {
+                maxDamage += 2;
+                damage = 0;
+                repair();
+            }
         }
     }
-    
+
     /**
      *  @return hasFailed boolean
      */

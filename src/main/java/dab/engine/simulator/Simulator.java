@@ -19,6 +19,7 @@ import dab.engine.simulator.views.FailableComponentView;
 import dab.engine.simulator.views.PumpView;
 import dab.engine.simulator.views.ReactorView;
 import dab.engine.simulator.views.TurbineView;
+import dab.engine.simulator.views.ValveView;
 import java.util.HashMap;
 
 
@@ -64,6 +65,10 @@ public class Simulator implements PlantController, PlantStatus, GameManager {
         for (Pump p : physicalModel.getPumps()) 
             pumps.add(p);
         return pumps;
+    }
+    
+    public ValveView getValve(int i) {
+        return physicalModel.getValve(i);
     }
     
     /**

@@ -111,7 +111,7 @@ public class Menu extends JPanel {
                         setVisible(false);
                         //initialize the UI
                         SinglePlayerInterface ic = SinglePlayerInterface.instance();
-                        ic.setup(simulator);
+                        //ic.setup(simulator);
                         getParent().add(ic);
                         getParent().setVisible(true);
                         popupMenu.setVisible(false);

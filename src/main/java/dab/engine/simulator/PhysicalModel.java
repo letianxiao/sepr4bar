@@ -111,7 +111,7 @@ public class PhysicalModel implements PlantController, PlantStatus {
         return allPumps;
     }
 
-    public Valve getValve(int valveNumber) throws KeyNotFoundException {
+    public Valve getValve(int valveNumber) {
         int actualIndex = valveNumber - 1; // internally valves are stored from 0
         return allConnections.get(actualIndex);
     }

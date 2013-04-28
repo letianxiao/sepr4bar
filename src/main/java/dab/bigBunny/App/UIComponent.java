@@ -22,9 +22,10 @@ public class UIComponent extends JComponent {
     protected FixButton fixButton;
     protected Image standardImage;
     protected Image damagedImage;
-    protected Point middlePoint;  // middle of the component
+    protected GamePanel parent;
       
-    public UIComponent(FailableComponentView component, Point location, String stdImgPath, String dmgImgPath) {
+    public UIComponent(GamePanel parent, FailableComponentView component, Point location, String stdImgPath, String dmgImgPath) {
+        this.parent = parent;
         this.component = component;
         this.standardImage = new ImageIcon(GamePanel.class.getResource(stdImgPath)).getImage();
         this.damagedImage  = new ImageIcon(GamePanel.class.getResource(dmgImgPath)).getImage();
@@ -34,19 +35,19 @@ public class UIComponent extends JComponent {
         int width =  standardImage.getWidth(null);
         int height = standardImage.getHeight(null);
         
-        setSize(width + 10, height + 10);   
+        setSize(width, height);   
         
-        this.fixButton = new FixButton(component);
+        fixButton = new FixButton(component);
         
-        
-        add(fixButton);
+        parent.add(fixButton);
         fixButton.setVisible(true);
-        fixButton.setLocation(0, 0);
+        fixButton.setLocation(location.x, location.y - 50);
         
     }
     
     public void update() {
         fixButton.update();
+        repaint();
     }
     
     @Override

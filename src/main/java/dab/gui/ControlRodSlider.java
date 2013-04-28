@@ -1,6 +1,8 @@
 package dab.gui;
 
 import dab.engine.simulator.UserCommands;
+import dab.engine.simulator.views.ReactorView;
+import dab.engine.utilities.Percentage;
 
 import java.awt.Graphics;
 import java.awt.Image;
@@ -21,29 +23,29 @@ import javax.swing.plaf.basic.BasicSliderUI;
  * 
  *
  */
-public class ControlRodSlider extends JSlider implements Observable{
-    protected ArrayList<Observer> observers;
+public class ControlRodSlider extends JSlider{
 
+    ReactorView reactor;
     /**
      * 
-     * @param simulator The simulator which contains the FuelPile to control
-     * @param control_rods The graphical ControlRods to update accordingly
+     * @param
+     * @param
      */
-    public ControlRodSlider() {
+    public ControlRodSlider(ReactorView r) {
         super(JSlider.VERTICAL, 0, 100, 0);
-        observers = new ArrayList<Observer>();
+        this.reactor = r;
         setBounds(10, 80, 100, 200);
         setOpaque(false);
         setMajorTickSpacing(25);
         setPaintTicks(true);
         setPaintLabels(true);
-        setUI(new mySliderUI(this));
+        setUI(new MySliderUI(this));
         addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
                 if (!getValueIsAdjusting()){
                     //notify observer only when the rods are released
-                    notifyObservers(getValue()/2);
+                    reactor.moveControlRods(new Percentage(getValue()/2));
                     // int y = control_rods.getHeight();
                     //  control_rods.setBounds(44,(int)( y-getValue()/1.5-87), 300, 300);
                 }
@@ -54,9 +56,9 @@ public class ControlRodSlider extends JSlider implements Observable{
      *
      * A private class used to overwrite the natural look of a basic slider
      */
-    private class mySliderUI extends BasicSliderUI {
+    private class MySliderUI extends BasicSliderUI {
         Image knobImage;
-        public mySliderUI( JSlider aSlider ) {
+        public MySliderUI( JSlider aSlider ) {
             super( aSlider );
             try {
                 this.knobImage = ImageIO.read( new File("resources/controlPanel/orangeSlider.png") );
@@ -75,16 +77,5 @@ public class ControlRodSlider extends JSlider implements Observable{
             g.drawImage( this.knobImage, thumbRect.x-10, thumbRect.y-1, 40, 16, null );
             repaint();
         }
-    }
-
-    protected void notifyObservers(int id){
-        for(Observer o : observers)
-            o.update(UserCommands.MOVE, id);
-    }
-
-
-    @Override
-    public void attachObserver(Observer observer) {
-        observers.add(observer);
     }
 }
