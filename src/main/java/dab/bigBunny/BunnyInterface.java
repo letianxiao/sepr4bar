@@ -30,7 +30,7 @@ public class BunnyInterface extends JFrame implements KeyListener {
         //for now temproray panelSize. The one in haddocks game needs fixing as well
         
           try {
-            background = ImageIO.read(GamePanel.class.getResourceAsStream("gamepanel_bkg.png"));
+            background = ImageIO.read(GamePanel.class.getResourceAsStream("gamepanel_bkg2.png"));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -156,7 +156,7 @@ class ShowCanvas extends JPanel implements MouseListener {
         this.setLayout(null);
         
            try {
-            background = ImageIO.read(GamePanel.class.getResourceAsStream("gamepanel_bkg.png"));
+            background = ImageIO.read(GamePanel.class.getResourceAsStream("gamepanel_bkg2.png"));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -172,19 +172,19 @@ class ShowCanvas extends JPanel implements MouseListener {
         boxToHit = new ImageIcon("resources/HitableBox.png");
         box.setIcon(boxToHit);
         
-        box.setBounds(hitBoundsController.getHittableComponents().get(2).getDimensions(10));
-        this.add(box);
+        box.setBounds(hitBoundsController.getHittableComponents().get(2).getDimensions());
+       // this.add(box);
         box.setVisible(true);
         //controller.setHitBounds(box.getBounds());
            
         pump = new JLabel();
         pump.setIcon(new ImageIcon("resources/mainInterface/MOVINGPUMP_MAIN_SCALED.gif"));  
-        pump.setBounds(hitBoundsController.getHittableComponents().get(1).getDimensions(10));
-        this.add(pump);
-        Rectangle r = new Rectangle(hitBoundsController.getHittableComponents().get(1).getDimensions(10));
+        pump.setBounds(hitBoundsController.getHittableComponents().get(1).getDimensions());
+      //  this.add(pump);
+        Rectangle r = new Rectangle(hitBoundsController.getHittableComponents().get(1).getDimensions());
         pumpCircle = new Ellipse2D.Double(r.x, r.y, r.width, r.height);
        
-        r = new Rectangle(hitBoundsController.getHittableComponents().get(0).getDimensions(10));
+        r = new Rectangle(hitBoundsController.getHittableComponents().get(0).getDimensions());
         hitableCircle = new Ellipse2D.Double(r.x, r.y, r.width, r.height);          
 
         //to call this on the reactorPannel, not on this thing
@@ -237,9 +237,9 @@ class ShowCanvas extends JPanel implements MouseListener {
          g.drawImage(background, 0, 0, null);
         
         g2D.setColor(Color.GREEN);
-        g2D.fill(hitableCircle);
+      // g2D.fill(hitableCircle);
         
-        g2D.draw(pumpCircle);
+       // g2D.draw(pumpCircle);
         
 
         bar.setValue(bunnyController.getHealth());

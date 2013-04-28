@@ -29,5 +29,9 @@ public abstract class HittableComponent {
         return component;
     }
     
-    protected abstract Rectangle getDimensions(int radius);
+    protected Rectangle getDimensions(){
+        return new Rectangle(x,y,width,height);
+    }
+    
+    protected abstract Rectangle getHittableBounds(int radius);
 }
