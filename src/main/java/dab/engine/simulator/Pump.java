@@ -6,6 +6,7 @@ import static dab.engine.utilities.Units.kilograms;
 import static dab.engine.utilities.Units.percent;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import dab.engine.simulator.views.PumpView;
 
 /**
  * 
@@ -13,7 +14,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  *
  * @author Marius
  */
-public class Pump extends FailableComponent {
+public class Pump extends FailableComponent implements PumpView {
 
     @JsonProperty
     private Port inputPort;

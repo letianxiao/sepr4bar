@@ -101,14 +101,6 @@ public class FailureModel implements PlantController, PlantStatus {
         return status.listFailedComponents();
     }
 
-    /**
-     * @return String[] list of repairing components
-     */
-    @Override
-    public String[] listRepairingComponents() {
-        return status.listRepairingComponents();
-    }
-
     @Override
     public void moveControlRods(Percentage extracted) {
         if (softFailCheck(UserCommands.MOVE, extracted.points())) {

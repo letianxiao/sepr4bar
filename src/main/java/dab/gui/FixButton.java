@@ -65,7 +65,7 @@ public abstract class FixButton extends JButton implements ObservableFix {
      * and updates accordingly
      */
     protected void pressed() throws CannotRepairException{
-    	component.fixingDamage();
+    	component.fixDamage();
     	if (!component.hasFailed()){
     		setVisible(false);
     	}	

@@ -37,7 +37,7 @@ public class ReactorPanel extends JPanel {
          systemImage.setAutoscrolls(true);
          systemImage.setIcon(new ImageIcon("resources/mainInterface/BACKGROUNDCOMPONENTS.png"));
          
-         turbineFixButton = new TurbineFixButton(360, 137, simulator.getTurbine());
+         /*turbineFixButton = new TurbineFixButton(360, 137, simulator.getTurbine());
          turbineFixButton.attachFixObserver(InterfaceController.instance());
          systemImage.add(turbineFixButton);
          condenserFixButton = new CondenserFixButton(450, 274, simulator.getCondenser());
@@ -48,7 +48,7 @@ public class ReactorPanel extends JPanel {
          systemImage.add(pump1FixButton);
          pump2FixButton = new PumpFixButton(660, 485, simulator.getPump(2));
          pump2FixButton.attachFixObserver(InterfaceController.instance());
-         systemImage.add(pump2FixButton);
+         systemImage.add(pump2FixButton);*/
          
          controlRods = DynamicImageFactory.instance().createButton("ControlRods", 44, 250, 300, 300, "resources/mainInterface/RODS_SCALED.png");
          systemImage.add(controlRods);

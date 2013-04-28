@@ -24,10 +24,13 @@ import javax.swing.border.Border;
  */
 public class InfoPanel extends JPanel {
 
+    Simulator simulator;
     JLabel screenText;
     Image background;
 
-    public InfoPanel() {
+    public InfoPanel(Simulator simulator) {
+        this.simulator = simulator;
+        
         setLayout(new BorderLayout());
         screenText = new JLabel();
         screenText.setFont(new Font("Bookman Old Style", Font.BOLD, 14));
@@ -47,12 +50,9 @@ public class InfoPanel extends JPanel {
         add(screenText);
     }
 
-    public void setText(String str) {
-        screenText.setText(str);
-    }
-
-    public void updateText(Simulator simulator) {
-        setText("<html>Control Rod Position " + (Integer.parseInt((simulator.controlRodPosition().toString())) * 2) + "<br>" + //this lines throws a NullPointerException at the moment
+    public void update() {
+        screenText.setText(
+                "<html>Control Rod Position " + (Integer.parseInt((simulator.controlRodPosition().toString())) * 2) + "<br>" + //this lines throws a NullPointerException at the moment
                 "<br>" + "Reactor Water Level " + simulator.reactorWaterLevel() + "<br>" + "Reactor Temperature " + simulator.reactorTemperature()
                 + "<br>" + "Reactor Pressure " + simulator.reactorPressure() + "<br>" + "<br>" + "Condenser Water Level " + simulator.condenserWaterLevel()
                 + "<br>" + "Condenser Temperature " + simulator.condenserTemperature() + "<br>" + "Condenser Pressure " + simulator.condenserPressure()

@@ -1,5 +1,6 @@
 package dab.gui;
 
+import dab.engine.simulator.Simulator;
 import java.awt.Graphics;
 import java.awt.Image;
 
@@ -22,20 +23,22 @@ public class ButtonPanel extends JPanel {
 	private JLabel valve1_label;
 	private JLabel valve2_label;
 	private JLabel rods_label;
+    private Simulator simulator;
 	
 	/**
 	 * Initialises the ButtonPanel to a standard layout.
 	 */
-	public ButtonPanel(){
+	public ButtonPanel(Simulator sim){
 		setLayout(null);
-		
+        simulator = sim;
+		/*
 		pump2_label = new JLabel("Coolant Pump");
 		pump2_label.setBounds(265, 40, 100, 30);
 		add(pump2_label);
 		btnPump2 = ButtonFactory.instance().createButton("Pump", 2);
 		btnPump2.setBounds(255, 61, 101, 71);
         add(btnPump2);
-        btnPump2.attachObserver(InterfaceController.instance());
+        btnPump2.attachObserver(SinglePlayerInterface.instance());
         
         pump1_label = new JLabel("Water Pump");
         pump1_label.setBounds(117, 40, 100, 30);
@@ -43,7 +46,7 @@ public class ButtonPanel extends JPanel {
 		btnPump1 = ButtonFactory.instance().createButton("Pump", 1);
 		btnPump1.setBounds(111, 61, 101, 71);
         add(btnPump1);
-        btnPump1.attachObserver(InterfaceController.instance());
+        btnPump1.attachObserver(SinglePlayerInterface.instance());
 		
         valve2_label = new JLabel("Condenser Valve");
         valve2_label.setBounds(261, 193, 100, 30);
@@ -51,7 +54,7 @@ public class ButtonPanel extends JPanel {
 		btnValve2 = ButtonFactory.instance().createButton("Valve", 2);
 		btnValve2.setBounds(255, 214, 101, 71);
         add(btnValve2);
-        btnValve2.attachObserver(InterfaceController.instance());
+        btnValve2.attachObserver(SinglePlayerInterface.instance());
 		
         valve1_label = new JLabel("Reactor Valve");
         valve1_label.setBounds(121, 193, 100, 30);
@@ -59,15 +62,15 @@ public class ButtonPanel extends JPanel {
 		btnValve1 = ButtonFactory.instance().createButton("Valve", 1);
 		btnValve1.setBounds(111, 214, 101, 71);
         add(btnValve1);
-        btnValve1.attachObserver(InterfaceController.instance());
+        btnValve1.attachObserver(SinglePlayerInterface.instance());
         
         rods_label = new JLabel("Control Rods");
         rods_label.setBounds(25, 40, 100, 30);
         add(rods_label);
         controlRodSlider = new ControlRodSlider();
         add(controlRodSlider);
-        controlRodSlider.attachObserver(InterfaceController.instance());
-        
+        controlRodSlider.attachObserver(SinglePlayerInterface.instance());
+        */
 		
 	}
 	

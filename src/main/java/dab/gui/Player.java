@@ -54,7 +54,7 @@ public class Player extends JPanel {
                         simulator.setUsername(enter_name.getText());
                         setVisible(false);
                         music.interrupt();
-                        InterfaceController ic = InterfaceController.instance();
+                        SinglePlayerInterface ic = SinglePlayerInterface.instance();
                         ic.setup(simulator);
                         getParent().add(ic);
                         getParent().setVisible(true);
@@ -87,9 +87,9 @@ public class Player extends JPanel {
                     music.interrupt();
                     simulator.setUsername(enter_name.getText());
                     setVisible(false);
-                    InterfaceController.rewrite();
-                    InterfaceController.instance().setup(simulator);
-                    getParent().add(InterfaceController.instance());
+                    SinglePlayerInterface.rewrite();
+                    SinglePlayerInterface.instance().setup(simulator);
+                    getParent().add(SinglePlayerInterface.instance());
                     getParent().setVisible(true);
                 }
             }

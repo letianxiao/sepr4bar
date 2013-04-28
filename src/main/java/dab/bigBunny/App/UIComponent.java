@@ -5,11 +5,12 @@
 package dab.bigBunny.App;
 
 import dab.engine.simulator.FailableComponent;
-import dab.gui.FixButton;
+import dab.engine.simulator.views.FailableComponentView;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Point;
+import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 
 /**
@@ -17,31 +18,44 @@ import javax.swing.JComponent;
  * @author eduard
  */
 public class UIComponent extends JComponent {
-    protected FailableComponent component;
+    protected FailableComponentView component;
+    protected FixButton fixButton;
     protected Image standardImage;
     protected Image damagedImage;
-    int counter = 0;
-    
-    
-    public UIComponent(FailableComponent component, Point position, Image standardImage, Image damagedImage) {
+    protected Point middlePoint;  // middle of the component
+      
+    public UIComponent(FailableComponentView component, Point location, String stdImgPath, String dmgImgPath) {
         this.component = component;
-        setSize(new Dimension(standardImage.getWidth(null), standardImage.getHeight(null)));
-        this.standardImage = standardImage;
-        this.damagedImage  = damagedImage;
-        this.setBounds(position.x, position.y, standardImage.getWidth(null), standardImage.getHeight(null));
+        this.standardImage = new ImageIcon(GamePanel.class.getResource(stdImgPath)).getImage();
+        this.damagedImage  = new ImageIcon(GamePanel.class.getResource(dmgImgPath)).getImage();
+        setLayout(null);
+        setLocation(location);
         
+        int width =  standardImage.getWidth(null);
+        int height = standardImage.getHeight(null);
+        
+        setSize(width + 10, height + 10);   
+        
+        this.fixButton = new FixButton(component);
+        
+        
+        add(fixButton);
+        fixButton.setVisible(true);
+        fixButton.setLocation(0, 0);
+        
+    }
+    
+    public void update() {
+        fixButton.update();
     }
     
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        if (counter < 10) {
+        if (component.hasFailed()) {
             g.drawImage(damagedImage, 0, 0, this);
         } else {
             g.drawImage(standardImage, 0, 0, this);
-            if (counter > 20) counter = 0;
         }
-        System.out.println(counter);
-        counter++;
     }
 }

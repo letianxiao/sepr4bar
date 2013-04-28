@@ -9,7 +9,7 @@ import dab.bigBunny.Environment;
 import dab.bigBunny.HitBoundsController;
 import dab.bigBunny.TwoPlayerScreen;
 import dab.engine.simulator.Simulator;
-import dab.gui.InterfaceController;
+import dab.gui.SinglePlayerInterface;
 import java.awt.Component;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -24,21 +24,6 @@ public class MainWindow extends JFrame {
 
     private HitBoundsController hitboundsController;
     
-    static {
-        //Registers relevant items to repective factories
-        //See their static{} blocks.
-        // aka java voodoo need to call the exorcist
-        try {
-            Class.forName("dab.gui.PumpButton");
-            Class.forName("dab.gui.ValveButton");
-
-            Class.forName("dab.gui.Component");
-            Class.forName("dab.gui.ControlRods");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
-
     public static void main(String[] args) {
         java.awt.EventQueue.invokeLater(new Runnable() {
 
@@ -48,7 +33,7 @@ public class MainWindow extends JFrame {
                 mw.setExtendedState(MainWindow.MAXIMIZED_BOTH);
                 mw.setVisible(true);
 
-                mw.startSinglePlayer();
+                mw.showIntro();
 
             }
         });
@@ -82,9 +67,12 @@ public class MainWindow extends JFrame {
     }
     
     public void startSinglePlayer(Simulator sim) {
-        InterfaceController ic = InterfaceController.instance();
-        ic.setup(sim);
-        changeToPanel(ic);
+        changeToPanel(new SinglePlayerInterface(this, sim));
+    }
+    
+    public void close() {
+        setVisible(false);
+        dispose();
     }
 
     public void startTwoPlayer() {

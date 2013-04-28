@@ -4,6 +4,7 @@
  */
 package dab.bigBunny.App;
 
+import dab.gui.SinglePlayerInterface;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -16,7 +17,10 @@ import java.awt.image.BufferedImage;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import javax.imageio.ImageIO;
+import javax.swing.AbstractAction;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.KeyStroke;
 import javax.swing.Timer;
 
 /**
@@ -24,10 +28,10 @@ import javax.swing.Timer;
  * @author eduard
  * note: beats me why Da, but it's better than just naming the class Intro
  */
-public class DaIntro extends JPanel implements ActionListener, KeyListener {
+public class DaIntro extends JPanel {
     private static int FPS = 30;
     private Timer animator;   
-    private MainWindow mw;
+    private MainWindow mainWindow;
     private BufferedImage background;
     // each element stores the 3 coordinates of a pixel
     // [][0] = x axis - from left to right
@@ -36,9 +40,8 @@ public class DaIntro extends JPanel implements ActionListener, KeyListener {
     private StoryReader story;
     private double aspectRatio;    
     
-    public DaIntro(MainWindow x) {
-        this.mw = x;
-        animator = new Timer(1000/FPS, this);
+    public DaIntro(MainWindow mainWindow) {
+        this.mainWindow = mainWindow;
         setFocusable(true);
 
         
@@ -56,11 +59,38 @@ public class DaIntro extends JPanel implements ActionListener, KeyListener {
             throw new RuntimeException(e);
         }
         
+                
+        setupSpaceKeyListener();
+        setupTimer();
         
         animator.setInitialDelay(300);
-        animator.start();
-        addKeyListener(this);
-        
+        animator.start();  
+
+    }
+ 
+    private void setupSpaceKeyListener() {
+
+        // register a space press listener
+        AbstractAction stopper = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                stop();
+            }
+        };        
+        getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0), "stop");
+        getActionMap().put("stop", stopper);
+    }
+
+    private void setupTimer() {
+        ActionListener updater = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                // update 3d story position
+                story.move(0, -1, 1);
+                repaint();
+            }
+        };
+        animator = new Timer(1000 / FPS, updater);
     }
     
     private BufferedImage makeBackground(BufferedImage rawImg) {
@@ -79,28 +109,8 @@ public class DaIntro extends JPanel implements ActionListener, KeyListener {
     
     private void stop() {
         animator.stop();
-        removeKeyListener(this);
-        mw.showMenu();
-    }
-    
-    @Override
-    public void keyPressed(KeyEvent ke) {
-        if (ke.getKeyCode() == KeyEvent.VK_SPACE) {
-            stop();
-        }
-    }
-    
-    @Override
-    public void keyReleased(KeyEvent ke) {}
-    
-    @Override
-    public void keyTyped(KeyEvent ke) {}
-    
-    @Override
-    public void actionPerformed(ActionEvent ae) {
-        // update 3d story position
-        story.move(0, -1, 1);
-        repaint();
+        getActionMap().put("stop", null);
+        mainWindow.showMenu();
     }
                         
     @Override

@@ -6,12 +6,13 @@ import dab.engine.utilities.*;
 import dab.engine.seprphase2.GameOverException;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import dab.engine.simulator.views.ReactorView;
 
 /**
  * Class containing the physical model logic for the Reactor component
  * @author Marius
  */
-public class Reactor extends FailableComponent {
+public class Reactor extends FailableComponent implements ReactorView {
 
     private final Mass maximumWaterMass = kilograms(1000);
     private final Mass minimumWaterMass = kilograms(800);

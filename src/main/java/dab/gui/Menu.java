@@ -110,7 +110,7 @@ public class Menu extends JPanel {
                         simulator.loadGame(sampleJList.getSelectedIndex());
                         setVisible(false);
                         //initialize the UI
-                        InterfaceController ic = InterfaceController.instance();
+                        SinglePlayerInterface ic = SinglePlayerInterface.instance();
                         ic.setup(simulator);
                         getParent().add(ic);
                         getParent().setVisible(true);

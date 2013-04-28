@@ -14,6 +14,12 @@ import java.util.ArrayList;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import dab.engine.simulator.views.CondenserView;
+import dab.engine.simulator.views.FailableComponentView;
+import dab.engine.simulator.views.PumpView;
+import dab.engine.simulator.views.ReactorView;
+import dab.engine.simulator.views.TurbineView;
+import java.util.HashMap;
 
 
 /**
@@ -37,17 +43,27 @@ public class Simulator implements PlantController, PlantStatus, GameManager {
         userName = "";
     }
     
-
-    public FailableComponent getCondenser(){
-        return physicalModel.getCondenser();
-    }
-    
-    public FailableComponent getTurbine(){
+    public TurbineView getTurbine(){
         return physicalModel.getTurbine();
     }
     
-    public FailableComponent getPump(int i){
+    public PumpView getPump(int i) {
         return physicalModel.getPump(i);
+    }
+    
+    public ReactorView getReactor() {
+        return physicalModel.getReactor();
+    }
+    
+    public CondenserView getCondenser() {
+        return physicalModel.getCondenser();
+    }
+    
+    public ArrayList<PumpView> getPumps() {
+        ArrayList<PumpView> pumps = new ArrayList<>();
+        for (Pump p : physicalModel.getPumps()) 
+            pumps.add(p);
+        return pumps;
     }
     
     /**
@@ -115,15 +131,6 @@ public class Simulator implements PlantController, PlantStatus, GameManager {
     @Override
     public String[] listFailedComponents() {
         return failureModel.listFailedComponents();
-    }
-
-    /**
-     *
-     * @return String[] repairing components
-     */
-    @Override
-    public String[] listRepairingComponents(){
-        return failureModel.listRepairingComponents();
     }
 
     /**

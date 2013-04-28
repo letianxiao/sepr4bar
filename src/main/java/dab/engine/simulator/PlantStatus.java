@@ -35,8 +35,6 @@ public interface PlantStatus {
     public Percentage reactorMinimumWaterLevel();
 
     public String[] listFailedComponents();
-    
-    public String[] listRepairingComponents();
 
     public boolean turbineHasFailed();
 

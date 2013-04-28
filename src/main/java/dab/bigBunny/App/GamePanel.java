@@ -14,6 +14,7 @@ import java.awt.Image;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.ArrayList;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -23,12 +24,14 @@ import javax.swing.JPanel;
  *
  * @author eduard
  */
-public abstract class GamePanel extends JPanel {
+public class GamePanel extends JPanel {
     protected Simulator simulator;
     protected BufferedImage background;
+    protected ArrayList<UIComponent> uiComponents;
     
     public GamePanel(Simulator simulator) {
         this.simulator = simulator;
+        uiComponents = new ArrayList<>();
         
         // load background and set the size of the pannel according to it
         try {
@@ -46,17 +49,29 @@ public abstract class GamePanel extends JPanel {
         
         setLayout(null);
         
-        add(new UIComponent(simulator.components().get(0), new Point(50, 60), new ImageIcon(GamePanel.class.getResource("pump1.png")).getImage(), new ImageIcon(GamePanel.class.getResource("pump2.gif")).getImage()));
+        
+        uiComponents.add(new UIComponent(simulator.getPumps().get(1), new Point(200, 100), "pump1.png", "pump2.gif"));
+        uiComponents.add(new UIComponent(simulator.getPumps().get(0), new Point(200, 200), "pump1.png", "pump2.gif"));
+        uiComponents.add(new UIComponent(simulator.getTurbine(),      new Point(200, 300), "pump1.png", "pump2.gif"));
+        uiComponents.add(new UIComponent(simulator.getCondenser(),    new Point(200, 400), "pump1.png", "pump2.gif"));
+        uiComponents.add(new UIComponent(simulator.getReactor(),      new Point(200, 500), "pump1.png", "pump2.gif"));
+        
+        for (UIComponent c : uiComponents) {
+            add(c);
+            c.setVisible(true);
+        }
     }
     
-    public void screenUpdate() {
-        
+    public void updateComponents() {
+        for (UIComponent c : uiComponents) {
+            c.update();
+        }
     }
     
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        paintComponents(g);
+        //paintComponents(g);
         g.drawImage(background, 0, 0, null);
     }
 }

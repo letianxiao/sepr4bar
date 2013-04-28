@@ -12,6 +12,7 @@ import dab.engine.utilities.Temperature;
 import dab.engine.utilities.Volume;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import dab.engine.simulator.views.CondenserView;
 
 /**
  * 
@@ -19,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * 
  * @author Marius
  */
-public class Condenser extends FailableComponent {
+public class Condenser extends FailableComponent implements CondenserView {
 
     @JsonProperty
     private Mass steamMass;

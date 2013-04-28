@@ -6,13 +6,14 @@ import dab.engine.utilities.Percentage;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import dab.engine.simulator.views.TurbineView;
 
 /**
  * 	Class that contains the physical model of the Turbine component.
  *
  * @author Marius
  */
-public class Turbine extends FailableComponent {
+public class Turbine extends FailableComponent implements TurbineView {
 
     @JsonProperty
     private double outputPower;

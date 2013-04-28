@@ -3,6 +3,7 @@ package dab.engine.simulator;
 import dab.engine.utilities.Percentage;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import dab.engine.simulator.views.FailableComponentView;
 
 /**
  * Base Class for all components which can fail.
@@ -19,15 +20,19 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * 
  * @author Marius Dumetrescu
  */
-public abstract class FailableComponent {
+public abstract class FailableComponent implements FailableComponentView {
 
     @JsonProperty
     private boolean hasFailed;      //The state of the component
     @JsonProperty
     private Percentage wear;                //Current wear level - capped at 100%
 
+    @JsonProperty
     private int damage;
+    
+    @JsonProperty
     private int maxDamage;
+    
     private final int INITIAL_DAMAGE = 5;
     
     /**
@@ -45,7 +50,7 @@ public abstract class FailableComponent {
         return damage;
     }
     
-    public void fixingDamage() throws CannotRepairException{
+    public void fixDamage() throws CannotRepairException{
         damage --;
         if (damage <= 0 ){
             maxDamage += 2;

@@ -19,11 +19,14 @@ import javax.swing.SwingConstants;
  */
 public class ObamaPanel extends JPanel {
 
+    Simulator simulator;
     JLabel lblObama;
     JLabel lblSpeech;
     JLabel lblWords;
 
-    public ObamaPanel() {
+    public ObamaPanel(Simulator simulator) {
+        this.simulator = simulator;
+        
         setBackground(Color.WHITE);
         setLayout(null);
         lblObama = new JLabel();
@@ -55,22 +58,15 @@ public class ObamaPanel extends JPanel {
         add(lblSpeech);
     }
 
-    /**
-     *
-     * @param str String of text to appear in the speech bubble.
-     */
-    public void setText(String str) {
-        lblWords.setText(str);
-    }
-
-    public void updateText(Simulator simulator) {
+    // update the panel with warnings and stuff
+    public void update() {
         String temp = "<html>";
         
         if (simulator.reactorTemperature().inCelsius() > 150) {
             temp += "WARNING, " + simulator.getUsername() + ": REACTOR TEMPERATURE TOO HIGH" + "<br>";
         }
 
-        if (simulator.condenserPressure().greaterThan(InterfaceController.CONDENSER_WARNING_PRESSURE)) {
+        if (simulator.condenserPressure().greaterThan(SinglePlayerInterface.CONDENSER_WARNING_PRESSURE)) {
             temp += "WARNING, " + simulator.getUsername() + ": CONDENSER PRESSURE TOO HIGH" + "<br>";
         }
 
@@ -91,6 +87,6 @@ public class ObamaPanel extends JPanel {
         }
         temp += "</html>";
         
-        setText(temp);
+        lblWords.setText(temp);
     }
 }
