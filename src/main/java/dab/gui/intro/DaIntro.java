@@ -97,6 +97,7 @@ public class DaIntro extends JPanel {
     private BufferedImage makeBackground(BufferedImage rawImg) {
         BufferedImage temp = new BufferedImage(rawImg.getWidth(), rawImg.getHeight(), Image.SCALE_DEFAULT);
         Graphics gBackgnd = temp.getGraphics();
+        //gBackgnd.setColor(Color.red);
         gBackgnd.drawImage(rawImg, 0, 0, null); // raw image does not have scaling (I think TODO: investigate)
         gBackgnd.setFont(new Font("Arial", Font.PLAIN, 25));
         gBackgnd.setColor(Color.PINK);
